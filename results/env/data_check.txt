@@ -1,0 +1,10 @@
+# Đối chiếu dữ liệu 2026-11-24T11:39:30+07:00, scale=5
+# branches|tellers|accounts|sum(aid)|sum(accounts.bid)|sum(tellers.bid)
+postgresql: 5|50|500000|125000250000|1500000|150
+mysql:      5|50|500000|125000250000|1500000|150
+# Bất biến ban đầu (a_sum|t_sum|b_sum|h_sum|h_count), phải toàn 0
+postgresql: 0|0|0|0|0
+mysql:      0|0|0|0|0
+# Kích thước
+postgresql: 82 MB
+mysql:      61 MB
