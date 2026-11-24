@@ -21,7 +21,7 @@ function event()
   local aid   = sysbench.rand.uniform(1, 100000 * scale)
   local bid   = sysbench.rand.uniform(1, scale)
   local tid   = sysbench.rand.uniform(1, 10 * scale)
-  local delta = sysbench.rand.uniform(-5000, 5000)
+  local delta = sysbench.rand.uniform(0, 10000) - 5000
 
   con:query("BEGIN")
   con:query(string.format("UPDATE pgbench_accounts SET abalance = abalance + %d WHERE aid = %d", delta, aid))
