@@ -26,13 +26,19 @@ log "3/5 Tạo lược đồ trong MySQL"
 my_file "$ROOT/data/mysql_schema.sql"
 
 log "4/5 Nạp CSV vào MySQL (accounts mất vài phút)"
-my_sql "LOAD DATA INFILE '/var/lib/mysql-files/import/pgbench_branches.csv' INTO TABLE pgbench_branches
+# Chép CSV vào thư mục secure_file_priv bên trong container (không mount thư mục data/ vào
+# container, vì entrypoint của MySQL sẽ chown thư mục đó và dừng nếu nó chỉ đọc)
+for t in branches tellers accounts; do
+  dc cp "$ROOT/data/pgbench_$t.csv" "mysql:/var/lib/mysql-files/pgbench_$t.csv"
+done
+my_sql "LOAD DATA INFILE '/var/lib/mysql-files/pgbench_branches.csv' INTO TABLE pgbench_branches
         FIELDS TERMINATED BY ',' (bid, bbalance);"
-my_sql "LOAD DATA INFILE '/var/lib/mysql-files/import/pgbench_tellers.csv' INTO TABLE pgbench_tellers
+my_sql "LOAD DATA INFILE '/var/lib/mysql-files/pgbench_tellers.csv' INTO TABLE pgbench_tellers
         FIELDS TERMINATED BY ',' (tid, bid, tbalance);"
-my_sql "LOAD DATA INFILE '/var/lib/mysql-files/import/pgbench_accounts.csv' INTO TABLE pgbench_accounts
+my_sql "LOAD DATA INFILE '/var/lib/mysql-files/pgbench_accounts.csv' INTO TABLE pgbench_accounts
         FIELDS TERMINATED BY ',' (aid, bid, abalance) SET filler = '';"
 my_sql "ANALYZE TABLE pgbench_branches, pgbench_tellers, pgbench_accounts, pgbench_history;" >/dev/null
+dc exec -T mysql sh -c 'rm -f /var/lib/mysql-files/pgbench_*.csv'
 
 log "5/5 Đối chiếu hai hệ và kiểm tra bất biến ban đầu"
 Q="SELECT (SELECT COUNT(*) FROM pgbench_branches), (SELECT COUNT(*) FROM pgbench_tellers),

@@ -28,7 +28,6 @@ services:
     volumes:
       - mydata:/var/lib/mysql
       - ./mysql/bench.cnf:/etc/mysql/conf.d/bench.cnf:ro
-      - ../data:/var/lib/mysql-files/import:ro   # chứa file CSV để LOAD DATA
     ports: ["3306:3306"]
     cpus: 4
     mem_limit: 6g

@@ -120,8 +120,8 @@ def fig_B(s, samples, wd):
         top = agg.groupby("loai")["MB"].sum().nlargest(6).index
         agg["loai"] = agg["loai"].where(agg["loai"].isin(top), "khác")
         pv = agg.pivot_table(index="value", columns="loai", values="MB", aggfunc="sum").fillna(0)
-        fpi = agg.groupby("value")["fpi_bytes"].sum() / agg.groupby("value").apply(
-            lambda g: (g["record_bytes"] + g["fpi_bytes"]).sum())
+        tot = agg.groupby("value")[["record_bytes", "fpi_bytes"]].sum()
+        fpi = tot["fpi_bytes"] / (tot["record_bytes"] + tot["fpi_bytes"])
         ax = pv.plot.bar(stacked=True, figsize=(8, 4.5), rot=0)
         for i, v in enumerate(pv.index):
             ax.text(i, pv.loc[v].sum(), f"FPI {100 * fpi[v]:.0f}%", ha="center", va="bottom", fontsize=9)

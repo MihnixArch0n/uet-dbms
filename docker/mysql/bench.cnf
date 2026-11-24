@@ -5,6 +5,8 @@ max_connections = 200
 
 # Bộ nhớ (bằng shared_buffers bên PostgreSQL)
 innodb_buffer_pool_size = 2G
+innodb_buffer_pool_instances = 8
+innodb_buffer_pool_chunk_size = 128M
 
 # Redo log và độ bền
 innodb_flush_log_at_trx_commit = 1

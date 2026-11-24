@@ -1,8 +1,8 @@
 # Hướng dẫn demo khi thuyết trình: Durability & Crash Recovery (PostgreSQL vs MySQL InnoDB)
 
-Dùng kèm `Huong_dan_BTL_Durability.md` và bộ mã `btl-durability` (Python quản lý bằng uv: chạy `uv sync` một lần trước khi demo). Ký hiệu nơi chạy lệnh giống tài liệu chính:
-**[Ubuntu]** = terminal Ubuntu trên máy đo hoặc laptop thuyết trình, đứng trong `~/btl-durability`;
-`dc` = bí danh `docker compose -f ~/btl-durability/docker/docker-compose.yml` (mục 4.3.4).
+Dùng kèm `Huong_dan_BTL_Durability.md` và bộ mã trong repo `uet-dbms` (Python quản lý bằng uv: chạy `uv sync` một lần trước khi demo). Ký hiệu nơi chạy lệnh giống tài liệu chính:
+**[Ubuntu]** = terminal Ubuntu trên máy đo hoặc laptop thuyết trình, đứng trong `~/uet-dbms`;
+`dc` = bí danh `docker compose -f ~/uet-dbms/docker/docker-compose.yml` (mục 4.3.4).
 
 ## 1. Tổng quan
 
@@ -74,7 +74,7 @@ Tổng khoảng 1,5–2 phút sau khi cắt (bỏ đoạn chờ bơm tải và c
 
 ### 4.2. Lệnh quay
 
-**Chạy ở:** [Ubuntu] trên máy đo, terminal thường (không dùng tmux cho dễ quay), đã chạy `uv sync` trong `~/btl-durability` (script tự dùng `.venv/bin/python` của uv, không cần kích hoạt môi trường). Máy ảo `dbvm` đang bật (mục 4.3.5 tài liệu chính).
+**Chạy ở:** [Ubuntu] trên máy đo, terminal thường (không dùng tmux cho dễ quay), đã chạy `uv sync` trong `~/uet-dbms` (script tự dùng `.venv/bin/python` của uv, không cần kích hoạt môi trường). Máy ảo `dbvm` đang bật (mục 4.3.5 tài liệu chính).
 
 Chuẩn bị màn hình: phóng to chữ terminal (Ctrl + dấu cộng, cỡ 16–18), xóa màn hình (`clear`). Chia đôi màn hình: trái là terminal chạy lệnh, phải là terminal xem log (`dc logs -f mysql` cho cảnh 1).
 
@@ -86,7 +86,7 @@ MIN_LOAD=20 MAX_LOAD=20 bash scripts/run_expC.sh mysql process 2 demo1
 # Cảnh 2 và 3: crash hệ điều hành (DBMS trong máy ảo). Khai báo máy ảo trong CÙNG terminal:
 export REMOTE="ssh bench@<VM_IP>"
 export DB_HOST=<VM_IP>
-export COMPOSE=/home/bench/btl-durability/docker/docker-compose.yml
+export COMPOSE=/home/bench/uet-dbms/docker/docker-compose.yml
 export VM_CRASH_CMD="VBoxManage controlvm dbvm poweroff"
 export VM_START_CMD="VBoxManage startvm dbvm --type headless"
 MIN_LOAD=20 MAX_LOAD=20 bash scripts/run_expC.sh mysql os 2 demo2      # cảnh 2

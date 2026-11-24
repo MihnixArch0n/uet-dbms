@@ -5,7 +5,7 @@
 #          bash scripts/run_expC.sh mysql process 2 1
 # Mức os (DBMS chạy trong máy ảo) cần đặt thêm:
 #   REMOTE="ssh bench@192.168.56.10"  DB_HOST=192.168.56.10
-#   COMPOSE=/home/bench/btl-durability/docker/docker-compose.yml   (đường dẫn TRONG máy ảo)
+#   COMPOSE=/home/bench/uet-dbms/docker/docker-compose.yml   (đường dẫn TRONG máy ảo)
 #   VM_CRASH_CMD="VBoxManage controlvm dbvm poweroff"
 #   VM_START_CMD="VBoxManage startvm dbvm --type headless"
 # Tùy chỉnh: THREADS=8 MIN_LOAD=60 MAX_LOAD=120
