@@ -114,8 +114,16 @@ run_sysbench() {
   else
     conn="--db-driver=mysql --mysql-host=$DB_HOST --mysql-port=3306 --mysql-user=root --mysql-password=bench --mysql-db=bank"
   fi
+  # Sysbench 1.0.20 không hỗ trợ --warmup-time, nên chạy warmup riêng.
   # shellcheck disable=SC2086
-  sysbench "$ROOT/workload/tpcb.lua" $conn --scale="$(db_scale "$db")" --threads="$threads" --time="$time" --warmup-time="$warmup" \
+  if [ "$warmup" -gt 0 ]; then
+    sysbench "$ROOT/workload/tpcb.lua" $conn --scale="$(db_scale "$db")" --threads="$threads" --time="$warmup" \
+      --report-interval=0 run > /dev/null 2>&1 || return $?
+  fi
+
+  # Lượt đo chính thức
+  # shellcheck disable=SC2086
+  sysbench "$ROOT/workload/tpcb.lua" $conn --scale="$(db_scale "$db")" --threads="$threads" --time="$time" \
     --report-interval=10 --histogram=on --percentile=99 run > "$out" 2>&1
 }
 
