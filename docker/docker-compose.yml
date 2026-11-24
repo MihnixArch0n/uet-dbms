@@ -1,0 +1,40 @@
+# Hai DBMS dùng chung một file. Khi đo chỉ bật MỘT service:
+#   docker compose -f docker/docker-compose.yml up -d pg      (hoặc mysql)
+#   docker compose -f docker/docker-compose.yml stop mysql
+services:
+  pg:
+    image: postgres:16
+    container_name: bench-pg
+    environment:
+      POSTGRES_PASSWORD: bench
+      POSTGRES_INITDB_ARGS: "--data-checksums"   # để phát hiện trang hỏng sau crash
+    command: ["postgres", "-c", "config_file=/etc/postgresql/postgresql.conf"]
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./pg/postgresql.conf:/etc/postgresql/postgresql.conf:ro
+    ports: ["5432:5432"]
+    shm_size: 1g
+    cpus: 4
+    mem_limit: 6g
+    stop_grace_period: 60s
+    restart: "no"          # trong máy ảo (thí nghiệm C mức 2) đổi thành "always"
+
+  mysql:
+    image: mysql:8.4
+    container_name: bench-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: bench
+      MYSQL_DATABASE: bank
+    volumes:
+      - mydata:/var/lib/mysql
+      - ./mysql/bench.cnf:/etc/mysql/conf.d/bench.cnf:ro
+      - ../data:/var/lib/mysql-files/import:ro   # chứa file CSV để LOAD DATA
+    ports: ["3306:3306"]
+    cpus: 4
+    mem_limit: 6g
+    stop_grace_period: 60s
+    restart: "no"          # trong máy ảo (thí nghiệm C mức 2) đổi thành "always"
+
+volumes:
+  pgdata:
+  mydata:

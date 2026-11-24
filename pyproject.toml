@@ -1,13 +1,15 @@
 [project]
-name = "uet-dbms"
+name = "btl-durability"
 version = "0.1.0"
-readme = "README.md"
-requires-python = ">=3.14"
-dependencies = []
+description = "Durability va Crash Recovery: PostgreSQL vs MySQL InnoDB (BTL INT3202)"
+requires-python = ">=3.10"
+dependencies = [
+    "psycopg[binary]>=3.1",   # crash_client.py ket noi PostgreSQL
+    "pymysql>=1.1",           # crash_client.py ket noi MySQL
+    "cryptography>=41",       # PyMySQL can de dang nhap MySQL 8 (caching_sha2_password)
+    "pandas>=2.0",            # analysis/parse_results.py
+    "matplotlib>=3.7",        # analysis/plots.py
+]
 
-[project.scripts]
-uet-dbms = "uet_dbms:main"
-
-[build-system]
-requires = ["uv_build>=0.13.9,<0.14.0"]
-build-backend = "uv_build"
+[tool.uv]
+package = false   # day la bo script, khong phai thu vien can dong goi

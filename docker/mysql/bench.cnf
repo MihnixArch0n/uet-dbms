@@ -1,0 +1,19 @@
+# Cấu hình nền MySQL 8.4 InnoDB cho thí nghiệm (cấu hình BỀN VỮNG mặc định).
+# Script thí nghiệm đổi tham số bằng SET PERSIST_ONLY + khởi động lại.
+[mysqld]
+max_connections = 200
+
+# Bộ nhớ (bằng shared_buffers bên PostgreSQL)
+innodb_buffer_pool_size = 2G
+
+# Redo log và độ bền
+innodb_flush_log_at_trx_commit = 1
+innodb_flush_log_at_timeout = 1
+innodb_doublewrite = ON
+innodb_redo_log_capacity = 4G
+
+# Tắt binlog để chỉ so sánh redo log với WAL (nêu rõ trong báo cáo)
+skip-log-bin
+
+# Ghi log chi tiết để đọc quá trình crash recovery
+log_error_verbosity = 3

@@ -1,0 +1,5 @@
+# CSV dữ liệu sinh lại được bằng data/setup_data.sh (rất lớn)
+data/*.csv
+__pycache__/
+*.pyc
+.venv/
