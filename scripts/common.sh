@@ -106,24 +106,36 @@ snapshot() {
 # Scale của dữ liệu đang có = số chi nhánh (pgbench tạo 1 chi nhánh cho mỗi đơn vị scale)
 db_scale() { db_sql "$1" "SELECT COUNT(*) FROM pgbench_branches;"; }
 
-# run_sysbench <pg|mysql> <threads> <time_s> <warmup_s> <file_out>
-run_sysbench() {
-  local db=$1 threads=$2 time=$3 warmup=$4 out=$5 conn
-  if [ "$db" = pg ]; then
-    conn="--db-driver=pgsql --pgsql-host=$DB_HOST --pgsql-port=5432 --pgsql-user=postgres --pgsql-password=bench --pgsql-db=postgres"
+# Tham số kết nối sysbench cho từng DBMS
+sysbench_conn() {
+  if [ "$1" = pg ]; then
+    echo "--db-driver=pgsql --pgsql-host=$DB_HOST --pgsql-port=5432 --pgsql-user=postgres --pgsql-password=bench --pgsql-db=postgres"
   else
-    conn="--db-driver=mysql --mysql-host=$DB_HOST --mysql-port=3306 --mysql-user=root --mysql-password=bench --mysql-db=bank"
+    echo "--db-driver=mysql --mysql-host=$DB_HOST --mysql-port=3306 --mysql-user=root --mysql-password=bench --mysql-db=bank"
   fi
-  # Sysbench 1.0.20 không hỗ trợ --warmup-time, nên chạy warmup riêng.
-  # shellcheck disable=SC2086
-  if [ "$warmup" -gt 0 ]; then
-    sysbench "$ROOT/workload/tpcb.lua" $conn --scale="$(db_scale "$db")" --threads="$threads" --time="$warmup" \
-      --report-interval=0 run > /dev/null 2>&1 || return $?
-  fi
+}
 
+# sysbench_warmup <pg|mysql> <threads> <warmup_s>
+# Sysbench 1.0.20 không có --warmup-time nên warmup là một lượt chạy riêng, bỏ kết quả.
+# Thí nghiệm A/B gọi hàm này TRƯỚC khi chụp "before", để WAL/fsync/iostat chỉ tính phần đo chính thức.
+sysbench_warmup() {
+  local db=$1 threads=$2 warmup=$3
+  [ "$warmup" -gt 0 ] || return 0
+  log "   warmup ${warmup}s"
+  # shellcheck disable=SC2046
+  sysbench "$ROOT/workload/tpcb.lua" $(sysbench_conn "$db") --scale="$(db_scale "$db")" --threads="$threads" \
+    --time="$warmup" --report-interval=0 run > /dev/null 2>&1
+}
+
+# run_sysbench <pg|mysql> <threads> <time_s> <warmup_s> <file_out>
+# warmup_s > 0: chạy warmup ngay trước lượt đo (tiện khi thử tay).
+# Thí nghiệm A/B truyền 0 ở đây và gọi sysbench_warmup riêng, trước khi chụp "before".
+run_sysbench() {
+  local db=$1 threads=$2 time=$3 warmup=$4 out=$5
+  sysbench_warmup "$db" "$threads" "$warmup" || return $?
   # Lượt đo chính thức
-  # shellcheck disable=SC2086
-  sysbench "$ROOT/workload/tpcb.lua" $conn --scale="$(db_scale "$db")" --threads="$threads" --time="$time" \
+  # shellcheck disable=SC2046
+  sysbench "$ROOT/workload/tpcb.lua" $(sysbench_conn "$db") --scale="$(db_scale "$db")" --threads="$threads" --time="$time" \
     --report-interval=10 --histogram=on --percentile=99 run > "$out" 2>&1
 }
 
@@ -131,7 +143,8 @@ run_sysbench() {
 invariant() { db_file "$1" "$ROOT/scripts/invariant.sql" | tr '\t' '|'; }
 
 check_invariant() {
-  local line; line=$(invariant "$1")
+  # a t b h c phải là biến local: run_expA.sh dùng biến c cho số client
+  local line a t b h c; line=$(invariant "$1")
   IFS='|' read -r a t b h c <<< "$line"
   if [ "$a" = "$t" ] && [ "$t" = "$b" ] && [ "$b" = "$h" ]; then echo "OK|$line"; else echo "FAIL|$line"; fi
 }

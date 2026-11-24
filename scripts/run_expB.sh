@@ -50,12 +50,14 @@ for extra in $EXTRA_VALUES; do
         echo "extra_param|$EXTRA_PARAM"; echo "extra_value|$extra"
         echo "clients|$CLIENTS"; echo "rep|$r"; echo "time|$TIME"
       } > "$out.meta"
+      # Warmup trước khi chụp "before": khoảng before→after chỉ chứa lượt đo chính thức
+      sysbench_warmup "$DB" "$CLIENTS" "$WARMUP" || log "warmup lỗi"
       snapshot "$DB" > "$out.before"
       : > "$out.samples"
       sampler "$out.samples" & SP=$!
       IO_PID=""
       if command -v iostat >/dev/null; then iostat -dxm 10 > "$out.iostat" & IO_PID=$!; fi
-      run_sysbench "$DB" "$CLIENTS" "$TIME" "$WARMUP" "$out.txt" || log "sysbench lỗi, xem $out.txt"
+      run_sysbench "$DB" "$CLIENTS" "$TIME" 0 "$out.txt" || log "sysbench lỗi, xem $out.txt"
       kill "$SP" 2>/dev/null || true
       [ -n "$IO_PID" ] && kill "$IO_PID" 2>/dev/null || true
       snapshot "$DB" > "$out.after"
