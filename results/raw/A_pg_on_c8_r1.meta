@@ -1,0 +1,6 @@
+db|pg
+param|synchronous_commit
+value|on
+clients|8
+rep|1
+time|300

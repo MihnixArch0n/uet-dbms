@@ -1,0 +1,6 @@
+db|mysql
+param|innodb_flush_log_at_trx_commit
+value|0
+clients|8
+rep|2
+time|300

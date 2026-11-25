@@ -1,0 +1,101 @@
+ Container bench-pg Restarting 
+ Container bench-pg Started 
+ Container bench-pg Restarting 
+ Container bench-pg Started 
+[02:55:38] pg: synchronous_commit = on
+[02:55:38] == A_pg_on_c1_r1
+ Container bench-pg Restarting 
+ Container bench-pg Started 
+[02:55:39]    warmup 60s
+[03:01:40]    transactions: 125135 (417.11 per sec.) | bất biến: OK
+[03:01:40] == A_pg_on_c1_r2
+ Container bench-pg Restarting 
+ Container bench-pg Started 
+[03:01:44]    warmup 60s
+[03:07:45]    transactions: 124945 (416.48 per sec.) | bất biến: OK
+[03:07:45] == A_pg_on_c1_r3
+ Container bench-pg Restarting 
+ Container bench-pg Started 
+[03:07:51]    warmup 60s
+[03:13:52]    transactions: 100088 (333.62 per sec.) | bất biến: OK
+[03:13:52] == A_pg_on_c8_r1
+ Container bench-pg Restarting 
+ Container bench-pg Started 
+[03:13:59]    warmup 60s
+[03:20:02]    transactions: 327017 (1089.93 per sec.) | bất biến: OK
+[03:20:02] == A_pg_on_c8_r2
+ Container bench-pg Restarting 
+ Container bench-pg Started 
+[03:20:09]    warmup 60s
+[03:26:11]    transactions: 353878 (1179.57 per sec.) | bất biến: OK
+[03:26:11] == A_pg_on_c8_r3
+ Container bench-pg Restarting 
+ Container bench-pg Started 
+[03:26:17]    warmup 60s
+[03:32:19]    transactions: 353180 (1177.23 per sec.) | bất biến: OK
+[03:32:19] == A_pg_on_c32_r1
+ Container bench-pg Restarting 
+ Container bench-pg Started 
+[03:32:25]    warmup 60s
+[03:38:36]    transactions: 1038795 (3460.08 per sec.) | bất biến: OK
+[03:38:36] == A_pg_on_c32_r2
+ Container bench-pg Restarting 
+ Container bench-pg Started 
+[03:38:57]    warmup 60s
+[03:45:04]    transactions: 1047015 (3487.43 per sec.) | bất biến: OK
+[03:45:04] == A_pg_on_c32_r3
+ Container bench-pg Restarting 
+ Container bench-pg Started 
+[03:45:16]    warmup 60s
+[03:51:22]    transactions: 1013210 (3375.29 per sec.) | bất biến: OK
+ Container bench-pg Restarting 
+ Container bench-pg Started 
+[03:51:39] pg: synchronous_commit = off
+[03:51:39] == A_pg_off_c1_r1
+ Container bench-pg Restarting 
+ Container bench-pg Started 
+[03:51:42]    warmup 60s
+[03:57:43]    transactions: 1481201 (4937.27 per sec.) | bất biến: OK
+[03:57:43] == A_pg_off_c1_r2
+ Container bench-pg Restarting 
+ Container bench-pg Started 
+[03:57:53]    warmup 60s
+[04:03:54]    transactions: 1409244 (4697.42 per sec.) | bất biến: OK
+[04:03:54] == A_pg_off_c1_r3
+ Container bench-pg Restarting 
+ Container bench-pg Started 
+[04:04:04]    warmup 60s
+[04:10:06]    transactions: 1804472 (6014.84 per sec.) | bất biến: OK
+[04:10:06] == A_pg_off_c8_r1
+ Container bench-pg Restarting 
+ Container bench-pg Started 
+[04:10:10]    warmup 60s
+[04:16:12]    transactions: 6322521 (21074.79 per sec.) | bất biến: OK
+[04:16:12] == A_pg_off_c8_r2
+ Container bench-pg Restarting 
+ Container bench-pg Started 
+[04:16:17]    warmup 60s
+[04:22:20]    transactions: 6186265 (20620.25 per sec.) | bất biến: OK
+[04:22:20] == A_pg_off_c8_r3
+ Container bench-pg Restarting 
+ Container bench-pg Started 
+[04:22:34]    warmup 60s
+[04:28:36]    transactions: 6328804 (21094.84 per sec.) | bất biến: OK
+[04:28:36] == A_pg_off_c32_r1
+ Container bench-pg Restarting 
+ Container bench-pg Started 
+[04:28:57]    warmup 60s
+[04:34:59]    transactions: 3835662 (12784.47 per sec.) | bất biến: OK
+[04:34:59] == A_pg_off_c32_r2
+ Container bench-pg Restarting 
+ Container bench-pg Started 
+[04:35:11]    warmup 60s
+[04:41:14]    transactions: 3848345 (12826.90 per sec.) | bất biến: OK
+[04:41:14] == A_pg_off_c32_r3
+ Container bench-pg Restarting 
+ Container bench-pg Started 
+[04:41:27]    warmup 60s
+[04:47:29]    transactions: 3813062 (12707.27 per sec.) | bất biến: OK
+ Container bench-pg Restarting 
+ Container bench-pg Started 
+[04:47:42] Xong thí nghiệm A cho pg. Kết quả trong /home/tran-minh-hieu/uet-dbms/results/raw/A_pg_*
