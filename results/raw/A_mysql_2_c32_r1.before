@@ -1,0 +1,10 @@
+ts|1795562786.724818
+lsn_bytes|7736230253
+Com_commit|318480
+Innodb_data_fsyncs|1565
+Innodb_data_written|2525347328
+Innodb_dblwr_pages_written|46246
+Innodb_dblwr_writes|659
+Innodb_os_log_fsyncs|300
+Innodb_os_log_written|1589488128
+Innodb_pages_written|46387

@@ -33,10 +33,12 @@ for cfg in $CONFIGS; do
         echo "db|$DB"; echo "param|$PARAM"; echo "value|$(show_param "$DB" "$PARAM")"
         echo "clients|$c"; echo "rep|$r"; echo "time|$TIME"
       } > "$out.meta"
+      # Warmup trước khi chụp "before": khoảng before→after chỉ chứa lượt đo chính thức
+      sysbench_warmup "$DB" "$c" "$WARMUP" || log "warmup lỗi"
       snapshot "$DB" > "$out.before"
       IO_PID=""
       if command -v iostat >/dev/null; then iostat -dxm 10 > "$out.iostat" & IO_PID=$!; fi
-      run_sysbench "$DB" "$c" "$TIME" "$WARMUP" "$out.txt" || log "sysbench lỗi, xem $out.txt"
+      run_sysbench "$DB" "$c" "$TIME" 0 "$out.txt" || log "sysbench lỗi, xem $out.txt"
       [ -n "$IO_PID" ] && kill "$IO_PID" 2>/dev/null || true
       snapshot "$DB" > "$out.after"
       check_invariant "$DB" > "$out.inv"

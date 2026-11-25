@@ -1,0 +1,10 @@
+ts|1795553177.336771
+lsn|5/4038D308
+lsn_bytes|22552302344
+wal_records|1348908
+wal_fpi|89857
+wal_bytes|746021834
+wal_write|20310
+wal_sync|20309
+wal_sync_time|59116.335
+xact_commit|4424603

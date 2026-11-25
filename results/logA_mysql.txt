@@ -1,0 +1,149 @@
+ Container bench-mysql Restarting 
+ Container bench-mysql Started 
+ Container bench-mysql Restarting 
+ Container bench-mysql Started 
+[04:48:25] mysql: innodb_flush_log_at_trx_commit = 1
+[04:48:25] == A_mysql_1_c1_r1
+ Container bench-mysql Restarting 
+ Container bench-mysql Started 
+[04:48:32]    warmup 60s
+[04:54:35]    transactions: 73905 (246.35 per sec.) | bất biến: OK
+[04:54:35] == A_mysql_1_c1_r2
+ Container bench-mysql Restarting 
+ Container bench-mysql Started 
+[04:54:57]    warmup 60s
+[05:00:59]    transactions: 58619 (195.38 per sec.) | bất biến: OK
+[05:00:59] == A_mysql_1_c1_r3
+ Container bench-mysql Restarting 
+ Container bench-mysql Started 
+[05:01:15]    warmup 60s
+[05:07:18]    transactions: 60429 (201.36 per sec.) | bất biến: OK
+[05:07:18] == A_mysql_1_c8_r1
+ Container bench-mysql Restarting 
+ Container bench-mysql Started 
+[05:07:41]    warmup 60s
+[05:13:42]    transactions: 203673 (678.84 per sec.) | bất biến: OK
+[05:13:42] == A_mysql_1_c8_r2
+ Container bench-mysql Restarting 
+ Container bench-mysql Started 
+[05:14:01]    warmup 60s
+[05:20:04]    transactions: 244076 (813.56 per sec.) | bất biến: OK
+[05:20:04] == A_mysql_1_c8_r3
+ Container bench-mysql Restarting 
+ Container bench-mysql Started 
+[05:20:27]    warmup 60s
+[05:26:28]    transactions: 213635 (711.99 per sec.) | bất biến: OK
+[05:26:28] == A_mysql_1_c32_r1
+ Container bench-mysql Restarting 
+ Container bench-mysql Started 
+[05:26:43]    warmup 60s
+[05:32:46]    transactions: 513187 (1710.50 per sec.) | bất biến: OK
+[05:32:46] == A_mysql_1_c32_r2
+ Container bench-mysql Restarting 
+ Container bench-mysql Started 
+[05:33:04]    warmup 60s
+[05:39:15]    transactions: 412033 (1373.34 per sec.) | bất biến: OK
+[05:39:15] == A_mysql_1_c32_r3
+ Container bench-mysql Restarting 
+ Container bench-mysql Started 
+[05:39:38]    warmup 60s
+[05:45:42]    transactions: 659492 (2195.38 per sec.) | bất biến: OK
+ Container bench-mysql Restarting 
+ Container bench-mysql Started 
+[05:46:02] mysql: innodb_flush_log_at_trx_commit = 2
+[05:46:02] == A_mysql_2_c1_r1
+ Container bench-mysql Restarting 
+ Container bench-mysql Started 
+[05:46:12]    warmup 60s
+[05:52:21]    transactions: 669581 (2231.71 per sec.) | bất biến: OK
+[05:52:21] == A_mysql_2_c1_r2
+ Container bench-mysql Restarting 
+ Container bench-mysql Started 
+[05:52:40]    warmup 60s
+[05:58:45]    transactions: 741675 (2472.21 per sec.) | bất biến: OK
+[05:58:45] == A_mysql_2_c1_r3
+ Container bench-mysql Restarting 
+ Container bench-mysql Started 
+[05:59:01]    warmup 60s
+[06:05:19]    transactions: 766959 (2556.49 per sec.) | bất biến: OK
+[06:05:19] == A_mysql_2_c8_r1
+ Container bench-mysql Restarting 
+ Container bench-mysql Started 
+[06:05:27]    warmup 60s
+[06:11:48]    transactions: 1277973 (4257.19 per sec.) | bất biến: OK
+[06:11:48] == A_mysql_2_c8_r2
+ Container bench-mysql Restarting 
+ Container bench-mysql Started 
+[06:12:15]    warmup 60s
+[06:18:41]    transactions: 1049551 (3497.01 per sec.) | bất biến: OK
+[06:18:41] == A_mysql_2_c8_r3
+ Container bench-mysql Restarting 
+ Container bench-mysql Started 
+[06:18:58]    warmup 60s
+[06:25:14]    transactions: 920482 (3066.64 per sec.) | bất biến: OK
+[06:25:14] == A_mysql_2_c32_r1
+ Container bench-mysql Restarting 
+ Container bench-mysql Started 
+[06:25:25]    warmup 60s
+[06:31:40]    transactions: 1141755 (3805.11 per sec.) | bất biến: OK
+[06:31:40] == A_mysql_2_c32_r2
+ Container bench-mysql Restarting 
+ Container bench-mysql Started 
+[06:32:00]    warmup 60s
+[06:38:20]    transactions: 1063134 (3541.71 per sec.) | bất biến: OK
+[06:38:20] == A_mysql_2_c32_r3
+ Container bench-mysql Restarting 
+ Container bench-mysql Started 
+[06:38:28]    warmup 60s
+[06:45:03]    transactions: 1153544 (3838.58 per sec.) | bất biến: OK
+ Container bench-mysql Restarting 
+ Container bench-mysql Started 
+[06:45:24] mysql: innodb_flush_log_at_trx_commit = 0
+[06:45:24] == A_mysql_0_c1_r1
+ Container bench-mysql Restarting 
+ Container bench-mysql Started 
+[06:45:32]    warmup 60s
+[06:51:56]    transactions: 777218 (2588.44 per sec.) | bất biến: OK
+[06:51:56] == A_mysql_0_c1_r2
+ Container bench-mysql Restarting 
+ Container bench-mysql Started 
+[06:52:06]    warmup 60s
+[06:58:22]    transactions: 725756 (2418.03 per sec.) | bất biến: OK
+[06:58:22] == A_mysql_0_c1_r3
+ Container bench-mysql Restarting 
+ Container bench-mysql Started 
+[06:58:33]    warmup 60s
+[07:04:57]    transactions: 758595 (2527.62 per sec.) | bất biến: OK
+[07:04:57] == A_mysql_0_c8_r1
+ Container bench-mysql Restarting 
+ Container bench-mysql Started 
+[07:05:09]    warmup 60s
+[07:11:24]    transactions: 1350373 (4501.16 per sec.) | bất biến: OK
+[07:11:24] == A_mysql_0_c8_r2
+ Container bench-mysql Restarting 
+ Container bench-mysql Started 
+[07:11:36]    warmup 60s
+[07:18:00]    transactions: 1434580 (4780.47 per sec.) | bất biến: OK
+[07:18:00] == A_mysql_0_c8_r3
+ Container bench-mysql Restarting 
+ Container bench-mysql Started 
+[07:18:11]    warmup 60s
+[07:24:38]    transactions: 1300541 (4334.92 per sec.) | bất biến: OK
+[07:24:38] == A_mysql_0_c32_r1
+ Container bench-mysql Restarting 
+ Container bench-mysql Started 
+[07:24:46]    warmup 60s
+[07:31:03]    transactions: 1467789 (4891.97 per sec.) | bất biến: OK
+[07:31:03] == A_mysql_0_c32_r2
+ Container bench-mysql Restarting 
+ Container bench-mysql Started 
+[07:31:11]    warmup 60s
+[07:37:33]    transactions: 1415464 (4711.30 per sec.) | bất biến: OK
+[07:37:33] == A_mysql_0_c32_r3
+ Container bench-mysql Restarting 
+ Container bench-mysql Started 
+[07:37:44]    warmup 60s
+[07:44:24]    transactions: 1522847 (5075.92 per sec.) | bất biến: OK
+ Container bench-mysql Restarting 
+ Container bench-mysql Started 
+[07:44:47] Xong thí nghiệm A cho mysql. Kết quả trong /home/tran-minh-hieu/uet-dbms/results/raw/A_mysql_*

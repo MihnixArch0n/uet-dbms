@@ -1,0 +1,78 @@
+# Máy đo - 2026-11-25T01:11:30+07:00
+## CPU
+CPU(s):                                  24
+Model name:                              AMD Ryzen AI 9 HX 370 w/ Radeon 890M
+Thread(s) per core:                      2
+Core(s) per socket:                      12
+Socket(s):                               1
+CPU(s) scaling MHz:                      37%
+CPU max MHz:                             5157.8950
+CPU min MHz:                             605.2640
+## Bộ nhớ
+               total        used        free      shared  buff/cache   available
+Mem:            30Gi       6.1Gi        19Gi       196Mi       5.3Gi        24Gi
+Swap:          7.6Gi          0B       7.6Gi
+## Ổ đĩa
+NAME    MODEL                      ROTA   SIZE TYPE
+loop0                                 0 179.3M loop
+loop1                                 0     4K loop
+loop2                                 0    74M loop
+loop3                                 0  66.8M loop
+loop4                                 0  66.8M loop
+loop5                                 0  47.9M loop
+loop6                                 0  18.5M loop
+loop7                                 0 531.4M loop
+loop8                                 0 614.5M loop
+loop9                                 0 531.5M loop
+loop10                                0 251.7M loop
+loop11                                0  91.7M loop
+loop12                                0   402M loop
+loop13                                0 111.8M loop
+loop14                                0  10.8M loop
+loop15                                0  48.1M loop
+loop16                                0  50.3M loop
+loop17                                0   576K loop
+loop18                                0   828K loop
+loop19                                0 222.1M loop
+loop20                                0 226.6M loop
+sda     HS-SSD-C100 240G              0 223.6G disk
+nvme0n1 SAMSUNG MZVL81T0HELB-00BTW    0 953.9G disk
+## Bộ nhớ đệm ghi của ổ (write back = có cache ghi)
+/sys/block/loop0/queue/write_cache: write through
+/sys/block/loop10/queue/write_cache: write through
+/sys/block/loop11/queue/write_cache: write through
+/sys/block/loop12/queue/write_cache: write through
+/sys/block/loop13/queue/write_cache: write through
+/sys/block/loop14/queue/write_cache: write through
+/sys/block/loop15/queue/write_cache: write through
+/sys/block/loop16/queue/write_cache: write through
+/sys/block/loop17/queue/write_cache: write through
+/sys/block/loop18/queue/write_cache: write through
+/sys/block/loop19/queue/write_cache: write through
+/sys/block/loop1/queue/write_cache: write through
+/sys/block/loop20/queue/write_cache: write through
+/sys/block/loop21/queue/write_cache: write back
+/sys/block/loop2/queue/write_cache: write through
+/sys/block/loop3/queue/write_cache: write through
+/sys/block/loop4/queue/write_cache: write through
+/sys/block/loop5/queue/write_cache: write through
+/sys/block/loop6/queue/write_cache: write through
+/sys/block/loop7/queue/write_cache: write through
+/sys/block/loop8/queue/write_cache: write through
+/sys/block/loop9/queue/write_cache: write through
+/sys/block/nvme0n1/queue/write_cache: write back
+/sys/block/sda/queue/write_cache: write back
+## Hệ điều hành
+Linux tran-minh-hieu-ASUS-Vivobook-S-14-M5406WA-M5406WA 7.0.0-34-generic #34~24.04.1-Ubuntu SMP PREEMPT_DYNAMIC Fri Sep  4 15:38:29 UTC 2 x86_64 x86_64 x86_64 GNU/Linux
+Ubuntu 24.04.5 LTS
+## Hệ file chứa dữ liệu Docker
+Filesystem     Type 1K-blocks     Used Available Use% Mounted on
+/dev/sda3      ext4 219690992 22030680 186427800  11% /
+## Docker
+Docker version 29.10.0, build fdd4b8e
+Docker Compose version v5.8.0
+## sysbench
+sysbench 1.0.20
+## Python (uv)
+uv 0.13.9 (x86_64-unknown-linux-gnu)
+Python 3.14.10

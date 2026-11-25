@@ -9,6 +9,10 @@
 # Tùy chỉnh: CLIENTS=8 REPS=3 TIME=300 WARMUP=60 SAMPLE=10 QUICK=1
 # Thí nghiệm phụ B2 (chỉ pg): EXTRA_PARAM=checkpoint_timeout EXTRA_VALUES="30s 5min" CONFIGS=on bash scripts/run_expB.sh pg
 source "$(dirname "$0")/common.sh"
+# Dù script kết thúc thế nào (xong, lỗi, Ctrl+C) cũng trả doublewrite về ON trong bench.cnf,
+# để thí nghiệm C không vô tình chạy với cấu hình không bền vững
+restore_dblwr() { sed -i "s/^innodb_doublewrite = .*/innodb_doublewrite = ON/" "$ROOT/docker/mysql/bench.cnf"; }
+trap restore_dblwr EXIT
 
 TARGET=""
 QUICK=${QUICK:-0}
@@ -97,12 +101,14 @@ run_db_exp() {
           echo "extra_param|$EXTRA_PARAM"; echo "extra_value|$extra"
           echo "clients|$CLIENTS"; echo "rep|$r"; echo "time|$TIME"
         } > "$out.meta"
+        # Warmup trước khi chụp "before": khoảng before→after chỉ chứa lượt đo chính thức
+        sysbench_warmup "$db" "$CLIENTS" "$WARMUP" || log "warmup lỗi"
         snapshot "$db" > "$out.before"
         : > "$out.samples"
         sampler "$db" "$out.samples" & SP=$!
         IO_PID=""
         if command -v iostat >/dev/null; then iostat -dxm 10 > "$out.iostat" & IO_PID=$!; fi
-        run_sysbench "$db" "$CLIENTS" "$TIME" "$WARMUP" "$out.txt" || log "sysbench lỗi, xem $out.txt"
+        run_sysbench "$db" "$CLIENTS" "$TIME" 0 "$out.txt" || log "sysbench lỗi, xem $out.txt"
         kill "$SP" 2>/dev/null || true
         [ -n "$IO_PID" ] && kill "$IO_PID" 2>/dev/null || true
         snapshot "$db" > "$out.after"
