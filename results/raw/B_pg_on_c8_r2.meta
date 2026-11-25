@@ -1,0 +1,8 @@
+db|pg
+param|full_page_writes
+value|on
+extra_param|
+extra_value|default
+clients|8
+rep|2
+time|300

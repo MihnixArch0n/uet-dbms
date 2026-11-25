@@ -87,6 +87,43 @@ def parse_sysbench(path):
     return r
 
 
+PAGE = 16384          # innodb_page_size mặc định
+IOSTAT_INTERVAL = 10  # scripts gọi "iostat -dxm 10"
+
+
+def iostat_write_bytes(path):
+    """Tổng byte ghi đĩa trong lần chạy, lấy từ iostat -dxm (bỏ báo cáo đầu: trung bình từ lúc khởi động máy).
+    Chọn thiết bị ghi nhiều nhất (ổ chứa dữ liệu Docker)."""
+    if not os.path.exists(path):
+        return None
+    reports, cur, ix = [], None, None
+    for line in open(path, errors="replace"):
+        f = line.split()
+        if not f:
+            continue
+        if f[0] == "Device":
+            ix = {h: i for i, h in enumerate(f)}
+            cur = {}
+            reports.append(cur)
+        elif cur is not None and ix and "wMB/s" in ix and len(f) == len(ix):
+            try:
+                cur[f[0]] = float(f[ix["wMB/s"]])
+            except ValueError:
+                pass
+    reports = reports[1:]
+    if not reports:
+        return None
+    totals = {}
+    for r in reports:
+        for dev, w in r.items():
+            if not dev.startswith(("loop", "zram", "ram")):
+                totals[dev] = totals.get(dev, 0) + w
+    if not totals:
+        return None
+    dev = max(totals, key=totals.get)
+    return totals[dev] * IOSTAT_INTERVAL * 1024 * 1024
+
+
 def parse_run(txt_path):
     base = txt_path[:-4]
     meta = kv(base + ".meta")
@@ -105,6 +142,24 @@ def parse_run(txt_path):
         for k in ("log_bytes", "log_fsyncs", "page_protect", "pages_written", "data_written"):
             if k in deltas:
                 row[f"{k}_per_txn"] = deltas[k] / commits
+    if commits > 0:
+        # MySQL: Innodb_data_written KHÔNG tính phần ghi qua doublewrite (MySQL 8.0.20+ dùng file .dblwr riêng),
+        # nên tách rõ ba phần: redo log, trang dữ liệu ghi vào tablespace, trang ghi qua doublewrite.
+        if db == "mysql":
+            if "page_protect" in deltas:
+                row["dblwr_bytes_per_txn"] = deltas["page_protect"] * PAGE / commits
+            if "pages_written" in deltas:
+                row["page_bytes_per_txn"] = deltas["pages_written"] * PAGE / commits
+        # PostgreSQL: tách WAL thành phần bản ghi thường và phần full-page image (từ pg_waldump)
+        if db == "pg" and os.path.exists(base + ".waldump"):
+            tot = [r for r in parse_waldump(base + ".waldump")]
+            if tot:
+                row["wal_record_bytes_per_txn"] = sum(r["record_bytes"] for r in tot) / commits
+                row["wal_fpi_bytes_per_txn"] = sum(r["fpi_bytes"] for r in tot) / commits
+        # Đối chiếu độc lập: byte thực sự ghi xuống đĩa theo iostat
+        dw = iostat_write_bytes(base + ".iostat")
+        if dw:
+            row["disk_write_per_txn"] = dw / commits
     inv = open(base + ".inv").read().strip() if os.path.exists(base + ".inv") else ""
     row["invariant"] = inv.split("|")[0] if inv else ""
     return row

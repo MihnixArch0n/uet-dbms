@@ -1,0 +1,10 @@
+ts|1795592949.785767
+lsn|E/FC504A80
+lsn_bytes|64362662528
+wal_records|2435693
+wal_fpi|188571
+wal_bytes|1276975331
+wal_write|114313
+wal_sync|114309
+wal_sync_time|354605.35
+xact_commit|48885411

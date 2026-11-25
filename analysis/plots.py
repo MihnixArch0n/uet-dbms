@@ -77,21 +77,45 @@ def fig_A(s):
 
 
 def fig_B(s, samples, wd):
-    # H6: byte log / giao dịch và chỉ số bảo vệ trang, bật và tắt
+    # H6: lượng ghi trên mỗi giao dịch, bật và tắt bảo vệ trang, tách theo thành phần.
+    # PG: WAL = bản ghi thường + ảnh trang đầy đủ (FPI, từ pg_waldump).
+    # MySQL: redo log + trang ghi vào tablespace + trang ghi qua doublewrite
+    #   (Innodb_data_written không tính doublewrite nên không dùng nó ở đây).
+    # Chấm đen: byte ghi đĩa đo bằng iostat, để đối chiếu độc lập.
     d = s[s["extra_value"].fillna("default").astype(str) == "default"] if "extra_value" in s else s
     if len(d):
-        fig, axes = plt.subplots(1, 2, figsize=(11, 4))
+        parts = {
+            "pg": [("wal_record_bytes_per_txn_mean", "WAL: bản ghi thường"),
+                   ("wal_fpi_bytes_per_txn_mean", "WAL: ảnh trang đầy đủ (FPI)")],
+            "mysql": [("log_bytes_per_txn_mean", "Redo log"),
+                      ("page_bytes_per_txn_mean", "Trang dữ liệu (tablespace)"),
+                      ("dblwr_bytes_per_txn_mean", "Trang ghi qua doublewrite")],
+        }
+        order = {"pg": ["on", "off"], "mysql": ["ON", "OFF"]}
+        fig, axes = plt.subplots(1, 2, figsize=(12, 4.5))
         for ax, db in zip(axes, ["pg", "mysql"]):
-            g = d[d["db"] == db]
+            g = d[d["db"] == db].set_index("value")
             if not len(g):
+                ax.set_visible(False)
                 continue
-            cols = [c for c in ("log_bytes_per_txn_mean", "data_written_per_txn_mean") if c in g and g[c].notna().any()]
-            g.set_index("value")[cols].rename(columns={"log_bytes_per_txn_mean": "byte log / giao dịch",
-                                                      "data_written_per_txn_mean": "byte ghi dữ liệu / giao dịch"}
-                                             ).plot.bar(ax=ax, rot=0)
+            vals = [v for v in order[db] if v in g.index]
+            cols = [(c, lab) for c, lab in parts[db] if c in g and g[c].notna().any()]
+            if not cols and "log_bytes_per_txn_mean" in g:
+                cols = [("log_bytes_per_txn_mean", "Log")]
+            bottom = pd.Series(0.0, index=vals)
+            for c, lab in cols:
+                y = g.loc[vals, c].fillna(0) / 1024
+                ax.bar(vals, y, bottom=bottom, label=lab, width=0.55)
+                bottom = bottom + y
+            for i, (v, tot) in enumerate(bottom.items()):
+                ax.text(i - 0.3, tot, f"{tot:.1f} KB", ha="left", va="bottom", fontsize=8)
+            if "disk_write_per_txn_mean" in g and g["disk_write_per_txn_mean"].notna().any():
+                dw = g.loc[vals, "disk_write_per_txn_mean"] / 1024
+                err = g.loc[vals, "disk_write_per_txn_std"] / 1024 if "disk_write_per_txn_std" in g else None
+                ax.errorbar(vals, dw, yerr=err, fmt="o", color="black", capsize=3, label="Ghi đĩa thực tế (iostat, mọi loại ghi)")
             ax.set_title(f"{DBNAME[db]}: {'full_page_writes' if db == 'pg' else 'innodb_doublewrite'}")
-            ax.set_ylabel("Byte / giao dịch"); ax.set_xlabel(""); ax.grid(axis="y", alpha=.3)
-        fig.suptitle("H6. Chi phí bảo vệ trang: lượng ghi trên mỗi giao dịch")
+            ax.set_ylabel("KB / giao dịch"); ax.grid(axis="y", alpha=.3); ax.legend(fontsize=8)
+        fig.suptitle("H6. Chi phí bảo vệ trang: lượng ghi trên mỗi giao dịch (8 client, trung bình 3 lần)")
         save(fig, "H6_page_protection_cost.png")
 
     # H7: tốc độ sinh WAL theo thời gian (lần chạy r1 của mỗi cấu hình PostgreSQL)

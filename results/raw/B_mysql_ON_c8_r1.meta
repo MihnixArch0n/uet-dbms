@@ -1,0 +1,8 @@
+db|mysql
+param|innodb_doublewrite
+value|ON
+extra_param|
+extra_value|default
+clients|8
+rep|1
+time|300

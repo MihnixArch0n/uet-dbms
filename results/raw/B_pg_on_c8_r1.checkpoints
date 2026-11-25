@@ -1,0 +1,9 @@
+bench-pg  | 2026-11-25 07:30:26.133 GMT [27] LOG:  checkpoint starting: shutdown immediate
+bench-pg  | 2026-11-25 07:30:26.175 GMT [27] LOG:  checkpoint complete: wrote 3 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.014 s, sync=0.005 s, total=0.046 s; sync files=2, longest=0.003 s, average=0.003 s; distance=0 kB, estimate=0 kB; lsn=D/C5E0EA18, redo lsn=D/C5E0EA18
+bench-pg  | 2026-11-25 07:30:26.899 GMT [27] LOG:  checkpoint starting: shutdown immediate
+bench-pg  | 2026-11-25 07:30:26.940 GMT [27] LOG:  checkpoint complete: wrote 3 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.014 s, sync=0.005 s, total=0.046 s; sync files=2, longest=0.003 s, average=0.003 s; distance=0 kB, estimate=0 kB; lsn=D/C5E0EA90, redo lsn=D/C5E0EA90
+bench-pg  | 2026-11-25 07:30:29.124 GMT [27] LOG:  checkpoint starting: shutdown immediate
+bench-pg  | 2026-11-25 07:30:30.033 GMT [27] LOG:  checkpoint complete: wrote 22209 buffers (8.5%); 0 WAL file(s) added, 10 removed, 0 recycled; write=0.732 s, sync=0.103 s, total=0.915 s; sync files=13, longest=0.080 s, average=0.008 s; distance=153309 kB, estimate=153309 kB; lsn=D/CF3C6060, redo lsn=D/CF3C6060
+bench-pg  | 2026-11-25 07:30:30.668 GMT [27] LOG:  checkpoint starting: immediate force wait
+bench-pg  | 2026-11-25 07:30:30.711 GMT [27] LOG:  checkpoint complete: wrote 3 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.014 s, sync=0.005 s, total=0.044 s; sync files=2, longest=0.003 s, average=0.003 s; distance=0 kB, estimate=0 kB; lsn=D/CF3C6110, redo lsn=D/CF3C60D8
+bench-pg  | 2026-11-25 07:35:30.759 GMT [27] LOG:  checkpoint starting: time

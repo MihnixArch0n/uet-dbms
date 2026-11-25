@@ -1,0 +1,88 @@
+[14:30:24] Cô lập container: dừng mysql, bật pg...
+ Container bench-pg Starting 
+ Container bench-pg Started 
+ Container bench-pg Restarting 
+ Container bench-pg Started 
+ Container bench-pg Restarting 
+ Container bench-pg Started 
+[14:30:27] pg: full_page_writes = on
+[14:30:27] == B_pg_on_c8_r1
+ Container bench-pg Restarting 
+ Container bench-pg Started 
+[14:30:30]    warmup 60s
+[14:36:33]    transactions: 464280 (1547.54 per sec.) | inv=OK|1814716|1814716|1814716|1814716|556792
+[14:36:33] == B_pg_on_c8_r2
+ Container bench-pg Restarting 
+ Container bench-pg Started 
+[14:36:42]    warmup 60s
+[14:42:44]    transactions: 356805 (1189.32 per sec.) | inv=OK|-1429822|-1429822|-1429822|-1429822|415207
+[14:42:44] == B_pg_on_c8_r3
+ Container bench-pg Restarting 
+ Container bench-pg Started 
+[14:43:09]    warmup 60s
+[14:49:23]    transactions: 343692 (1145.44 per sec.) | inv=OK|-1621256|-1621256|-1621256|-1621256|423646
+ Container bench-pg Restarting 
+ Container bench-pg Started 
+[14:49:37] pg: full_page_writes = off
+[14:49:37] == B_pg_off_c8_r1
+ Container bench-pg Restarting 
+ Container bench-pg Started 
+[14:49:54]    warmup 60s
+[14:55:56]    transactions: 359391 (1197.94 per sec.) | inv=OK|1306274|1306274|1306274|1306274|434105
+[14:55:56] == B_pg_off_c8_r2
+ Container bench-pg Restarting 
+ Container bench-pg Started 
+[14:56:19]    warmup 60s
+[15:02:21]    transactions: 334875 (1116.22 per sec.) | inv=OK|-912563|-912563|-912563|-912563|400710
+[15:02:21] == B_pg_off_c8_r3
+ Container bench-pg Restarting 
+ Container bench-pg Started 
+[15:02:39]    warmup 60s
+[15:08:41]    transactions: 359058 (1196.83 per sec.) | inv=OK|862085|862085|862085|862085|433817
+ Container bench-pg Restarting 
+ Container bench-pg Started 
+[15:08:50] Xong thí nghiệm B cho pg.
+[15:08:50] Cô lập container: dừng pg, bật mysql...
+ Container bench-mysql Starting 
+ Container bench-mysql Started 
+ Container bench-mysql Restarting 
+ Container bench-mysql Started 
+ Container bench-mysql Restarting 
+ Container bench-mysql Started 
+[15:09:16] mysql: innodb_doublewrite = ON
+[15:09:16] == B_mysql_ON_c8_r1
+ Container bench-mysql Restarting 
+ Container bench-mysql Started 
+[15:09:45]    warmup 60s
+[15:15:46]    transactions: 185764 (619.19 per sec.) | inv=OK|340371|340371|340371|340371|246417
+[15:15:46] == B_mysql_ON_c8_r2
+ Container bench-mysql Restarting 
+ Container bench-mysql Started 
+[15:16:10]    warmup 60s
+[15:22:34]    transactions: 187006 (622.08 per sec.) | inv=OK|708688|708688|708688|708688|244590
+[15:22:34] == B_mysql_ON_c8_r3
+ Container bench-mysql Restarting 
+ Container bench-mysql Started 
+[15:23:15]    warmup 60s
+[15:29:16]    transactions: 260035 (866.75 per sec.) | inv=OK|-864821|-864821|-864821|-864821|328855
+ Container bench-mysql Restarting 
+ Container bench-mysql Started 
+[15:29:39] mysql: innodb_doublewrite = OFF
+[15:29:39] == B_mysql_OFF_c8_r1
+ Container bench-mysql Restarting 
+ Container bench-mysql Started 
+[15:30:01]    warmup 60s
+[15:36:02]    transactions: 275310 (917.24 per sec.) | inv=OK|3809654|3809654|3809654|3809654|326733
+[15:36:02] == B_mysql_OFF_c8_r2
+ Container bench-mysql Restarting 
+ Container bench-mysql Started 
+[15:36:17]    warmup 60s
+[15:42:18]    transactions: 215605 (718.66 per sec.) | inv=OK|843277|843277|843277|843277|259906
+[15:42:18] == B_mysql_OFF_c8_r3
+ Container bench-mysql Restarting 
+ Container bench-mysql Started 
+[15:42:32]    warmup 60s
+[15:48:33]    transactions: 304795 (1015.96 per sec.) | inv=OK|428585|428585|428585|428585|354759
+ Container bench-mysql Restarting 
+ Container bench-mysql Started 
+[15:48:51] Xong thí nghiệm B cho mysql.
