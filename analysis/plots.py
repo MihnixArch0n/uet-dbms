@@ -35,6 +35,27 @@ def label(row):
     return f"{DBNAME[row['db']]}: {PNAME.get(row['param'], row['param'])}={row['value']}"
 
 
+def read_checkpoints(path, t0):
+    """Đọc log checkpoint của PostgreSQL; trả về [(loại, giây kể từ t0)].
+    loại: "time" (định kỳ), "manual" (lệnh CHECKPOINT), bỏ qua checkpoint lúc tắt máy (shutdown)."""
+    import datetime as dt
+    import re
+    out = []
+    if not os.path.exists(path):
+        return out
+    for line in open(path, errors="replace"):
+        m = re.search(r"(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d+) (GMT|UTC).*checkpoint starting: (.*)", line)
+        if not m:
+            continue
+        when = dt.datetime.strptime(m.group(1), "%Y-%m-%d %H:%M:%S.%f").replace(tzinfo=dt.timezone.utc).timestamp()
+        why = m.group(3)
+        if "shutdown" in why:
+            continue
+        kind = "time" if why.strip().startswith("time") else ("manual" if "immediate" in why or "force" in why else "other")
+        out.append((kind, when - t0))
+    return out
+
+
 def fig_A(s):
     # H3: TPS theo số client
     fig, axes = plt.subplots(1, 2, figsize=(11, 4), sharey=False)
@@ -65,14 +86,27 @@ def fig_A(s):
 
     # H5: số fsync log trên mỗi giao dịch theo số client
     if "log_fsyncs_per_txn_mean" in s:
-        fig, ax = plt.subplots(figsize=(7, 4))
+        fig, ax = plt.subplots(figsize=(8, 4.5))
+        style = {"pg": ("o", "-"), "mysql": ("s", "--")}
         for (db, val), g in s.groupby(["db", "value"]):
             g = g.sort_values("clients")
-            ax.plot(g["clients"], g["log_fsyncs_per_txn_mean"], marker="o", label=f"{DBNAME[db]} {val}")
+            mk, ls = style.get(db, ("o", "-"))
+            ax.plot(g["clients"], g["log_fsyncs_per_txn_mean"], marker=mk, linestyle=ls,
+                    markersize=6 if db == "pg" else 8, fillstyle="full" if db == "pg" else "none",
+                    label=f"{DBNAME[db]}: {PNAME.get(g['param'].iloc[0], g['param'].iloc[0])} = {val}")
+        hi = s[s["log_fsyncs_per_txn_mean"] > 1.05]
+        for _, r in hi.iterrows():
+            ax.annotate("> 1: gồm cả fsync của luồng nền\n(master thread, checkpoint)",
+                        (r["clients"], r["log_fsyncs_per_txn_mean"]), xytext=(18, -6),
+                        textcoords="offset points", fontsize=7, arrowprops=dict(arrowstyle="-", lw=.6))
+        ax.text(0.98, 0.42, "Các cấu hình không fsync khi COMMIT (PG off, MySQL 0 và 2)\n"
+                "đều xấp xỉ 0 nên các đường nằm chồng lên nhau",
+                transform=ax.transAxes, ha="right", va="bottom", fontsize=7, color="dimgray",
+                bbox=dict(facecolor="white", edgecolor="none", alpha=.8))
         ax.set_xscale("log", base=2); ax.set_xticks(sorted(s["clients"].unique()))
         ax.get_xaxis().set_major_formatter(matplotlib.ticker.ScalarFormatter())
         ax.set_xlabel("Số client"); ax.set_ylabel("Số lần fsync log / giao dịch")
-        ax.set_title("H5. Group commit: số fsync log trên mỗi giao dịch"); ax.grid(alpha=.3); ax.legend(fontsize=8)
+        ax.set_title("H5. Group commit: số fsync log trên mỗi giao dịch"); ax.grid(alpha=.3); ax.legend(fontsize=7)
         save(fig, "H5_fsync_per_txn.png")
 
 
@@ -118,20 +152,44 @@ def fig_B(s, samples, wd):
         fig.suptitle("H6. Chi phí bảo vệ trang: lượng ghi trên mỗi giao dịch (8 client, trung bình 3 lần)")
         save(fig, "H6_page_protection_cost.png")
 
-    # H7: tốc độ sinh WAL theo thời gian (lần chạy r1 của mỗi cấu hình PostgreSQL)
+    # H7: tốc độ sinh WAL theo thời gian (lần chạy r1 của mỗi cấu hình PostgreSQL),
+    # đánh dấu checkpoint đọc từ file .checkpoints (log PostgreSQL, giờ GMT).
     if samples is not None:
         sm = samples[(samples["db"] == "pg") & (samples["name"] == "lsn_bytes") & samples["run"].str.endswith("_r1")]
+        ts = samples[(samples["db"] == "pg") & (samples["name"] == "ts") & samples["run"].str.endswith("_r1")]
         if len(sm):
-            fig, ax = plt.subplots(figsize=(9, 4))
+            fig, ax = plt.subplots(figsize=(10, 4.5))
+            colors = {}
             for run, g in sm.groupby("run"):
                 g = g.sort_values("t")
                 rate = g["v"].diff() / g["t"].diff() / 1e6
-                ax.plot(g["t"], rate, label=run.replace("B_pg_", "").replace("_c8_r1", ""))
-                ck = os.path.join(RES, "raw", run + ".checkpoints")
-                if os.path.exists(ck) and os.path.getsize(ck):
-                    ax.text(0.01, 0.95, "xem thời điểm checkpoint trong file .checkpoints", transform=ax.transAxes, fontsize=7)
-            ax.set_xlabel("Thời gian từ lúc bắt đầu (giây)"); ax.set_ylabel("WAL sinh ra (MB/giây)")
-            ax.set_title("H7. Tốc độ sinh WAL theo thời gian, full_page_writes bật và tắt"); ax.grid(alpha=.3); ax.legend()
+                lab = run.replace("B_pg_", "").replace("_c8_r1", "")
+                line, = ax.plot(g["t"], rate, label=f"full_page_writes = {lab}")
+                colors[run] = line.get_color()
+            tmax = sm["t"].max()
+            marked_manual = marked_timed = False
+            for run in sm["run"].unique():
+                t0 = ts[ts["run"] == run].sort_values("t")["v"]
+                if not len(t0):
+                    continue
+                t0 = float(t0.iloc[0])
+                for kind, t in read_checkpoints(os.path.join(RES, "raw", run + ".checkpoints"), t0):
+                    if kind == "time" and 0 <= t <= tmax:
+                        ax.axvline(t, color=colors[run], linestyle="--", lw=1.2)
+                        ax.annotate("checkpoint định kỳ\n(checkpoint_timeout = 5min)", (t, ax.get_ylim()[1] * 0.9),
+                                    xytext=(-8, 0), textcoords="offset points", ha="right", fontsize=8,
+                                    color="black") if not marked_timed else None
+                        marked_timed = True
+                    elif kind == "manual" and -120 <= t < 0 and not marked_manual:
+                        ax.axvline(t, color="gray", linestyle=":", lw=1.2)
+                        ax.axvspan(t, 0, color="gray", alpha=.12)
+                        ax.text((t + 0) / 2, ax.get_ylim()[1] * 0.5, "CHECKPOINT thủ công\n+ warmup 60 s\n(không đo)",
+                                ha="center", fontsize=7, color="dimgray")
+                        marked_manual = True
+            ax.set_xlim(left=-75 if marked_manual else 0)
+            ax.set_xlabel("Thời gian từ lúc bắt đầu đo (giây)"); ax.set_ylabel("WAL sinh ra (MB/giây)")
+            ax.set_title("H7. Tốc độ sinh WAL theo thời gian: đỉnh sau mỗi checkpoint khi full_page_writes = on")
+            ax.grid(alpha=.3); ax.legend(loc="upper center", fontsize=8)
             save(fig, "H7_wal_rate.png")
 
     # H8: thành phần WAL (byte bản ghi thường và byte full-page image), tách FPI_FOR_HINT
@@ -151,7 +209,8 @@ def fig_B(s, samples, wd):
             ax.text(i, pv.loc[v].sum(), f"FPI {100 * fpi[v]:.0f}%", ha="center", va="bottom", fontsize=9)
         ax.set_ylim(0, pv.sum(axis=1).max() * 1.12)
         ax.set_xlabel("full_page_writes"); ax.set_ylabel("MB WAL mỗi lần chạy (trung bình)")
-        ax.set_title("H8. Thành phần WAL theo pg_waldump"); ax.grid(axis="y", alpha=.3)
+        ax.legend(title="Loại bản ghi WAL", fontsize=8, title_fontsize=8)
+        ax.set_title("H8. Thành phần WAL theo pg_waldump (FPI = phần ảnh trang đầy đủ)"); ax.grid(axis="y", alpha=.3)
         save(ax.figure, "H8_wal_composition.png")
 
 
