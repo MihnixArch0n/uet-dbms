@@ -224,6 +224,9 @@ def table_C(c):
         "bất biến sai (lần)": g["invariant"].apply(lambda x: (x != "OK").sum()),
         "giao dịch lạ": g["phantom"].sum(),
         "RTO trung bình (s)": g["rto_s"].mean().round(2),
+        # RTO chỉ tính DBMS (từ dòng khởi động đầu tiên trong log tới "ready"), không gồm thời gian
+        # máy ảo khởi động ở mức os: dùng cột này khi so sánh hai mức sự cố
+        "RTO theo log DBMS (s)": pd.to_numeric(c["rto_log_s"], errors="coerce").groupby([c["db"], c["level"], c["value"]]).mean().round(2),
         "redo trung bình (s)": pd.to_numeric(c["redo_s"], errors="coerce").groupby([c["db"], c["level"], c["value"]]).mean().round(3),
     }).reset_index()
     t.to_csv(os.path.join(RES, "C_table.csv"), index=False)
