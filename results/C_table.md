@@ -1,12 +1,12 @@
-| db | level | value | số lần crash | tổng giao dịch mất | mất nhiều nhất / lần | RPO lớn nhất (ms) | bất biến sai (lần) | giao dịch lạ | RTO trung bình (s) | RTO theo log DBMS (s) | redo trung bình (s) |
+| db | level | value | số lần crash | tổng giao dịch mất | mất nhiều nhất / lần | RPO lớn nhất (ms) | bất biến sai (lần) | giao dịch lạ | RTO trung bình (s) | RTO theo log DBMS, trung vị (s) | redo trung bình (s) |
 |---|---|---|---|---|---|---|---|---|---|---|---|
-| mysql | os | 0 | 5 | 8071 | 3517 | 629.6 | 0 | 0 | 20.0 | 9.16 | 2.466 |
-| mysql | os | 1 | 3 | 0 | 0 | 0.0 | 0 | 0 | 23.58 | 11.05 | 1.413 |
-| mysql | os | 2 | 5 | 4926 | 2674 | 551.7 | 0 | 0 | 27.03 | 14.9 | 2.413 |
-| mysql | process | 0 | 5 | 118 | 108 | 18.6 | 0 | 0 | 23.86 | 22.22 | 9.291 |
-| mysql | process | 1 | 3 | 0 | 0 | 0.0 | 0 | 0 | 20.24 | 18.6 | 8.568 |
-| mysql | process | 2 | 5 | 0 | 0 | 0.0 | 0 | 0 | 23.1 | 21.32 | 9.23 |
-| pg | os | off | 5 | 2687 | 897 | 196.6 | 0 | 0 | 22.59 | 10.65 | 3.822 |
-| pg | os | on | 3 | 0 | 0 | 0.0 | 0 | 0 | 20.54 | 8.41 | 1.743 |
-| pg | process | off | 5 | 80 | 69 | 20.1 | 0 | 0 | 11.64 | 10.88 | 1.198 |
-| pg | process | on | 3 | 0 | 0 | 0.0 | 0 | 0 | 9.87 | 9.02 | 0.59 |
+| mysql | os | 0 | 5 | 8071 | 3517 | 629.6 | 0 | 0 | 20.0 | 7.35 | 2.466 |
+| mysql | os | 1 | 3 | 0 | 0 | 0.0 | 0 | 0 | 23.58 | 8.93 | 1.413 |
+| mysql | os | 2 | 5 | 4926 | 2674 | 551.7 | 0 | 0 | 27.03 | 11.64 | 2.413 |
+| mysql | process | 0 | 5 | 118 | 108 | 18.6 | 0 | 0 | 23.86 | 18.54 | 9.291 |
+| mysql | process | 1 | 3 | 0 | 0 | 0.0 | 0 | 0 | 20.24 | 18.12 | 8.568 |
+| mysql | process | 2 | 5 | 0 | 0 | 0.0 | 0 | 0 | 23.1 | 19.21 | 9.23 |
+| pg | os | off | 5 | 2687 | 897 | 196.6 | 0 | 0 | 22.59 | 10.6 | 3.822 |
+| pg | os | on | 3 | 0 | 0 | 0.0 | 0 | 0 | 20.54 | 8.69 | 1.743 |
+| pg | process | off | 5 | 80 | 69 | 20.1 | 0 | 0 | 11.64 | 11.13 | 1.198 |
+| pg | process | on | 3 | 0 | 0 | 0.0 | 0 | 0 | 9.87 | 9.85 | 0.59 |

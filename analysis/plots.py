@@ -226,7 +226,7 @@ def table_C(c):
         "RTO trung bình (s)": g["rto_s"].mean().round(2),
         # RTO chỉ tính DBMS (từ dòng khởi động đầu tiên trong log tới "ready"), không gồm thời gian
         # máy ảo khởi động ở mức os: dùng cột này khi so sánh hai mức sự cố
-        "RTO theo log DBMS (s)": pd.to_numeric(c["rto_log_s"], errors="coerce").groupby([c["db"], c["level"], c["value"]]).mean().round(2),
+        "RTO theo log DBMS, trung vị (s)": pd.to_numeric(c["rto_log_s"], errors="coerce").groupby([c["db"], c["level"], c["value"]]).median().round(2),
         "redo trung bình (s)": pd.to_numeric(c["redo_s"], errors="coerce").groupby([c["db"], c["level"], c["value"]]).mean().round(3),
     }).reset_index()
     t.to_csv(os.path.join(RES, "C_table.csv"), index=False)
@@ -242,11 +242,17 @@ def table_C(c):
     cc["redo_bytes"] = pd.to_numeric(cc["redo_bytes"], errors="coerce")
     cc = cc.dropna(subset=["redo_s", "redo_bytes"])
     if len(cc):
-        fig, ax = plt.subplots(figsize=(7, 4))
-        for db, g in cc.groupby("db"):
-            ax.scatter(g["redo_bytes"] / 1e6, g["redo_s"], label=DBNAME[db])
+        fig, ax = plt.subplots(figsize=(8, 4.5))
+        lv = {"process": ("o", "kill tiến trình (máy đo)"), "os": ("^", "tắt ngang máy ảo (KVM)")}
+        colors = {"pg": "tab:blue", "mysql": "tab:orange"}
+        for (db, level), g in cc.groupby(["db", "level"]):
+            mk, lab = lv.get(level, ("s", level))
+            ax.scatter(g["redo_bytes"] / 1e6, g["redo_s"], marker=mk, color=colors.get(db),
+                       facecolors="none" if level == "os" else colors.get(db), s=45,
+                       label=f"{DBNAME[db]} – {lab}")
         ax.set_xlabel("Lượng log cần redo (MB)"); ax.set_ylabel("Thời gian redo (giây)")
-        ax.set_title("H9. Thời gian phục hồi theo lượng log cần redo"); ax.grid(alpha=.3); ax.legend()
+        ax.set_title("H9. Thời gian redo theo lượng log cần phát lại (42 lần crash)")
+        ax.grid(alpha=.3); ax.legend(fontsize=8)
         save(fig, "H9_redo_time.png")
 
 
