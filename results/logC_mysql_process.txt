@@ -1,0 +1,260 @@
+[10:00:04] == C_mysql_process_1_r1: chuẩn bị
+ Container bench-mysql Restarting 
+ Container bench-mysql Started 
+[10:00:13] mysql: innodb_flush_log_at_trx_commit = 1
+[10:00:38] Bơm tải 8 luồng
+[10:02:12] CRASH tiến trình sau 94s: docker kill -s KILL bench-mysql
+[10:02:23] Khởi động lại
+ Container bench-mysql Starting 
+ Container bench-mysql Started 
+[10:02:42] Sẵn sàng sau 19.05 s
+
+=== Đối soát C_mysql_process_1_r1 ===
+Đã xác nhận (ACK)            : 105807
+Đang dở lúc crash (INFLIGHT) : 1  (trong đó đã commit: 1)
+Còn trong DB sau phục hồi    : 105808  (COUNT(*) khớp: True)
+MẤT giao dịch đã xác nhận    : 0   RPO ≈ 0.0 ms
+Giao dịch lạ (phải = 0)      : 0
+Bất biến                     : OK  (-12933|-12933|-12933|-12933)
+RTO (đo từ máy thật)         : 19.05 s   RTO theo log DBMS: 17.412 s   redo: 8.535 s
+Đã nối vào /home/tran-minh-hieu/uet-dbms/results/C_summary.csv
+[10:02:48] == C_mysql_process_1_r2: chuẩn bị
+ Container bench-mysql Restarting 
+ Container bench-mysql Started 
+[10:02:54] mysql: innodb_flush_log_at_trx_commit = 1
+[10:03:00] Bơm tải 8 luồng
+[10:04:16] CRASH tiến trình sau 76s: docker kill -s KILL bench-mysql
+[10:04:27] Khởi động lại
+ Container bench-mysql Starting 
+ Container bench-mysql Started 
+[10:04:49] Sẵn sàng sau 21.94 s
+
+=== Đối soát C_mysql_process_1_r2 ===
+Đã xác nhận (ACK)            : 58719
+Đang dở lúc crash (INFLIGHT) : 8  (trong đó đã commit: 8)
+Còn trong DB sau phục hồi    : 58727  (COUNT(*) khớp: True)
+MẤT giao dịch đã xác nhận    : 0   RPO ≈ 0.0 ms
+Giao dịch lạ (phải = 0)      : 0
+Bất biến                     : OK  (625791|625791|625791|625791)
+RTO (đo từ máy thật)         : 21.94 s   RTO theo log DBMS: 20.281 s   redo: 8.53 s
+Đã nối vào /home/tran-minh-hieu/uet-dbms/results/C_summary.csv
+[10:04:54] == C_mysql_process_1_r3: chuẩn bị
+ Container bench-mysql Restarting 
+ Container bench-mysql Started 
+[10:05:05] mysql: innodb_flush_log_at_trx_commit = 1
+[10:05:32] Bơm tải 8 luồng
+[10:07:00] CRASH tiến trình sau 88s: docker kill -s KILL bench-mysql
+[10:07:10] Khởi động lại
+ Container bench-mysql Starting 
+ Container bench-mysql Started 
+[10:07:30] Sẵn sàng sau 19.72 s
+
+=== Đối soát C_mysql_process_1_r3 ===
+Đã xác nhận (ACK)            : 74452
+Đang dở lúc crash (INFLIGHT) : 2  (trong đó đã commit: 2)
+Còn trong DB sau phục hồi    : 74454  (COUNT(*) khớp: True)
+MẤT giao dịch đã xác nhận    : 0   RPO ≈ 0.0 ms
+Giao dịch lạ (phải = 0)      : 0
+Bất biến                     : OK  (1342734|1342734|1342734|1342734)
+RTO (đo từ máy thật)         : 19.72 s   RTO theo log DBMS: 18.12 s   redo: 8.64 s
+Đã nối vào /home/tran-minh-hieu/uet-dbms/results/C_summary.csv
+[10:07:35] == C_mysql_process_2_r1: chuẩn bị
+ Container bench-mysql Restarting 
+ Container bench-mysql Started 
+[10:07:42] mysql: innodb_flush_log_at_trx_commit = 2
+[10:07:47] Bơm tải 8 luồng
+[10:09:45] CRASH tiến trình sau 118s: docker kill -s KILL bench-mysql
+[10:09:56] Khởi động lại
+ Container bench-mysql Starting 
+ Container bench-mysql Started 
+[10:10:16] Sẵn sàng sau 20.19 s
+
+=== Đối soát C_mysql_process_2_r1 ===
+Đã xác nhận (ACK)            : 396227
+Đang dở lúc crash (INFLIGHT) : 3  (trong đó đã commit: 0)
+Còn trong DB sau phục hồi    : 396227  (COUNT(*) khớp: True)
+MẤT giao dịch đã xác nhận    : 0   RPO ≈ 0.0 ms
+Giao dịch lạ (phải = 0)      : 0
+Bất biến                     : OK  (3190520|3190520|3190520|3190520)
+RTO (đo từ máy thật)         : 20.19 s   RTO theo log DBMS: 18.552 s   redo: 8.155 s
+Đã nối vào /home/tran-minh-hieu/uet-dbms/results/C_summary.csv
+[10:10:19] == C_mysql_process_2_r2: chuẩn bị
+ Container bench-mysql Restarting 
+ Container bench-mysql Started 
+[10:10:28] mysql: innodb_flush_log_at_trx_commit = 2
+[10:10:34] Bơm tải 8 luồng
+[10:11:57] CRASH tiến trình sau 83s: docker kill -s KILL bench-mysql
+[10:12:07] Khởi động lại
+ Container bench-mysql Starting 
+ Container bench-mysql Started 
+[10:12:28] Sẵn sàng sau 20.60 s
+
+=== Đối soát C_mysql_process_2_r2 ===
+Đã xác nhận (ACK)            : 287947
+Đang dở lúc crash (INFLIGHT) : 0  (trong đó đã commit: 0)
+Còn trong DB sau phục hồi    : 287947  (COUNT(*) khớp: True)
+MẤT giao dịch đã xác nhận    : 0   RPO ≈ 0.0 ms
+Giao dịch lạ (phải = 0)      : 0
+Bất biến                     : OK  (-578662|-578662|-578662|-578662)
+RTO (đo từ máy thật)         : 20.6 s   RTO theo log DBMS: 19.211 s   redo: 9.55 s
+Đã nối vào /home/tran-minh-hieu/uet-dbms/results/C_summary.csv
+[10:12:31] == C_mysql_process_2_r3: chuẩn bị
+ Container bench-mysql Restarting 
+ Container bench-mysql Started 
+[10:12:40] mysql: innodb_flush_log_at_trx_commit = 2
+[10:12:47] Bơm tải 8 luồng
+[10:14:17] CRASH tiến trình sau 90s: docker kill -s KILL bench-mysql
+[10:14:28] Khởi động lại
+ Container bench-mysql Starting 
+ Container bench-mysql Started 
+[10:15:01] Sẵn sàng sau 33.02 s
+
+=== Đối soát C_mysql_process_2_r3 ===
+Đã xác nhận (ACK)            : 318125
+Đang dở lúc crash (INFLIGHT) : 0  (trong đó đã commit: 0)
+Còn trong DB sau phục hồi    : 318125  (COUNT(*) khớp: True)
+MẤT giao dịch đã xác nhận    : 0   RPO ≈ 0.0 ms
+Giao dịch lạ (phải = 0)      : 0
+Bất biến                     : OK  (1239773|1239773|1239773|1239773)
+RTO (đo từ máy thật)         : 33.02 s   RTO theo log DBMS: 30.354 s   redo: 12.304 s
+Đã nối vào /home/tran-minh-hieu/uet-dbms/results/C_summary.csv
+[10:15:05] == C_mysql_process_2_r4: chuẩn bị
+ Container bench-mysql Restarting 
+ Container bench-mysql Started 
+[10:15:12] mysql: innodb_flush_log_at_trx_commit = 2
+[10:15:20] Bơm tải 8 luồng
+[10:16:49] CRASH tiến trình sau 89s: docker kill -s KILL bench-mysql
+[10:16:59] Khởi động lại
+ Container bench-mysql Starting 
+ Container bench-mysql Started 
+[10:17:21] Sẵn sàng sau 21.34 s
+
+=== Đối soát C_mysql_process_2_r4 ===
+Đã xác nhận (ACK)            : 326301
+Đang dở lúc crash (INFLIGHT) : 0  (trong đó đã commit: 0)
+Còn trong DB sau phục hồi    : 326301  (COUNT(*) khớp: True)
+MẤT giao dịch đã xác nhận    : 0   RPO ≈ 0.0 ms
+Giao dịch lạ (phải = 0)      : 0
+Bất biến                     : OK  (-1246912|-1246912|-1246912|-1246912)
+RTO (đo từ máy thật)         : 21.34 s   RTO theo log DBMS: 19.658 s   redo: 7.121 s
+Đã nối vào /home/tran-minh-hieu/uet-dbms/results/C_summary.csv
+[10:17:24] == C_mysql_process_2_r5: chuẩn bị
+ Container bench-mysql Restarting 
+ Container bench-mysql Started 
+[10:17:34] mysql: innodb_flush_log_at_trx_commit = 2
+[10:17:46] Bơm tải 8 luồng
+[10:19:26] CRASH tiến trình sau 100s: docker kill -s KILL bench-mysql
+[10:19:37] Khởi động lại
+ Container bench-mysql Starting 
+ Container bench-mysql Started 
+[10:19:57] Sẵn sàng sau 20.35 s
+
+=== Đối soát C_mysql_process_2_r5 ===
+Đã xác nhận (ACK)            : 326455
+Đang dở lúc crash (INFLIGHT) : 1  (trong đó đã commit: 0)
+Còn trong DB sau phục hồi    : 326455  (COUNT(*) khớp: True)
+MẤT giao dịch đã xác nhận    : 0   RPO ≈ 0.0 ms
+Giao dịch lạ (phải = 0)      : 0
+Bất biến                     : OK  (-730731|-730731|-730731|-730731)
+RTO (đo từ máy thật)         : 20.35 s   RTO theo log DBMS: 18.811 s   redo: 9.02 s
+Đã nối vào /home/tran-minh-hieu/uet-dbms/results/C_summary.csv
+[10:20:00] == C_mysql_process_0_r1: chuẩn bị
+ Container bench-mysql Restarting 
+ Container bench-mysql Started 
+[10:20:08] mysql: innodb_flush_log_at_trx_commit = 0
+[10:20:15] Bơm tải 8 luồng
+[10:21:59] CRASH tiến trình sau 104s: docker kill -s KILL bench-mysql
+[10:22:10] Khởi động lại
+ Container bench-mysql Starting 
+ Container bench-mysql Started 
+[10:22:43] Sẵn sàng sau 33.38 s
+
+=== Đối soát C_mysql_process_0_r1 ===
+Đã xác nhận (ACK)            : 363985
+Đang dở lúc crash (INFLIGHT) : 2  (trong đó đã commit: 0)
+Còn trong DB sau phục hồi    : 363877  (COUNT(*) khớp: True)
+MẤT giao dịch đã xác nhận    : 108   RPO ≈ 18.6 ms
+Giao dịch lạ (phải = 0)      : 0
+Bất biến                     : OK  (-4210154|-4210154|-4210154|-4210154)
+RTO (đo từ máy thật)         : 33.38 s   RTO theo log DBMS: 31.786 s   redo: 12.446 s
+Đã nối vào /home/tran-minh-hieu/uet-dbms/results/C_summary.csv
+[10:22:46] == C_mysql_process_0_r2: chuẩn bị
+ Container bench-mysql Restarting 
+ Container bench-mysql Started 
+[10:22:53] mysql: innodb_flush_log_at_trx_commit = 0
+[10:23:02] Bơm tải 8 luồng
+[10:24:11] CRASH tiến trình sau 69s: docker kill -s KILL bench-mysql
+[10:24:22] Khởi động lại
+ Container bench-mysql Starting 
+ Container bench-mysql Started 
+[10:24:42] Sẵn sàng sau 20.09 s
+
+=== Đối soát C_mysql_process_0_r2 ===
+Đã xác nhận (ACK)            : 262535
+Đang dở lúc crash (INFLIGHT) : 1  (trong đó đã commit: 0)
+Còn trong DB sau phục hồi    : 262530  (COUNT(*) khớp: True)
+MẤT giao dịch đã xác nhận    : 5   RPO ≈ 1.3 ms
+Giao dịch lạ (phải = 0)      : 0
+Bất biến                     : OK  (1695116|1695116|1695116|1695116)
+RTO (đo từ máy thật)         : 20.09 s   RTO theo log DBMS: 18.544 s   redo: 8.546 s
+Đã nối vào /home/tran-minh-hieu/uet-dbms/results/C_summary.csv
+[10:24:45] == C_mysql_process_0_r3: chuẩn bị
+ Container bench-mysql Restarting 
+ Container bench-mysql Started 
+[10:24:53] mysql: innodb_flush_log_at_trx_commit = 0
+[10:24:58] Bơm tải 8 luồng
+[10:26:42] CRASH tiến trình sau 104s: docker kill -s KILL bench-mysql
+[10:26:52] Khởi động lại
+ Container bench-mysql Starting 
+ Container bench-mysql Started 
+[10:27:11] Sẵn sàng sau 18.46 s
+
+=== Đối soát C_mysql_process_0_r3 ===
+Đã xác nhận (ACK)            : 369677
+Đang dở lúc crash (INFLIGHT) : 0  (trong đó đã commit: 0)
+Còn trong DB sau phục hồi    : 369677  (COUNT(*) khớp: True)
+MẤT giao dịch đã xác nhận    : 0   RPO ≈ 0.0 ms
+Giao dịch lạ (phải = 0)      : 0
+Bất biến                     : OK  (-832313|-832313|-832313|-832313)
+RTO (đo từ máy thật)         : 18.46 s   RTO theo log DBMS: 16.92 s   redo: 7.339 s
+Đã nối vào /home/tran-minh-hieu/uet-dbms/results/C_summary.csv
+[10:27:14] == C_mysql_process_0_r4: chuẩn bị
+ Container bench-mysql Restarting 
+ Container bench-mysql Started 
+[10:27:23] mysql: innodb_flush_log_at_trx_commit = 0
+[10:27:30] Bơm tải 8 luồng
+[10:28:57] CRASH tiến trình sau 87s: docker kill -s KILL bench-mysql
+[10:29:07] Khởi động lại
+ Container bench-mysql Starting 
+ Container bench-mysql Started 
+[10:29:27] Sẵn sàng sau 19.64 s
+
+=== Đối soát C_mysql_process_0_r4 ===
+Đã xác nhận (ACK)            : 275373
+Đang dở lúc crash (INFLIGHT) : 2  (trong đó đã commit: 0)
+Còn trong DB sau phục hồi    : 275371  (COUNT(*) khớp: True)
+MẤT giao dịch đã xác nhận    : 2   RPO ≈ 0.1 ms
+Giao dịch lạ (phải = 0)      : 0
+Bất biến                     : OK  (-409238|-409238|-409238|-409238)
+RTO (đo từ máy thật)         : 19.64 s   RTO theo log DBMS: 17.93 s   redo: 9.855 s
+Đã nối vào /home/tran-minh-hieu/uet-dbms/results/C_summary.csv
+[10:29:30] == C_mysql_process_0_r5: chuẩn bị
+ Container bench-mysql Restarting 
+ Container bench-mysql Started 
+[10:29:38] mysql: innodb_flush_log_at_trx_commit = 0
+[10:29:44] Bơm tải 8 luồng
+[10:31:41] CRASH tiến trình sau 117s: docker kill -s KILL bench-mysql
+[10:31:52] Khởi động lại
+ Container bench-mysql Starting 
+ Container bench-mysql Started 
+[10:32:20] Sẵn sàng sau 27.73 s
+
+=== Đối soát C_mysql_process_0_r5 ===
+Đã xác nhận (ACK)            : 399008
+Đang dở lúc crash (INFLIGHT) : 5  (trong đó đã commit: 0)
+Còn trong DB sau phục hồi    : 399005  (COUNT(*) khớp: True)
+MẤT giao dịch đã xác nhận    : 3   RPO ≈ 0.7 ms
+Giao dịch lạ (phải = 0)      : 0
+Bất biến                     : OK  (22161|22161|22161|22161)
+RTO (đo từ máy thật)         : 27.73 s   RTO theo log DBMS: 25.897 s   redo: 8.268 s
+Đã nối vào /home/tran-minh-hieu/uet-dbms/results/C_summary.csv

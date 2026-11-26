@@ -1,0 +1,160 @@
+[09:35:40] == C_pg_process_on_r1: chuẩn bị
+ Container bench-pg Restarting 
+ Container bench-pg Started 
+[09:35:41] pg: synchronous_commit = on
+[09:35:47] Bơm tải 8 luồng
+[09:36:47] CRASH tiến trình sau 60s: docker kill -s KILL bench-pg
+[09:36:57] Khởi động lại
+ Container bench-pg Starting 
+ Container bench-pg Started 
+[09:37:05] Sẵn sàng sau 7.27 s
+
+=== Đối soát C_pg_process_on_r1 ===
+Đã xác nhận (ACK)            : 91764
+Đang dở lúc crash (INFLIGHT) : 8  (trong đó đã commit: 6)
+Còn trong DB sau phục hồi    : 91770  (COUNT(*) khớp: True)
+MẤT giao dịch đã xác nhận    : 0   RPO ≈ 0.0 ms
+Giao dịch lạ (phải = 0)      : 0
+Bất biến                     : OK  (-64373|-64373|-64373|-64373)
+RTO (đo từ máy thật)         : 7.27 s   RTO theo log DBMS: 6.782 s   redo: 0.61 s
+Đã nối vào /home/tran-minh-hieu/uet-dbms/results/C_summary.csv
+[09:37:08] == C_pg_process_on_r2: chuẩn bị
+ Container bench-pg Restarting 
+ Container bench-pg Started 
+[09:37:11] pg: synchronous_commit = on
+[09:37:23] Bơm tải 8 luồng
+[09:38:34] CRASH tiến trình sau 71s: docker kill -s KILL bench-pg
+[09:38:45] Khởi động lại
+ Container bench-pg Starting 
+ Container bench-pg Started 
+[09:38:56] Sẵn sàng sau 10.82 s
+
+=== Đối soát C_pg_process_on_r2 ===
+Đã xác nhận (ACK)            : 79372
+Đang dở lúc crash (INFLIGHT) : 7  (trong đó đã commit: 5)
+Còn trong DB sau phục hồi    : 79377  (COUNT(*) khớp: True)
+MẤT giao dịch đã xác nhận    : 0   RPO ≈ 0.0 ms
+Giao dịch lạ (phải = 0)      : 0
+Bất biến                     : OK  (752769|752769|752769|752769)
+RTO (đo từ máy thật)         : 10.82 s   RTO theo log DBMS: 9.851 s   redo: 0.55 s
+Đã nối vào /home/tran-minh-hieu/uet-dbms/results/C_summary.csv
+[09:38:59] == C_pg_process_on_r3: chuẩn bị
+ Container bench-pg Restarting 
+ Container bench-pg Started 
+[09:39:06] pg: synchronous_commit = on
+[09:39:17] Bơm tải 8 luồng
+[09:40:50] CRASH tiến trình sau 93s: docker kill -s KILL bench-pg
+[09:41:01] Khởi động lại
+ Container bench-pg Starting 
+ Container bench-pg Started 
+[09:41:12] Sẵn sàng sau 11.52 s
+
+=== Đối soát C_pg_process_on_r3 ===
+Đã xác nhận (ACK)            : 102441
+Đang dở lúc crash (INFLIGHT) : 8  (trong đó đã commit: 3)
+Còn trong DB sau phục hồi    : 102444  (COUNT(*) khớp: True)
+MẤT giao dịch đã xác nhận    : 0   RPO ≈ 0.0 ms
+Giao dịch lạ (phải = 0)      : 0
+Bất biến                     : OK  (553363|553363|553363|553363)
+RTO (đo từ máy thật)         : 11.52 s   RTO theo log DBMS: 10.422 s   redo: 0.61 s
+Đã nối vào /home/tran-minh-hieu/uet-dbms/results/C_summary.csv
+[09:41:16] == C_pg_process_off_r1: chuẩn bị
+ Container bench-pg Restarting 
+ Container bench-pg Started 
+[09:41:23] pg: synchronous_commit = off
+[09:41:47] Bơm tải 8 luồng
+[09:42:56] CRASH tiến trình sau 69s: docker kill -s KILL bench-pg
+[09:43:07] Khởi động lại
+ Container bench-pg Starting 
+ Container bench-pg Started 
+[09:43:17] Sẵn sàng sau 10.29 s
+
+=== Đối soát C_pg_process_off_r1 ===
+Đã xác nhận (ACK)            : 250920
+Đang dở lúc crash (INFLIGHT) : 4  (trong đó đã commit: 0)
+Còn trong DB sau phục hồi    : 250851  (COUNT(*) khớp: True)
+MẤT giao dịch đã xác nhận    : 69   RPO ≈ 20.1 ms
+Giao dịch lạ (phải = 0)      : 0
+Bất biến                     : OK  (-2095028|-2095028|-2095028|-2095028)
+RTO (đo từ máy thật)         : 10.29 s   RTO theo log DBMS: 9.654 s   redo: 0.99 s
+Đã nối vào /home/tran-minh-hieu/uet-dbms/results/C_summary.csv
+[09:43:21] == C_pg_process_off_r2: chuẩn bị
+ Container bench-pg Restarting 
+ Container bench-pg Started 
+[09:43:34] pg: synchronous_commit = off
+[09:44:03] Bơm tải 8 luồng
+[09:45:59] CRASH tiến trình sau 116s: docker kill -s KILL bench-pg
+[09:46:10] Khởi động lại
+ Container bench-pg Starting 
+ Container bench-pg Started 
+[09:46:22] Sẵn sàng sau 12.12 s
+
+=== Đối soát C_pg_process_off_r2 ===
+Đã xác nhận (ACK)            : 416655
+Đang dở lúc crash (INFLIGHT) : 1  (trong đó đã commit: 0)
+Còn trong DB sau phục hồi    : 416650  (COUNT(*) khớp: True)
+MẤT giao dịch đã xác nhận    : 5   RPO ≈ 0.9 ms
+Giao dịch lạ (phải = 0)      : 0
+Bất biến                     : OK  (2315919|2315919|2315919|2315919)
+RTO (đo từ máy thật)         : 12.12 s   RTO theo log DBMS: 11.463 s   redo: 1.41 s
+Đã nối vào /home/tran-minh-hieu/uet-dbms/results/C_summary.csv
+[09:46:27] == C_pg_process_off_r3: chuẩn bị
+ Container bench-pg Restarting 
+ Container bench-pg Started 
+[09:46:34] pg: synchronous_commit = off
+[09:47:04] Bơm tải 8 luồng
+[09:48:28] CRASH tiến trình sau 84s: docker kill -s KILL bench-pg
+[09:48:38] Khởi động lại
+ Container bench-pg Starting 
+ Container bench-pg Started 
+[09:48:50] Sẵn sàng sau 11.87 s
+
+=== Đối soát C_pg_process_off_r3 ===
+Đã xác nhận (ACK)            : 301175
+Đang dở lúc crash (INFLIGHT) : 1  (trong đó đã commit: 0)
+Còn trong DB sau phục hồi    : 301172  (COUNT(*) khớp: True)
+MẤT giao dịch đã xác nhận    : 3   RPO ≈ 2.2 ms
+Giao dịch lạ (phải = 0)      : 0
+Bất biến                     : OK  (-581974|-581974|-581974|-581974)
+RTO (đo từ máy thật)         : 11.87 s   RTO theo log DBMS: 11.126 s   redo: 1.21 s
+Đã nối vào /home/tran-minh-hieu/uet-dbms/results/C_summary.csv
+[09:48:55] == C_pg_process_off_r4: chuẩn bị
+ Container bench-pg Restarting 
+ Container bench-pg Started 
+[09:49:02] pg: synchronous_commit = off
+[09:49:26] Bơm tải 8 luồng
+[09:51:01] CRASH tiến trình sau 95s: docker kill -s KILL bench-pg
+[09:51:11] Khởi động lại
+ Container bench-pg Starting 
+ Container bench-pg Started 
+[09:51:23] Sẵn sàng sau 12.00 s
+
+=== Đối soát C_pg_process_off_r4 ===
+Đã xác nhận (ACK)            : 342821
+Đang dở lúc crash (INFLIGHT) : 2  (trong đó đã commit: 0)
+Còn trong DB sau phục hồi    : 342819  (COUNT(*) khớp: True)
+MẤT giao dịch đã xác nhận    : 2   RPO ≈ 0.0 ms
+Giao dịch lạ (phải = 0)      : 0
+Bất biến                     : OK  (-277337|-277337|-277337|-277337)
+RTO (đo từ máy thật)         : 12.0 s   RTO theo log DBMS: 11.264 s   redo: 1.28 s
+Đã nối vào /home/tran-minh-hieu/uet-dbms/results/C_summary.csv
+[09:51:28] == C_pg_process_off_r5: chuẩn bị
+ Container bench-pg Restarting 
+ Container bench-pg Started 
+[09:51:35] pg: synchronous_commit = off
+[09:52:00] Bơm tải 8 luồng
+[09:53:07] CRASH tiến trình sau 67s: docker kill -s KILL bench-pg
+[09:53:18] Khởi động lại
+ Container bench-pg Starting 
+ Container bench-pg Started 
+[09:53:30] Sẵn sàng sau 11.91 s
+
+=== Đối soát C_pg_process_off_r5 ===
+Đã xác nhận (ACK)            : 245023
+Đang dở lúc crash (INFLIGHT) : 2  (trong đó đã commit: 0)
+Còn trong DB sau phục hồi    : 245022  (COUNT(*) khớp: True)
+MẤT giao dịch đã xác nhận    : 1   RPO ≈ 0.0 ms
+Giao dịch lạ (phải = 0)      : 0
+Bất biến                     : OK  (-1732230|-1732230|-1732230|-1732230)
+RTO (đo từ máy thật)         : 11.91 s   RTO theo log DBMS: 10.891 s   redo: 1.1 s
+Đã nối vào /home/tran-minh-hieu/uet-dbms/results/C_summary.csv

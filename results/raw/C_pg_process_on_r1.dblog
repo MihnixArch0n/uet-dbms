@@ -1,0 +1,47 @@
+
+PostgreSQL Database directory appears to contain a database; Skipping initialization
+
+2026-11-26 02:36:58.231 GMT [1] LOG:  starting PostgreSQL 16.16 (Debian 16.16-1.pgdg13+1) on x86_64-pc-linux-gnu, compiled by gcc (Debian 14.2.0-19) 14.2.0, 64-bit
+2026-11-26 02:36:58.231 GMT [1] LOG:  listening on IPv4 address "0.0.0.0", port 5432
+2026-11-26 02:36:58.231 GMT [1] LOG:  listening on IPv6 address "::", port 5432
+2026-11-26 02:36:58.240 GMT [1] LOG:  listening on Unix socket "/var/run/postgresql/.s.PGSQL.5432"
+2026-11-26 02:36:58.251 GMT [29] LOG:  database system was interrupted; last known up at 2026-11-26 02:35:45 GMT
+2026-11-26 02:36:58.302 GMT [36] FATAL:  the database system is starting up
+2026-11-26 02:36:58.642 GMT [43] FATAL:  the database system is starting up
+2026-11-26 02:36:58.967 GMT [50] FATAL:  the database system is starting up
+2026-11-26 02:36:59.289 GMT [57] FATAL:  the database system is starting up
+2026-11-26 02:36:59.626 GMT [64] FATAL:  the database system is starting up
+2026-11-26 02:36:59.946 GMT [71] FATAL:  the database system is starting up
+2026-11-26 02:37:00.268 GMT [78] FATAL:  the database system is starting up
+2026-11-26 02:37:00.589 GMT [85] FATAL:  the database system is starting up
+2026-11-26 02:37:00.911 GMT [92] FATAL:  the database system is starting up
+2026-11-26 02:37:01.248 GMT [99] FATAL:  the database system is starting up
+2026-11-26 02:37:01.479 GMT [29] LOG:  database system was not properly shut down; automatic recovery in progress
+2026-11-26 02:37:01.484 GMT [29] LOG:  redo starts at 10/68079F0
+2026-11-26 02:37:01.588 GMT [106] FATAL:  the database system is not yet accepting connections
+2026-11-26 02:37:01.588 GMT [106] DETAIL:  Consistent recovery state has not been yet reached.
+2026-11-26 02:37:01.919 GMT [113] FATAL:  the database system is not yet accepting connections
+2026-11-26 02:37:01.919 GMT [113] DETAIL:  Consistent recovery state has not been yet reached.
+2026-11-26 02:37:02.101 GMT [29] LOG:  invalid record length at 10/2C225178: expected at least 24, got 0
+2026-11-26 02:37:02.101 GMT [29] LOG:  redo done at 10/2C225150 system usage: CPU: user: 0.38 s, system: 0.22 s, elapsed: 0.61 s
+2026-11-26 02:37:02.112 GMT [27] LOG:  checkpoint starting: end-of-recovery immediate wait
+2026-11-26 02:37:02.244 GMT [120] FATAL:  the database system is not yet accepting connections
+2026-11-26 02:37:02.244 GMT [120] DETAIL:  Consistent recovery state has not been yet reached.
+2026-11-26 02:37:02.568 GMT [127] FATAL:  the database system is not yet accepting connections
+2026-11-26 02:37:02.568 GMT [127] DETAIL:  Consistent recovery state has not been yet reached.
+2026-11-26 02:37:02.906 GMT [134] FATAL:  the database system is not yet accepting connections
+2026-11-26 02:37:02.906 GMT [134] DETAIL:  Consistent recovery state has not been yet reached.
+2026-11-26 02:37:03.234 GMT [141] FATAL:  the database system is not yet accepting connections
+2026-11-26 02:37:03.234 GMT [141] DETAIL:  Consistent recovery state has not been yet reached.
+2026-11-26 02:37:03.570 GMT [148] FATAL:  the database system is not yet accepting connections
+2026-11-26 02:37:03.570 GMT [148] DETAIL:  Consistent recovery state has not been yet reached.
+2026-11-26 02:37:03.904 GMT [155] FATAL:  the database system is not yet accepting connections
+2026-11-26 02:37:03.904 GMT [155] DETAIL:  Consistent recovery state has not been yet reached.
+2026-11-26 02:37:04.226 GMT [162] FATAL:  the database system is not yet accepting connections
+2026-11-26 02:37:04.226 GMT [162] DETAIL:  Consistent recovery state has not been yet reached.
+2026-11-26 02:37:04.558 GMT [169] FATAL:  the database system is not yet accepting connections
+2026-11-26 02:37:04.558 GMT [169] DETAIL:  Consistent recovery state has not been yet reached.
+2026-11-26 02:37:04.889 GMT [176] FATAL:  the database system is not yet accepting connections
+2026-11-26 02:37:04.889 GMT [176] DETAIL:  Consistent recovery state has not been yet reached.
+2026-11-26 02:37:04.993 GMT [27] LOG:  checkpoint complete: wrote 94922 buffers (36.2%); 0 WAL file(s) added, 0 removed, 38 recycled; write=1.520 s, sync=1.079 s, total=2.886 s; sync files=22, longest=0.660 s, average=0.050 s; distance=616565 kB, estimate=616565 kB; lsn=10/2C225178, redo lsn=10/2C225178
+2026-11-26 02:37:05.013 GMT [1] LOG:  database system is ready to accept connections

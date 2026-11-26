@@ -1,0 +1,70 @@
+
+PostgreSQL Database directory appears to contain a database; Skipping initialization
+
+2026-11-26 02:48:39.532 GMT [1] LOG:  starting PostgreSQL 16.16 (Debian 16.16-1.pgdg13+1) on x86_64-pc-linux-gnu, compiled by gcc (Debian 14.2.0-19) 14.2.0, 64-bit
+2026-11-26 02:48:39.532 GMT [1] LOG:  listening on IPv4 address "0.0.0.0", port 5432
+2026-11-26 02:48:39.532 GMT [1] LOG:  listening on IPv6 address "::", port 5432
+2026-11-26 02:48:39.597 GMT [1] LOG:  listening on Unix socket "/var/run/postgresql/.s.PGSQL.5432"
+2026-11-26 02:48:39.659 GMT [35] LOG:  database system was interrupted; last known up at 2026-11-26 02:46:59 GMT
+2026-11-26 02:48:39.904 GMT [42] FATAL:  the database system is starting up
+2026-11-26 02:48:40.237 GMT [49] FATAL:  the database system is starting up
+2026-11-26 02:48:40.566 GMT [56] FATAL:  the database system is starting up
+2026-11-26 02:48:40.901 GMT [63] FATAL:  the database system is starting up
+2026-11-26 02:48:41.232 GMT [70] FATAL:  the database system is starting up
+2026-11-26 02:48:41.555 GMT [77] FATAL:  the database system is starting up
+2026-11-26 02:48:41.887 GMT [84] FATAL:  the database system is starting up
+2026-11-26 02:48:42.213 GMT [91] FATAL:  the database system is starting up
+2026-11-26 02:48:42.535 GMT [98] FATAL:  the database system is starting up
+2026-11-26 02:48:42.859 GMT [105] FATAL:  the database system is starting up
+2026-11-26 02:48:43.181 GMT [112] FATAL:  the database system is starting up
+2026-11-26 02:48:43.223 GMT [35] LOG:  database system was not properly shut down; automatic recovery in progress
+2026-11-26 02:48:43.257 GMT [35] LOG:  redo starts at 12/2D7DAAD0
+2026-11-26 02:48:43.516 GMT [119] FATAL:  the database system is not yet accepting connections
+2026-11-26 02:48:43.516 GMT [119] DETAIL:  Consistent recovery state has not been yet reached.
+2026-11-26 02:48:43.853 GMT [126] FATAL:  the database system is not yet accepting connections
+2026-11-26 02:48:43.853 GMT [126] DETAIL:  Consistent recovery state has not been yet reached.
+2026-11-26 02:48:44.183 GMT [133] FATAL:  the database system is not yet accepting connections
+2026-11-26 02:48:44.183 GMT [133] DETAIL:  Consistent recovery state has not been yet reached.
+2026-11-26 02:48:44.469 GMT [35] LOG:  unexpected pageaddr 10/10596000 in WAL segment 000000010000001200000064, LSN 12/64596000, offset 5857280
+2026-11-26 02:48:44.469 GMT [35] LOG:  redo done at 12/64595FC8 system usage: CPU: user: 0.89 s, system: 0.31 s, elapsed: 1.21 s
+2026-11-26 02:48:44.499 GMT [140] FATAL:  the database system is not yet accepting connections
+2026-11-26 02:48:44.499 GMT [140] DETAIL:  Consistent recovery state has not been yet reached.
+2026-11-26 02:48:44.576 GMT [33] LOG:  checkpoint starting: end-of-recovery immediate wait
+2026-11-26 02:48:44.820 GMT [147] FATAL:  the database system is not yet accepting connections
+2026-11-26 02:48:44.820 GMT [147] DETAIL:  Consistent recovery state has not been yet reached.
+2026-11-26 02:48:45.136 GMT [154] FATAL:  the database system is not yet accepting connections
+2026-11-26 02:48:45.136 GMT [154] DETAIL:  Consistent recovery state has not been yet reached.
+2026-11-26 02:48:45.457 GMT [161] FATAL:  the database system is not yet accepting connections
+2026-11-26 02:48:45.457 GMT [161] DETAIL:  Consistent recovery state has not been yet reached.
+2026-11-26 02:48:45.778 GMT [168] FATAL:  the database system is not yet accepting connections
+2026-11-26 02:48:45.778 GMT [168] DETAIL:  Consistent recovery state has not been yet reached.
+2026-11-26 02:48:46.113 GMT [175] FATAL:  the database system is not yet accepting connections
+2026-11-26 02:48:46.113 GMT [175] DETAIL:  Consistent recovery state has not been yet reached.
+2026-11-26 02:48:46.444 GMT [182] FATAL:  the database system is not yet accepting connections
+2026-11-26 02:48:46.444 GMT [182] DETAIL:  Consistent recovery state has not been yet reached.
+2026-11-26 02:48:46.781 GMT [189] FATAL:  the database system is not yet accepting connections
+2026-11-26 02:48:46.781 GMT [189] DETAIL:  Consistent recovery state has not been yet reached.
+2026-11-26 02:48:47.107 GMT [196] FATAL:  the database system is not yet accepting connections
+2026-11-26 02:48:47.107 GMT [196] DETAIL:  Consistent recovery state has not been yet reached.
+2026-11-26 02:48:47.442 GMT [203] FATAL:  the database system is not yet accepting connections
+2026-11-26 02:48:47.442 GMT [203] DETAIL:  Consistent recovery state has not been yet reached.
+2026-11-26 02:48:47.769 GMT [210] FATAL:  the database system is not yet accepting connections
+2026-11-26 02:48:47.769 GMT [210] DETAIL:  Consistent recovery state has not been yet reached.
+2026-11-26 02:48:48.091 GMT [217] FATAL:  the database system is not yet accepting connections
+2026-11-26 02:48:48.091 GMT [217] DETAIL:  Consistent recovery state has not been yet reached.
+2026-11-26 02:48:48.409 GMT [224] FATAL:  the database system is not yet accepting connections
+2026-11-26 02:48:48.409 GMT [224] DETAIL:  Consistent recovery state has not been yet reached.
+2026-11-26 02:48:48.731 GMT [231] FATAL:  the database system is not yet accepting connections
+2026-11-26 02:48:48.731 GMT [231] DETAIL:  Consistent recovery state has not been yet reached.
+2026-11-26 02:48:49.055 GMT [238] FATAL:  the database system is not yet accepting connections
+2026-11-26 02:48:49.055 GMT [238] DETAIL:  Consistent recovery state has not been yet reached.
+2026-11-26 02:48:49.377 GMT [245] FATAL:  the database system is not yet accepting connections
+2026-11-26 02:48:49.377 GMT [245] DETAIL:  Consistent recovery state has not been yet reached.
+2026-11-26 02:48:49.708 GMT [252] FATAL:  the database system is not yet accepting connections
+2026-11-26 02:48:49.708 GMT [252] DETAIL:  Consistent recovery state has not been yet reached.
+2026-11-26 02:48:50.030 GMT [259] FATAL:  the database system is not yet accepting connections
+2026-11-26 02:48:50.030 GMT [259] DETAIL:  Consistent recovery state has not been yet reached.
+2026-11-26 02:48:50.366 GMT [266] FATAL:  the database system is not yet accepting connections
+2026-11-26 02:48:50.366 GMT [266] DETAIL:  Consistent recovery state has not been yet reached.
+2026-11-26 02:48:50.612 GMT [33] LOG:  checkpoint complete: wrote 141843 buffers (54.1%); 0 WAL file(s) added, 0 removed, 55 recycled; write=1.660 s, sync=2.044 s, total=6.061 s; sync files=21, longest=1.231 s, average=0.098 s; distance=898797 kB, estimate=898797 kB; lsn=12/64596048, redo lsn=12/64596048
+2026-11-26 02:48:50.658 GMT [1] LOG:  database system is ready to accept connections

@@ -1,0 +1,33 @@
+     5s  đã xác nhận: 9230
+    10s  đã xác nhận: 30247
+    15s  đã xác nhận: 51522
+    20s  đã xác nhận: 73319
+    25s  đã xác nhận: 94836
+    30s  đã xác nhận: 105451
+    35s  đã xác nhận: 118286
+    40s  đã xác nhận: 137278
+    45s  đã xác nhận: 158949
+    50s  đã xác nhận: 181397
+    55s  đã xác nhận: 202079
+    60s  đã xác nhận: 211846
+    65s  đã xác nhận: 225741
+    70s  đã xác nhận: 245426
+    75s  đã xác nhận: 264636
+    80s  đã xác nhận: 284630
+    85s  đã xác nhận: 297373
+    90s  đã xác nhận: 312296
+    95s  đã xác nhận: 331565
+   100s  đã xác nhận: 351409
+   105s  đã xác nhận: 366090
+   110s  đã xác nhận: 371962
+   115s  đã xác nhận: 385074
+[luồng 3] dừng: OperationalError: (2013, 'Lost connection to MySQL server during query')
+[luồng 4] dừng: OperationalError: (2013, 'Lost connection to MySQL server during query')
+[luồng 7] dừng: OperationalError: (2013, 'Lost connection to MySQL server during query')
+[luồng 2] dừng: OperationalError: (2013, 'Lost connection to MySQL server during query')
+[luồng 1] dừng: OperationalError: (2013, 'Lost connection to MySQL server during query')
+[luồng 5] dừng: OperationalError: (2013, 'Lost connection to MySQL server during query')
+[luồng 6] dừng: OperationalError: (2013, 'Lost connection to MySQL server during query')
+[luồng 8] dừng: OperationalError: (2013, 'Lost connection to MySQL server during query')
+   120s  đã xác nhận: 396227
+Kết thúc. Tổng giao dịch đã xác nhận: 396227

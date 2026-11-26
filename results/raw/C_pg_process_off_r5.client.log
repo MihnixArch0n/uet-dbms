@@ -1,0 +1,31 @@
+     5s  đã xác nhận: 17558
+    10s  đã xác nhận: 35858
+    15s  đã xác nhận: 54302
+    20s  đã xác nhận: 72653
+    25s  đã xác nhận: 91010
+    30s  đã xác nhận: 109598
+    35s  đã xác nhận: 127897
+    40s  đã xác nhận: 146275
+    45s  đã xác nhận: 164827
+    50s  đã xác nhận: 182990
+    55s  đã xác nhận: 201260
+    60s  đã xác nhận: 219387
+    65s  đã xác nhận: 237467
+[luồng 2] dừng: OperationalError: consuming input failed: server closed the connection unexpectedly
+	This probably
+[luồng 1] dừng: OperationalError: consuming input failed: server closed the connection unexpectedly
+	This probably
+[luồng 3] dừng: OperationalError: consuming input failed: server closed the connection unexpectedly
+	This probably
+[luồng 8] dừng: OperationalError: consuming input failed: server closed the connection unexpectedly
+	This probably
+[luồng 6] dừng: OperationalError: consuming input failed: server closed the connection unexpectedly
+	This probably
+[luồng 7] dừng: OperationalError: consuming input failed: server closed the connection unexpectedly
+	This probably
+[luồng 4] dừng: OperationalError: consuming input failed: server closed the connection unexpectedly
+	This probably
+[luồng 5] dừng: OperationalError: consuming input failed: server closed the connection unexpectedly
+	This probably
+    70s  đã xác nhận: 245023
+Kết thúc. Tổng giao dịch đã xác nhận: 245023

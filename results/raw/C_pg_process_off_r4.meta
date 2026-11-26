@@ -1,0 +1,5 @@
+db|pg
+level|process
+param|synchronous_commit
+value|off
+rep|4

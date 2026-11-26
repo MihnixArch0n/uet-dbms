@@ -1,0 +1,8 @@
+t_crash|1795662858.190804509
+t_start|1795662868.195232472
+t_ready|1795662901.219269448
+load_s|90
+redo_s|12.304
+redo_bytes|43284858
+rto_log_s|30.354
+integrity|OK
