@@ -1,0 +1,462 @@
+[12:17:04] == C_pg_os_on_r1: chuẩn bị
+ Container bench-pg Restarting 
+ Container bench-pg Started 
+[12:17:10] pg: synchronous_commit = on
+[12:17:13] Bơm tải 8 luồng
+[12:19:09] CRASH hệ điều hành sau 116s: virsh -c qemu:///system destroy dbvm
+Domain 'dbvm' destroyed
+
+[12:19:19] Khởi động lại
+Domain 'dbvm' started
+
+[12:19:39] Sẵn sàng sau 19.49 s
+
+=== Đối soát C_pg_os_on_r1 ===
+Đã xác nhận (ACK)            : 131569
+Đang dở lúc crash (INFLIGHT) : 8  (trong đó đã commit: 7)
+Còn trong DB sau phục hồi    : 131576  (COUNT(*) khớp: True)
+MẤT giao dịch đã xác nhận    : 0   RPO ≈ 0.0 ms
+Giao dịch lạ (phải = 0)      : 0
+Bất biến                     : OK  (-681633|-681633|-681633|-681633)
+RTO (đo từ máy thật)         : 19.49 s   RTO theo log DBMS: 7.428 s   redo: 0.97 s
+Đã nối vào /home/tran-minh-hieu/uet-dbms/results/C_summary.csv
+[12:19:50] == C_pg_os_on_r2: chuẩn bị
+ Container bench-pg Restarting 
+ Container bench-pg Started 
+[12:19:56] pg: synchronous_commit = on
+[12:20:39] Bơm tải 8 luồng
+[12:21:46] CRASH hệ điều hành sau 67s: virsh -c qemu:///system destroy dbvm
+Domain 'dbvm' destroyed
+
+[12:21:56] Khởi động lại
+Domain 'dbvm' started
+
+[12:22:17] Sẵn sàng sau 20.70 s
+
+=== Đối soát C_pg_os_on_r2 ===
+Đã xác nhận (ACK)            : 62711
+Đang dở lúc crash (INFLIGHT) : 6  (trong đó đã commit: 3)
+Còn trong DB sau phục hồi    : 62714  (COUNT(*) khớp: True)
+MẤT giao dịch đã xác nhận    : 0   RPO ≈ 0.0 ms
+Giao dịch lạ (phải = 0)      : 0
+Bất biến                     : OK  (-345417|-345417|-345417|-345417)
+RTO (đo từ máy thật)         : 20.7 s   RTO theo log DBMS: 8.691 s   redo: 2.38 s
+Đã nối vào /home/tran-minh-hieu/uet-dbms/results/C_summary.csv
+[12:22:30] == C_pg_os_on_r3: chuẩn bị
+ Container bench-pg Restarting 
+ Container bench-pg Started 
+[12:22:39] pg: synchronous_commit = on
+[12:23:03] Bơm tải 8 luồng
+[12:24:52] CRASH hệ điều hành sau 109s: virsh -c qemu:///system destroy dbvm
+Domain 'dbvm' destroyed
+
+[12:25:02] Khởi động lại
+Domain 'dbvm' started
+
+[12:25:24] Sẵn sàng sau 21.44 s
+
+=== Đối soát C_pg_os_on_r3 ===
+Đã xác nhận (ACK)            : 122700
+Đang dở lúc crash (INFLIGHT) : 8  (trong đó đã commit: 4)
+Còn trong DB sau phục hồi    : 122704  (COUNT(*) khớp: True)
+MẤT giao dịch đã xác nhận    : 0   RPO ≈ 0.0 ms
+Giao dịch lạ (phải = 0)      : 0
+Bất biến                     : OK  (-820586|-820586|-820586|-820586)
+RTO (đo từ máy thật)         : 21.44 s   RTO theo log DBMS: 9.113 s   redo: 1.88 s
+Đã nối vào /home/tran-minh-hieu/uet-dbms/results/C_summary.csv
+[12:25:37] == C_pg_os_off_r1: chuẩn bị
+ Container bench-pg Restarting 
+ Container bench-pg Started 
+[12:25:50] pg: synchronous_commit = off
+[12:26:20] Bơm tải 8 luồng
+[12:28:19] CRASH hệ điều hành sau 119s: virsh -c qemu:///system destroy dbvm
+Domain 'dbvm' destroyed
+
+[12:28:30] Khởi động lại
+Domain 'dbvm' started
+
+[12:28:53] Sẵn sàng sau 22.80 s
+
+=== Đối soát C_pg_os_off_r1 ===
+Đã xác nhận (ACK)            : 534218
+Đang dở lúc crash (INFLIGHT) : 4  (trong đó đã commit: 0)
+Còn trong DB sau phục hồi    : 533748  (COUNT(*) khớp: True)
+MẤT giao dịch đã xác nhận    : 470   RPO ≈ 112.8 ms
+Giao dịch lạ (phải = 0)      : 0
+Bất biến                     : OK  (2082162|2082162|2082162|2082162)
+RTO (đo từ máy thật)         : 22.8 s   RTO theo log DBMS: 10.635 s   redo: 3.56 s
+Đã nối vào /home/tran-minh-hieu/uet-dbms/results/C_summary.csv
+[12:28:59] == C_pg_os_off_r2: chuẩn bị
+ Container bench-pg Restarting 
+ Container bench-pg Started 
+[12:29:06] pg: synchronous_commit = off
+[12:29:22] Bơm tải 8 luồng
+[12:30:53] CRASH hệ điều hành sau 91s: virsh -c qemu:///system destroy dbvm
+Domain 'dbvm' destroyed
+
+[12:31:03] Khởi động lại
+Domain 'dbvm' started
+
+[12:31:25] Sẵn sàng sau 21.86 s
+
+=== Đối soát C_pg_os_off_r2 ===
+Đã xác nhận (ACK)            : 410543
+Đang dở lúc crash (INFLIGHT) : 0  (trong đó đã commit: 0)
+Còn trong DB sau phục hồi    : 409703  (COUNT(*) khớp: True)
+MẤT giao dịch đã xác nhận    : 840   RPO ≈ 189.7 ms
+Giao dịch lạ (phải = 0)      : 0
+Bất biến                     : OK  (688488|688488|688488|688488)
+RTO (đo từ máy thật)         : 21.86 s   RTO theo log DBMS: 10.6 s   redo: 3.95 s
+Đã nối vào /home/tran-minh-hieu/uet-dbms/results/C_summary.csv
+[12:31:32] == C_pg_os_off_r3: chuẩn bị
+ Container bench-pg Restarting 
+ Container bench-pg Started 
+[12:31:38] pg: synchronous_commit = off
+[12:31:53] Bơm tải 8 luồng
+[12:32:56] CRASH hệ điều hành sau 63s: virsh -c qemu:///system destroy dbvm
+Domain 'dbvm' destroyed
+
+[12:33:06] Khởi động lại
+Domain 'dbvm' started
+
+[12:33:28] Sẵn sàng sau 21.96 s
+
+=== Đối soát C_pg_os_off_r3 ===
+Đã xác nhận (ACK)            : 284463
+Đang dở lúc crash (INFLIGHT) : 2  (trong đó đã commit: 0)
+Còn trong DB sau phục hồi    : 284391  (COUNT(*) khớp: True)
+MẤT giao dịch đã xác nhận    : 72   RPO ≈ 19.8 ms
+Giao dịch lạ (phải = 0)      : 0
+Bất biến                     : OK  (-1207461|-1207461|-1207461|-1207461)
+RTO (đo từ máy thật)         : 21.96 s   RTO theo log DBMS: 9.935 s   redo: 3.45 s
+Đã nối vào /home/tran-minh-hieu/uet-dbms/results/C_summary.csv
+[12:33:34] == C_pg_os_off_r4: chuẩn bị
+ Container bench-pg Restarting 
+ Container bench-pg Started 
+[12:33:41] pg: synchronous_commit = off
+[12:33:56] Bơm tải 8 luồng
+[12:35:32] CRASH hệ điều hành sau 96s: virsh -c qemu:///system destroy dbvm
+Domain 'dbvm' destroyed
+
+[12:35:43] Khởi động lại
+Domain 'dbvm' started
+
+[12:36:07] Sẵn sàng sau 24.00 s
+
+=== Đối soát C_pg_os_off_r4 ===
+Đã xác nhận (ACK)            : 438904
+Đang dở lúc crash (INFLIGHT) : 2  (trong đó đã commit: 0)
+Còn trong DB sau phục hồi    : 438007  (COUNT(*) khớp: True)
+MẤT giao dịch đã xác nhận    : 897   RPO ≈ 196.6 ms
+Giao dịch lạ (phải = 0)      : 0
+Bất biến                     : OK  (-2135636|-2135636|-2135636|-2135636)
+RTO (đo từ máy thật)         : 24.0 s   RTO theo log DBMS: 11.667 s   redo: 3.81 s
+Đã nối vào /home/tran-minh-hieu/uet-dbms/results/C_summary.csv
+[12:36:13] == C_pg_os_off_r5: chuẩn bị
+ Container bench-pg Restarting 
+ Container bench-pg Started 
+[12:36:20] pg: synchronous_commit = off
+[12:36:40] Bơm tải 8 luồng
+[12:38:35] CRASH hệ điều hành sau 115s: virsh -c qemu:///system destroy dbvm
+Domain 'dbvm' destroyed
+
+[12:38:45] Khởi động lại
+Domain 'dbvm' started
+
+[12:39:07] Sẵn sàng sau 22.32 s
+
+=== Đối soát C_pg_os_off_r5 ===
+Đã xác nhận (ACK)            : 513518
+Đang dở lúc crash (INFLIGHT) : 0  (trong đó đã commit: 0)
+Còn trong DB sau phục hồi    : 513110  (COUNT(*) khớp: True)
+MẤT giao dịch đã xác nhận    : 408   RPO ≈ 97.6 ms
+Giao dịch lạ (phải = 0)      : 0
+Bất biến                     : OK  (-40893|-40893|-40893|-40893)
+RTO (đo từ máy thật)         : 22.32 s   RTO theo log DBMS: 10.428 s   redo: 4.34 s
+Đã nối vào /home/tran-minh-hieu/uet-dbms/results/C_summary.csv
+[12:39:14] == C_mysql_os_1_r1: chuẩn bị
+ Container bench-mysql Restarting 
+ Container bench-mysql Started 
+[12:39:22] mysql: innodb_flush_log_at_trx_commit = 1
+[12:39:27] Bơm tải 8 luồng
+[12:41:04] CRASH hệ điều hành sau 97s: virsh -c qemu:///system destroy dbvm
+Domain 'dbvm' destroyed
+
+[12:41:14] Khởi động lại
+Domain 'dbvm' started
+
+[12:41:41] Sẵn sàng sau 27.60 s
+
+=== Đối soát C_mysql_os_1_r1 ===
+Đã xác nhận (ACK)            : 80798
+Đang dở lúc crash (INFLIGHT) : 8  (trong đó đã commit: 4)
+Còn trong DB sau phục hồi    : 80802  (COUNT(*) khớp: True)
+MẤT giao dịch đã xác nhận    : 0   RPO ≈ 0.0 ms
+Giao dịch lạ (phải = 0)      : 0
+Bất biến                     : OK  (212621|212621|212621|212621)
+RTO (đo từ máy thật)         : 27.6 s   RTO theo log DBMS:  s   redo:  s
+Đã nối vào /home/tran-minh-hieu/uet-dbms/results/C_summary.csv
+[12:41:44] == C_mysql_os_1_r2: chuẩn bị
+ Container bench-mysql Restarting 
+ Container bench-mysql Started 
+[12:41:52] mysql: innodb_flush_log_at_trx_commit = 1
+[12:41:58] Bơm tải 8 luồng
+[12:43:58] CRASH hệ điều hành sau 120s: virsh -c qemu:///system destroy dbvm
+Domain 'dbvm' destroyed
+
+[12:44:08] Khởi động lại
+Domain 'dbvm' started
+
+[12:44:29] Sẵn sàng sau 21.34 s
+
+=== Đối soát C_mysql_os_1_r2 ===
+Đã xác nhận (ACK)            : 23234
+Đang dở lúc crash (INFLIGHT) : 8  (trong đó đã commit: 6)
+Còn trong DB sau phục hồi    : 23240  (COUNT(*) khớp: True)
+MẤT giao dịch đã xác nhận    : 0   RPO ≈ 0.0 ms
+Giao dịch lạ (phải = 0)      : 0
+Bất biến                     : OK  (-1388913|-1388913|-1388913|-1388913)
+RTO (đo từ máy thật)         : 21.34 s   RTO theo log DBMS:  s   redo:  s
+Đã nối vào /home/tran-minh-hieu/uet-dbms/results/C_summary.csv
+[12:44:32] == C_mysql_os_1_r3: chuẩn bị
+ Container bench-mysql Restarting 
+ Container bench-mysql Started 
+[12:44:41] mysql: innodb_flush_log_at_trx_commit = 1
+[12:44:45] Bơm tải 8 luồng
+[12:45:49] CRASH hệ điều hành sau 64s: virsh -c qemu:///system destroy dbvm
+Domain 'dbvm' destroyed
+
+[12:46:00] Khởi động lại
+Domain 'dbvm' started
+
+[12:46:21] Sẵn sàng sau 21.79 s
+
+=== Đối soát C_mysql_os_1_r3 ===
+Đã xác nhận (ACK)            : 34886
+Đang dở lúc crash (INFLIGHT) : 8  (trong đó đã commit: 5)
+Còn trong DB sau phục hồi    : 34891  (COUNT(*) khớp: True)
+MẤT giao dịch đã xác nhận    : 0   RPO ≈ 0.0 ms
+Giao dịch lạ (phải = 0)      : 0
+Bất biến                     : OK  (406715|406715|406715|406715)
+RTO (đo từ máy thật)         : 21.79 s   RTO theo log DBMS:  s   redo:  s
+Đã nối vào /home/tran-minh-hieu/uet-dbms/results/C_summary.csv
+[12:46:24] == C_mysql_os_2_r1: chuẩn bị
+ Container bench-mysql Restarting 
+ Container bench-mysql Started 
+[12:46:42] mysql: innodb_flush_log_at_trx_commit = 2
+[12:46:48] Bơm tải 8 luồng
+[12:47:50] CRASH hệ điều hành sau 62s: virsh -c qemu:///system destroy dbvm
+Domain 'dbvm' destroyed
+
+[12:48:00] Khởi động lại
+Domain 'dbvm' started
+
+[12:48:42] Sẵn sàng sau 41.62 s
+
+=== Đối soát C_mysql_os_2_r1 ===
+Đã xác nhận (ACK)            : 222580
+Đang dở lúc crash (INFLIGHT) : 1  (trong đó đã commit: 0)
+Còn trong DB sau phục hồi    : 221911  (COUNT(*) khớp: True)
+MẤT giao dịch đã xác nhận    : 669   RPO ≈ 162.5 ms
+Giao dịch lạ (phải = 0)      : 0
+Bất biến                     : OK  (-994934|-994934|-994934|-994934)
+RTO (đo từ máy thật)         : 41.62 s   RTO theo log DBMS:  s   redo:  s
+Đã nối vào /home/tran-minh-hieu/uet-dbms/results/C_summary.csv
+[12:48:45] == C_mysql_os_2_r2: chuẩn bị
+ Container bench-mysql Restarting 
+ Container bench-mysql Started 
+[12:48:55] mysql: innodb_flush_log_at_trx_commit = 2
+[12:49:00] Bơm tải 8 luồng
+[12:50:50] CRASH hệ điều hành sau 110s: virsh -c qemu:///system destroy dbvm
+Domain 'dbvm' destroyed
+
+[12:51:00] Khởi động lại
+Domain 'dbvm' started
+
+[12:51:22] Sẵn sàng sau 22.16 s
+
+=== Đối soát C_mysql_os_2_r2 ===
+Đã xác nhận (ACK)            : 391786
+Đang dở lúc crash (INFLIGHT) : 0  (trong đó đã commit: 0)
+Còn trong DB sau phục hồi    : 391728  (COUNT(*) khớp: True)
+MẤT giao dịch đã xác nhận    : 58   RPO ≈ 21.1 ms
+Giao dịch lạ (phải = 0)      : 0
+Bất biến                     : OK  (2186578|2186578|2186578|2186578)
+RTO (đo từ máy thật)         : 22.16 s   RTO theo log DBMS:  s   redo:  s
+Đã nối vào /home/tran-minh-hieu/uet-dbms/results/C_summary.csv
+[12:51:25] == C_mysql_os_2_r3: chuẩn bị
+ Container bench-mysql Restarting 
+ Container bench-mysql Started 
+[12:51:33] mysql: innodb_flush_log_at_trx_commit = 2
+[12:51:37] Bơm tải 8 luồng
+[12:53:13] CRASH hệ điều hành sau 96s: virsh -c qemu:///system destroy dbvm
+Domain 'dbvm' destroyed
+
+[12:53:24] Khởi động lại
+Domain 'dbvm' started
+
+[12:53:48] Sẵn sàng sau 24.01 s
+
+=== Đối soát C_mysql_os_2_r3 ===
+Đã xác nhận (ACK)            : 390749
+Đang dở lúc crash (INFLIGHT) : 1  (trong đó đã commit: 0)
+Còn trong DB sau phục hồi    : 389517  (COUNT(*) khớp: True)
+MẤT giao dịch đã xác nhận    : 1232   RPO ≈ 239.7 ms
+Giao dịch lạ (phải = 0)      : 0
+Bất biến                     : OK  (-1031238|-1031238|-1031238|-1031238)
+RTO (đo từ máy thật)         : 24.01 s   RTO theo log DBMS:  s   redo:  s
+Đã nối vào /home/tran-minh-hieu/uet-dbms/results/C_summary.csv
+[12:53:50] == C_mysql_os_2_r4: chuẩn bị
+ Container bench-mysql Restarting 
+ Container bench-mysql Started 
+[12:53:59] mysql: innodb_flush_log_at_trx_commit = 2
+[12:54:04] Bơm tải 8 luồng
+[12:55:24] CRASH hệ điều hành sau 80s: virsh -c qemu:///system destroy dbvm
+Domain 'dbvm' destroyed
+
+[12:55:34] Khởi động lại
+Domain 'dbvm' started
+
+[12:55:57] Sẵn sàng sau 23.24 s
+
+=== Đối soát C_mysql_os_2_r4 ===
+Đã xác nhận (ACK)            : 281183
+Đang dở lúc crash (INFLIGHT) : 1  (trong đó đã commit: 0)
+Còn trong DB sau phục hồi    : 278509  (COUNT(*) khớp: True)
+MẤT giao dịch đã xác nhận    : 2674   RPO ≈ 551.7 ms
+Giao dịch lạ (phải = 0)      : 0
+Bất biến                     : OK  (-1339598|-1339598|-1339598|-1339598)
+RTO (đo từ máy thật)         : 23.24 s   RTO theo log DBMS:  s   redo:  s
+Đã nối vào /home/tran-minh-hieu/uet-dbms/results/C_summary.csv
+[12:56:00] == C_mysql_os_2_r5: chuẩn bị
+ Container bench-mysql Restarting 
+ Container bench-mysql Started 
+[12:56:08] mysql: innodb_flush_log_at_trx_commit = 2
+[12:56:13] Bơm tải 8 luồng
+[12:57:45] CRASH hệ điều hành sau 92s: virsh -c qemu:///system destroy dbvm
+Domain 'dbvm' destroyed
+
+[12:57:55] Khởi động lại
+Domain 'dbvm' started
+
+[12:58:19] Sẵn sàng sau 24.11 s
+
+=== Đối soát C_mysql_os_2_r5 ===
+Đã xác nhận (ACK)            : 372748
+Đang dở lúc crash (INFLIGHT) : 0  (trong đó đã commit: 0)
+Còn trong DB sau phục hồi    : 372455  (COUNT(*) khớp: True)
+MẤT giao dịch đã xác nhận    : 293   RPO ≈ 58.9 ms
+Giao dịch lạ (phải = 0)      : 0
+Bất biến                     : OK  (49904|49904|49904|49904)
+RTO (đo từ máy thật)         : 24.11 s   RTO theo log DBMS:  s   redo:  s
+Đã nối vào /home/tran-minh-hieu/uet-dbms/results/C_summary.csv
+[12:58:22] == C_mysql_os_0_r1: chuẩn bị
+ Container bench-mysql Restarting 
+ Container bench-mysql Started 
+[12:58:30] mysql: innodb_flush_log_at_trx_commit = 0
+[12:58:34] Bơm tải 8 luồng
+[13:00:32] CRASH hệ điều hành sau 118s: virsh -c qemu:///system destroy dbvm
+Domain 'dbvm' destroyed
+
+[13:00:43] Khởi động lại
+Domain 'dbvm' started
+
+[13:01:07] Sẵn sàng sau 23.85 s
+
+=== Đối soát C_mysql_os_0_r1 ===
+Đã xác nhận (ACK)            : 520883
+Đang dở lúc crash (INFLIGHT) : 2  (trong đó đã commit: 0)
+Còn trong DB sau phục hồi    : 517366  (COUNT(*) khớp: True)
+MẤT giao dịch đã xác nhận    : 3517   RPO ≈ 629.6 ms
+Giao dịch lạ (phải = 0)      : 0
+Bất biến                     : OK  (736414|736414|736414|736414)
+RTO (đo từ máy thật)         : 23.85 s   RTO theo log DBMS:  s   redo:  s
+Đã nối vào /home/tran-minh-hieu/uet-dbms/results/C_summary.csv
+[13:01:10] == C_mysql_os_0_r2: chuẩn bị
+ Container bench-mysql Restarting 
+ Container bench-mysql Started 
+[13:01:15] mysql: innodb_flush_log_at_trx_commit = 0
+[13:01:20] Bơm tải 8 luồng
+[13:03:17] CRASH hệ điều hành sau 117s: virsh -c qemu:///system destroy dbvm
+Domain 'dbvm' destroyed
+
+[13:03:27] Khởi động lại
+Domain 'dbvm' started
+
+[13:03:50] Sẵn sàng sau 23.08 s
+
+=== Đối soát C_mysql_os_0_r2 ===
+Đã xác nhận (ACK)            : 556464
+Đang dở lúc crash (INFLIGHT) : 1  (trong đó đã commit: 0)
+Còn trong DB sau phục hồi    : 555994  (COUNT(*) khớp: True)
+MẤT giao dịch đã xác nhận    : 470   RPO ≈ 83.9 ms
+Giao dịch lạ (phải = 0)      : 0
+Bất biến                     : OK  (2065600|2065600|2065600|2065600)
+RTO (đo từ máy thật)         : 23.08 s   RTO theo log DBMS:  s   redo:  s
+Đã nối vào /home/tran-minh-hieu/uet-dbms/results/C_summary.csv
+[13:03:53] == C_mysql_os_0_r3: chuẩn bị
+ Container bench-mysql Restarting 
+ Container bench-mysql Started 
+[13:03:59] mysql: innodb_flush_log_at_trx_commit = 0
+[13:04:04] Bơm tải 8 luồng
+[13:05:32] CRASH hệ điều hành sau 88s: virsh -c qemu:///system destroy dbvm
+Domain 'dbvm' destroyed
+
+[13:05:43] Khởi động lại
+Domain 'dbvm' started
+
+[13:06:01] Sẵn sàng sau 18.64 s
+
+=== Đối soát C_mysql_os_0_r3 ===
+Đã xác nhận (ACK)            : 382307
+Đang dở lúc crash (INFLIGHT) : 0  (trong đó đã commit: 0)
+Còn trong DB sau phục hồi    : 380817  (COUNT(*) khớp: True)
+MẤT giao dịch đã xác nhận    : 1490   RPO ≈ 315.7 ms
+Giao dịch lạ (phải = 0)      : 0
+Bất biến                     : OK  (-1524678|-1524678|-1524678|-1524678)
+RTO (đo từ máy thật)         : 18.64 s   RTO theo log DBMS:  s   redo:  s
+Đã nối vào /home/tran-minh-hieu/uet-dbms/results/C_summary.csv
+[13:06:04] == C_mysql_os_0_r4: chuẩn bị
+ Container bench-mysql Restarting 
+ Container bench-mysql Started 
+[13:06:09] mysql: innodb_flush_log_at_trx_commit = 0
+[13:06:13] Bơm tải 8 luồng
+[13:07:33] CRASH hệ điều hành sau 80s: virsh -c qemu:///system destroy dbvm
+Domain 'dbvm' destroyed
+
+[13:07:43] Khởi động lại
+Domain 'dbvm' started
+
+[13:08:00] Sẵn sàng sau 17.05 s
+
+=== Đối soát C_mysql_os_0_r4 ===
+Đã xác nhận (ACK)            : 446548
+Đang dở lúc crash (INFLIGHT) : 2  (trong đó đã commit: 0)
+Còn trong DB sau phục hồi    : 445505  (COUNT(*) khớp: True)
+MẤT giao dịch đã xác nhận    : 1043   RPO ≈ 173.5 ms
+Giao dịch lạ (phải = 0)      : 0
+Bất biến                     : OK  (-541806|-541806|-541806|-541806)
+RTO (đo từ máy thật)         : 17.05 s   RTO theo log DBMS:  s   redo:  s
+Đã nối vào /home/tran-minh-hieu/uet-dbms/results/C_summary.csv
+[13:08:03] == C_mysql_os_0_r5: chuẩn bị
+ Container bench-mysql Restarting 
+ Container bench-mysql Started 
+[13:08:07] mysql: innodb_flush_log_at_trx_commit = 0
+[13:08:11] Bơm tải 8 luồng
+[13:09:27] CRASH hệ điều hành sau 76s: virsh -c qemu:///system destroy dbvm
+Domain 'dbvm' destroyed
+
+[13:09:37] Khởi động lại
+Domain 'dbvm' started
+
+[13:09:54] Sẵn sàng sau 17.39 s
+
+=== Đối soát C_mysql_os_0_r5 ===
+Đã xác nhận (ACK)            : 427635
+Đang dở lúc crash (INFLIGHT) : 0  (trong đó đã commit: 0)
+Còn trong DB sau phục hồi    : 426084  (COUNT(*) khớp: True)
+MẤT giao dịch đã xác nhận    : 1551   RPO ≈ 304.4 ms
+Giao dịch lạ (phải = 0)      : 0
+Bất biến                     : OK  (-2059580|-2059580|-2059580|-2059580)
+RTO (đo từ máy thật)         : 17.39 s   RTO theo log DBMS:  s   redo:  s
+Đã nối vào /home/tran-minh-hieu/uet-dbms/results/C_summary.csv

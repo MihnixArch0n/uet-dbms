@@ -1,0 +1,42 @@
+
+PostgreSQL Database directory appears to contain a database; Skipping initialization
+
+2026-11-26 05:25:14.907 GMT [1] LOG:  starting PostgreSQL 16.16 (Debian 16.16-1.pgdg13+1) on x86_64-pc-linux-gnu, compiled by gcc (Debian 14.2.0-19) 14.2.0, 64-bit
+2026-11-26 05:25:14.907 GMT [1] LOG:  listening on IPv4 address "0.0.0.0", port 5432
+2026-11-26 05:25:14.907 GMT [1] LOG:  listening on IPv6 address "::", port 5432
+2026-11-26 05:25:15.099 GMT [1] LOG:  listening on Unix socket "/var/run/postgresql/.s.PGSQL.5432"
+2026-11-26 05:25:15.243 GMT [36] FATAL:  the database system is starting up
+2026-11-26 05:25:15.243 GMT [35] LOG:  database system was interrupted; last known up at 2026-11-26 05:22:50 GMT
+2026-11-26 05:25:15.789 GMT [43] FATAL:  the database system is starting up
+2026-11-26 05:25:16.340 GMT [50] FATAL:  the database system is starting up
+2026-11-26 05:25:16.929 GMT [56] FATAL:  the database system is starting up
+2026-11-26 05:25:17.468 GMT [62] FATAL:  the database system is starting up
+2026-11-26 05:25:17.699 GMT [35] LOG:  database system was not properly shut down; automatic recovery in progress
+2026-11-26 05:25:17.806 GMT [35] LOG:  redo starts at 1/DF6FD240
+2026-11-26 05:25:18.033 GMT [69] FATAL:  the database system is not yet accepting connections
+2026-11-26 05:25:18.033 GMT [69] DETAIL:  Consistent recovery state has not been yet reached.
+2026-11-26 05:25:18.558 GMT [76] FATAL:  the database system is not yet accepting connections
+2026-11-26 05:25:18.558 GMT [76] DETAIL:  Consistent recovery state has not been yet reached.
+2026-11-26 05:25:19.088 GMT [83] FATAL:  the database system is not yet accepting connections
+2026-11-26 05:25:19.088 GMT [83] DETAIL:  Consistent recovery state has not been yet reached.
+2026-11-26 05:25:19.626 GMT [90] FATAL:  the database system is not yet accepting connections
+2026-11-26 05:25:19.626 GMT [90] DETAIL:  Consistent recovery state has not been yet reached.
+2026-11-26 05:25:19.693 GMT [35] LOG:  invalid record length at 2/6DADEE0: expected at least 24, got 0
+2026-11-26 05:25:19.693 GMT [35] LOG:  redo done at 2/6DADEB8 system usage: CPU: user: 0.73 s, system: 1.13 s, elapsed: 1.88 s
+2026-11-26 05:25:20.170 GMT [97] FATAL:  the database system is not yet accepting connections
+2026-11-26 05:25:20.170 GMT [97] DETAIL:  Consistent recovery state has not been yet reached.
+2026-11-26 05:25:20.511 GMT [33] LOG:  checkpoint starting: end-of-recovery immediate wait
+2026-11-26 05:25:20.707 GMT [105] FATAL:  the database system is not yet accepting connections
+2026-11-26 05:25:20.707 GMT [105] DETAIL:  Consistent recovery state has not been yet reached.
+2026-11-26 05:25:21.293 GMT [111] FATAL:  the database system is not yet accepting connections
+2026-11-26 05:25:21.293 GMT [111] DETAIL:  Consistent recovery state has not been yet reached.
+2026-11-26 05:25:21.821 GMT [118] FATAL:  the database system is not yet accepting connections
+2026-11-26 05:25:21.821 GMT [118] DETAIL:  Consistent recovery state has not been yet reached.
+2026-11-26 05:25:22.361 GMT [125] FATAL:  the database system is not yet accepting connections
+2026-11-26 05:25:22.361 GMT [125] DETAIL:  Consistent recovery state has not been yet reached.
+2026-11-26 05:25:22.903 GMT [132] FATAL:  the database system is not yet accepting connections
+2026-11-26 05:25:22.903 GMT [132] DETAIL:  Consistent recovery state has not been yet reached.
+2026-11-26 05:25:23.499 GMT [139] FATAL:  the database system is not yet accepting connections
+2026-11-26 05:25:23.499 GMT [139] DETAIL:  Consistent recovery state has not been yet reached.
+2026-11-26 05:25:23.887 GMT [33] LOG:  checkpoint complete: wrote 77058 buffers (29.4%); 0 WAL file(s) added, 0 removed, 5 recycled; write=0.678 s, sync=1.706 s, total=3.510 s; sync files=19, longest=1.448 s, average=0.090 s; distance=645827 kB, estimate=645827 kB; lsn=2/6DADEE0, redo lsn=2/6DADEE0
+2026-11-26 05:25:24.020 GMT [1] LOG:  database system is ready to accept connections

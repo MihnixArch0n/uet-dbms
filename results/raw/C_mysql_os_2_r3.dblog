@@ -1,0 +1,197 @@
+2026-11-26 05:53:35+00:00 [Note] [Entrypoint]: Entrypoint script for MySQL Server 8.4.13.1-1.el9 started.
+2026-11-26 05:53:35+00:00 [Note] [Entrypoint]: Switching to dedicated user 'mysql'
+2026-11-26 05:53:35+00:00 [Note] [Entrypoint]: Entrypoint script for MySQL Server 8.4.13.1-1.el9 started.
+'/var/lib/mysql/mysql.sock' -> '/var/run/mysqld/mysqld.sock'
+2026-11-26T05:53:35.670504Z 0 [Note] [MY-013667] [Server] Error-log destination "stderr" is not a file. Can not restore error log messages from previous run.
+2026-11-26T05:53:35.511365Z 0 [System] [MY-015015] [Server] MySQL Server - start.
+2026-11-26T05:53:35.669108Z 0 [Note] [MY-013932] [Server] BuildID[sha1]=18305b011c78f065d9fefe828230636637cd2ef8
+2026-11-26T05:53:35.669111Z 0 [Note] [MY-010949] [Server] Basedir set to /usr/.
+2026-11-26T05:53:35.669119Z 0 [System] [MY-010116] [Server] /usr/sbin/mysqld (mysqld 8.4.13) starting as process 1
+2026-11-26T05:53:35.669122Z 0 [System] [MY-015150] [Server] Server version with update: '8.4.13.1'
+2026-11-26T05:53:35.671363Z 0 [Note] [MY-012366] [InnoDB] Using Linux native AIO
+2026-11-26T05:53:35.671413Z 0 [Note] [MY-015140] [InnoDB] Using innodb_flush_method=O_DIRECT
+2026-11-26T05:53:35.671504Z 0 [Note] [MY-010747] [Server] Plugin 'FEDERATED' is disabled.
+2026-11-26T05:53:35.671539Z 0 [Note] [MY-010747] [Server] Plugin 'ndbcluster' is disabled.
+2026-11-26T05:53:35.671549Z 0 [Note] [MY-010747] [Server] Plugin 'ndbinfo' is disabled.
+2026-11-26T05:53:35.671552Z 0 [Note] [MY-010747] [Server] Plugin 'ndb_transid_mysql_connection_map' is disabled.
+2026-11-26T05:53:35.671581Z 0 [Note] [MY-010747] [Server] Plugin 'mysql_native_password' is disabled.
+2026-11-26T05:53:35.672593Z 1 [System] [MY-013576] [InnoDB] InnoDB initialization has started.
+2026-11-26T05:53:35.672626Z 1 [Note] [MY-013546] [InnoDB] Atomic write enabled
+2026-11-26T05:53:35.672643Z 1 [Note] [MY-012932] [InnoDB] PUNCH HOLE support available
+2026-11-26T05:53:35.672657Z 1 [Note] [MY-012944] [InnoDB] Uses event mutexes
+2026-11-26T05:53:35.672666Z 1 [Note] [MY-012945] [InnoDB] GCC builtin __atomic_thread_fence() is used for memory barrier
+2026-11-26T05:53:35.672670Z 1 [Note] [MY-012948] [InnoDB] Compressed tables use zlib 1.3.2
+2026-11-26T05:53:35.674257Z 1 [Note] [MY-012951] [InnoDB] Using hardware accelerated crc32 and polynomial multiplication.
+2026-11-26T05:53:35.674427Z 1 [Note] [MY-012203] [InnoDB] Directories to scan './'
+2026-11-26T05:53:35.674468Z 1 [Note] [MY-012204] [InnoDB] Scanning './'
+2026-11-26T05:53:35.676119Z 1 [Note] [MY-012208] [InnoDB] Completed space ID check of 8 files.
+2026-11-26T05:53:35.676740Z 1 [Note] [MY-012955] [InnoDB] Initializing buffer pool, total size = 2.000000G, instances = 8, chunk size =128.000000M 
+2026-11-26T05:53:35.732557Z 1 [Note] [MY-012957] [InnoDB] Completed initialization of buffer pool
+2026-11-26T05:53:35.736453Z 0 [Note] [MY-011952] [InnoDB] If the mysqld execution user is authorized, page cleaner thread priority can be changed. See the man page of setpriority().
+2026-11-26T05:53:35.736767Z 1 [Note] [MY-013532] [InnoDB] Using './#ib_16384_0.dblwr' for doublewrite
+2026-11-26T05:53:35.745790Z 1 [Note] [MY-013532] [InnoDB] Using './#ib_16384_1.dblwr' for doublewrite
+2026-11-26T05:53:35.758745Z 1 [Note] [MY-013566] [InnoDB] Double write buffer files: 2, --innodb-doublewrite-files=2, segments_per_file=8
+2026-11-26T05:53:35.758778Z 1 [Note] [MY-013565] [InnoDB] Double write buffer pages per instance: 128
+2026-11-26T05:53:35.758800Z 1 [Note] [MY-013532] [InnoDB] Using './#ib_16384_0.dblwr' for doublewrite
+2026-11-26T05:53:35.758809Z 1 [Note] [MY-013532] [InnoDB] Using './#ib_16384_1.dblwr' for doublewrite
+2026-11-26T05:53:36.827125Z 1 [Note] [MY-013883] [InnoDB] The latest found checkpoint is at lsn = 1642619108 in redo log file ./#innodb_redo/#ib_redo12.
+2026-11-26T05:53:36.827172Z 1 [Note] [MY-012560] [InnoDB] The log sequence number 1430790839 in the system tablespace does not match the log sequence number 1642619108 in the redo log files!
+2026-11-26T05:53:36.827214Z 1 [Note] [MY-012551] [InnoDB] Database was not shutdown normally!
+2026-11-26T05:53:36.827220Z 1 [Note] [MY-012552] [InnoDB] Starting crash recovery.
+2026-11-26T05:53:36.901360Z 1 [Note] [MY-013086] [InnoDB] Starting to parse redo log at lsn = 1642618962, whereas checkpoint_lsn = 1642619108 and start_lsn = 1642618880
+2026-11-26T05:53:36.934511Z 1 [Note] [MY-012550] [InnoDB] Doing recovery: scanned up to log sequence number 1647861760
+2026-11-26T05:53:36.971060Z 1 [Note] [MY-012550] [InnoDB] Doing recovery: scanned up to log sequence number 1653104640
+2026-11-26T05:53:37.007017Z 1 [Note] [MY-012550] [InnoDB] Doing recovery: scanned up to log sequence number 1658347520
+2026-11-26T05:53:37.042497Z 1 [Note] [MY-012550] [InnoDB] Doing recovery: scanned up to log sequence number 1663590400
+2026-11-26T05:53:37.079379Z 1 [Note] [MY-012550] [InnoDB] Doing recovery: scanned up to log sequence number 1668833280
+2026-11-26T05:53:37.116766Z 1 [Note] [MY-012550] [InnoDB] Doing recovery: scanned up to log sequence number 1674076160
+2026-11-26T05:53:37.152424Z 1 [Note] [MY-012550] [InnoDB] Doing recovery: scanned up to log sequence number 1679319040
+2026-11-26T05:53:37.188906Z 1 [Note] [MY-012550] [InnoDB] Doing recovery: scanned up to log sequence number 1684561920
+2026-11-26T05:53:37.224726Z 1 [Note] [MY-012550] [InnoDB] Doing recovery: scanned up to log sequence number 1689804800
+2026-11-26T05:53:37.261822Z 1 [Note] [MY-012550] [InnoDB] Doing recovery: scanned up to log sequence number 1695047680
+2026-11-26T05:53:37.297205Z 1 [Note] [MY-012550] [InnoDB] Doing recovery: scanned up to log sequence number 1700290560
+2026-11-26T05:53:37.321569Z 1 [Note] [MY-012550] [InnoDB] Doing recovery: scanned up to log sequence number 1703833121
+2026-11-26T05:53:37.443380Z 1 [Note] [MY-013083] [InnoDB] Log background threads are being started...
+2026-11-26T05:53:37.445113Z 1 [Note] [MY-012532] [InnoDB] Applying a batch of 36769 redo log records ...
+2026-11-26T05:53:38.430900Z 1 [Note] [MY-012533] [InnoDB] 10%
+2026-11-26T05:53:38.465699Z 1 [Note] [MY-012533] [InnoDB] 20%
+2026-11-26T05:53:38.467021Z 1 [Note] [MY-012533] [InnoDB] 30%
+2026-11-26T05:53:38.467384Z 1 [Note] [MY-012533] [InnoDB] 40%
+2026-11-26T05:53:38.468063Z 1 [Note] [MY-012533] [InnoDB] 50%
+2026-11-26T05:53:38.468750Z 1 [Note] [MY-012533] [InnoDB] 60%
+2026-11-26T05:53:38.469406Z 1 [Note] [MY-012533] [InnoDB] 70%
+2026-11-26T05:53:38.469980Z 1 [Note] [MY-012533] [InnoDB] 80%
+2026-11-26T05:53:38.470488Z 1 [Note] [MY-012533] [InnoDB] 90%
+2026-11-26T05:53:38.566470Z 1 [Note] [MY-012533] [InnoDB] 100%
+2026-11-26T05:53:39.070756Z 1 [Note] [MY-012535] [InnoDB] Apply batch completed!
+2026-11-26T05:53:45.791157Z 1 [Note] [MY-013252] [InnoDB] Using undo tablespace './undo_001'.
+2026-11-26T05:53:45.791386Z 1 [Note] [MY-013252] [InnoDB] Using undo tablespace './undo_002'.
+2026-11-26T05:53:45.791884Z 1 [Note] [MY-012910] [InnoDB] Opened 2 existing undo tablespaces.
+2026-11-26T05:53:45.791926Z 1 [Note] [MY-011980] [InnoDB] GTID recovery trx_no: 2644299
+2026-11-26T05:53:45.795511Z 1 [Note] [MY-013776] [InnoDB] Parallel initialization of rseg complete
+2026-11-26T05:53:45.795662Z 1 [Note] [MY-013777] [InnoDB] Time taken to initialize rseg using 4 thread: 3 ms.
+2026-11-26T05:53:45.795690Z 1 [Note] [MY-014017] [InnoDB] Transaction ID: 2644287 found for resurrecting updates
+2026-11-26T05:53:45.795704Z 1 [Note] [MY-014018] [InnoDB] Identified table ID: 1068 to acquire lock
+2026-11-26T05:53:45.795710Z 1 [Note] [MY-014018] [InnoDB] Identified table ID: 1069 to acquire lock
+2026-11-26T05:53:45.795712Z 1 [Note] [MY-014018] [InnoDB] Identified table ID: 1070 to acquire lock
+2026-11-26T05:53:45.795719Z 1 [Note] [MY-014021] [InnoDB] Total records resurrected: 3 - Total pages read: 0 - Total tables acquired: 3
+2026-11-26T05:53:45.795728Z 1 [Note] [MY-014023] [InnoDB] Resurrected 1 transactions doing updates.
+2026-11-26T05:53:45.795734Z 1 [Note] [MY-014017] [InnoDB] Transaction ID: 2644292 found for resurrecting updates
+2026-11-26T05:53:45.795737Z 1 [Note] [MY-014018] [InnoDB] Identified table ID: 1068 to acquire lock
+2026-11-26T05:53:45.795739Z 1 [Note] [MY-014018] [InnoDB] Identified table ID: 1069 to acquire lock
+2026-11-26T05:53:45.795741Z 1 [Note] [MY-014018] [InnoDB] Identified table ID: 1070 to acquire lock
+2026-11-26T05:53:45.795743Z 1 [Note] [MY-014021] [InnoDB] Total records resurrected: 3 - Total pages read: 0 - Total tables acquired: 3
+2026-11-26T05:53:45.795751Z 1 [Note] [MY-014023] [InnoDB] Resurrected 1 transactions doing updates.
+2026-11-26T05:53:45.795760Z 1 [Note] [MY-014017] [InnoDB] Transaction ID: 2644296 found for resurrecting updates
+2026-11-26T05:53:45.795764Z 1 [Note] [MY-014018] [InnoDB] Identified table ID: 1068 to acquire lock
+2026-11-26T05:53:45.795765Z 1 [Note] [MY-014018] [InnoDB] Identified table ID: 1069 to acquire lock
+2026-11-26T05:53:45.795767Z 1 [Note] [MY-014018] [InnoDB] Identified table ID: 1070 to acquire lock
+2026-11-26T05:53:45.795769Z 1 [Note] [MY-014021] [InnoDB] Total records resurrected: 3 - Total pages read: 0 - Total tables acquired: 3
+2026-11-26T05:53:45.795770Z 1 [Note] [MY-014023] [InnoDB] Resurrected 1 transactions doing updates.
+2026-11-26T05:53:45.795773Z 1 [Note] [MY-014017] [InnoDB] Transaction ID: 2644298 found for resurrecting updates
+2026-11-26T05:53:45.795774Z 1 [Note] [MY-014018] [InnoDB] Identified table ID: 1069 to acquire lock
+2026-11-26T05:53:45.795776Z 1 [Note] [MY-014018] [InnoDB] Identified table ID: 1070 to acquire lock
+2026-11-26T05:53:45.795777Z 1 [Note] [MY-014021] [InnoDB] Total records resurrected: 2 - Total pages read: 0 - Total tables acquired: 2
+2026-11-26T05:53:45.795779Z 1 [Note] [MY-014023] [InnoDB] Resurrected 1 transactions doing updates.
+2026-11-26T05:53:45.795782Z 1 [Note] [MY-014016] [InnoDB] Transaction ID: 2644289 found for resurrecting inserts
+2026-11-26T05:53:45.795784Z 1 [Note] [MY-014018] [InnoDB] Identified table ID: 1091 to acquire lock
+2026-11-26T05:53:45.795785Z 1 [Note] [MY-014021] [InnoDB] Total records resurrected: 1 - Total pages read: 0 - Total tables acquired: 1
+2026-11-26T05:53:45.795787Z 1 [Note] [MY-014022] [InnoDB] Resurrected 1 transactions doing inserts.
+2026-11-26T05:53:45.795789Z 1 [Note] [MY-014017] [InnoDB] Transaction ID: 2644289 found for resurrecting updates
+2026-11-26T05:53:45.795791Z 1 [Note] [MY-014018] [InnoDB] Identified table ID: 1068 to acquire lock
+2026-11-26T05:53:45.795799Z 1 [Note] [MY-014018] [InnoDB] Identified table ID: 1069 to acquire lock
+2026-11-26T05:53:45.795820Z 1 [Note] [MY-014018] [InnoDB] Identified table ID: 1070 to acquire lock
+2026-11-26T05:53:45.795825Z 1 [Note] [MY-014021] [InnoDB] Total records resurrected: 3 - Total pages read: 0 - Total tables acquired: 3
+2026-11-26T05:53:45.795835Z 1 [Note] [MY-014023] [InnoDB] Resurrected 1 transactions doing updates.
+2026-11-26T05:53:45.795841Z 1 [Note] [MY-014017] [InnoDB] Transaction ID: 2644293 found for resurrecting updates
+2026-11-26T05:53:45.795844Z 1 [Note] [MY-014018] [InnoDB] Identified table ID: 1068 to acquire lock
+2026-11-26T05:53:45.795845Z 1 [Note] [MY-014018] [InnoDB] Identified table ID: 1069 to acquire lock
+2026-11-26T05:53:45.795847Z 1 [Note] [MY-014018] [InnoDB] Identified table ID: 1070 to acquire lock
+2026-11-26T05:53:45.795849Z 1 [Note] [MY-014021] [InnoDB] Total records resurrected: 3 - Total pages read: 0 - Total tables acquired: 3
+2026-11-26T05:53:45.795851Z 1 [Note] [MY-014023] [InnoDB] Resurrected 1 transactions doing updates.
+2026-11-26T05:53:45.795853Z 1 [Note] [MY-014017] [InnoDB] Transaction ID: 2644297 found for resurrecting updates
+2026-11-26T05:53:45.795855Z 1 [Note] [MY-014018] [InnoDB] Identified table ID: 1068 to acquire lock
+2026-11-26T05:53:45.795857Z 1 [Note] [MY-014018] [InnoDB] Identified table ID: 1069 to acquire lock
+2026-11-26T05:53:45.795858Z 1 [Note] [MY-014018] [InnoDB] Identified table ID: 1070 to acquire lock
+2026-11-26T05:53:45.795860Z 1 [Note] [MY-014021] [InnoDB] Total records resurrected: 3 - Total pages read: 0 - Total tables acquired: 3
+2026-11-26T05:53:45.795861Z 1 [Note] [MY-014023] [InnoDB] Resurrected 1 transactions doing updates.
+2026-11-26T05:53:45.795870Z 1 [Note] [MY-013023] [InnoDB] 7 transaction(s) which must be rolled back or cleaned up in total 21 row operations to undo
+2026-11-26T05:53:45.795872Z 1 [Note] [MY-013024] [InnoDB] Trx id counter is 2644737
+2026-11-26T05:53:45.839633Z 1 [Note] [MY-012255] [InnoDB] Removed temporary tablespace data file: "ibtmp1"
+2026-11-26T05:53:45.839665Z 1 [Note] [MY-012923] [InnoDB] Creating shared tablespace for temporary tables
+2026-11-26T05:53:45.865002Z 1 [Note] [MY-012265] [InnoDB] Setting file './ibtmp1' size to 12 MB. Physically writing the file full; Please wait ...
+2026-11-26T05:53:45.957408Z 1 [Note] [MY-012266] [InnoDB] File './ibtmp1' size is now 12 MB.
+2026-11-26T05:53:45.957526Z 1 [Note] [MY-013627] [InnoDB] Scanning temp tablespace dir:'./#innodb_temp/'
+2026-11-26T05:53:47.194131Z 1 [Note] [MY-013018] [InnoDB] Created 128 and tracked 128 new rollback segment(s) in the temporary tablespace. 128 are now active.
+2026-11-26T05:53:47.194323Z 0 [Note] [MY-011953] [InnoDB] Page cleaner took 11457ms to flush 0 and evict 0 pages
+2026-11-26T05:53:47.194461Z 1 [Note] [MY-012976] [InnoDB] 8.4.13 started; log sequence number 1703833131
+2026-11-26T05:53:47.194552Z 1 [System] [MY-013577] [InnoDB] InnoDB initialization has ended.
+2026-11-26T05:53:47.200571Z 1 [Note] [MY-011089] [Server] Data dictionary restarting version '80300'.
+2026-11-26T05:53:47.242805Z 1 [Note] [MY-012357] [InnoDB] Reading DD tablespace files
+2026-11-26T05:53:47.243397Z 1 [Note] [MY-012356] [InnoDB] Scanned 10 tablespaces. Validated 10.
+2026-11-26T05:53:47.286705Z 1 [Note] [MY-010006] [Server] Using data dictionary with version '80300'.
+2026-11-26T05:53:47.290675Z 0 [Note] [MY-011332] [Server] Plugin mysqlx reported: 'IPv6 is available'
+2026-11-26T05:53:47.313819Z 0 [Note] [MY-011323] [Server] Plugin mysqlx reported: 'X Plugin ready for connections. bind-address: '::' port: 33060'
+2026-11-26T05:53:47.313852Z 0 [Note] [MY-011323] [Server] Plugin mysqlx reported: 'X Plugin ready for connections. socket: '/var/run/mysqld/mysqlx.sock''
+2026-11-26T05:53:47.320863Z 0 [Note] [MY-010902] [Server] Thread priority attribute setting in Resource Group SQL shall be ignored due to unsupported platform or insufficient privilege.
+2026-11-26T05:53:47.348292Z 0 [Note] [MY-013911] [Server] Crash recovery finished in InnoDB engine. No attempts to commit, rollback or prepare any transactions.
+2026-11-26T05:53:47.349924Z 0 [Note] [MY-012487] [InnoDB] DDL log recovery : begin
+2026-11-26T05:53:47.350099Z 0 [Note] [MY-012488] [InnoDB] DDL log recovery : end
+2026-11-26T05:53:47.351071Z 0 [Note] [MY-014019] [InnoDB] Acquired lock on table ID: 1068, name: bank/pgbench_branches
+2026-11-26T05:53:47.351098Z 0 [Note] [MY-014019] [InnoDB] Acquired lock on table ID: 1069, name: bank/pgbench_tellers
+2026-11-26T05:53:47.351113Z 0 [Note] [MY-014019] [InnoDB] Acquired lock on table ID: 1070, name: bank/pgbench_accounts
+2026-11-26T05:53:47.351134Z 0 [Note] [MY-014019] [InnoDB] Acquired lock on table ID: 1068, name: bank/pgbench_branches
+2026-11-26T05:53:47.351143Z 0 [Note] [MY-014019] [InnoDB] Acquired lock on table ID: 1069, name: bank/pgbench_tellers
+2026-11-26T05:53:47.351152Z 0 [Note] [MY-014019] [InnoDB] Acquired lock on table ID: 1070, name: bank/pgbench_accounts
+2026-11-26T05:53:47.351160Z 0 [Note] [MY-014019] [InnoDB] Acquired lock on table ID: 1068, name: bank/pgbench_branches
+2026-11-26T05:53:47.351173Z 0 [Note] [MY-014019] [InnoDB] Acquired lock on table ID: 1069, name: bank/pgbench_tellers
+2026-11-26T05:53:47.351180Z 0 [Note] [MY-014019] [InnoDB] Acquired lock on table ID: 1070, name: bank/pgbench_accounts
+2026-11-26T05:53:47.351184Z 0 [Note] [MY-014019] [InnoDB] Acquired lock on table ID: 1069, name: bank/pgbench_tellers
+2026-11-26T05:53:47.351187Z 0 [Note] [MY-014019] [InnoDB] Acquired lock on table ID: 1070, name: bank/pgbench_accounts
+2026-11-26T05:53:47.351197Z 0 [Note] [MY-014019] [InnoDB] Acquired lock on table ID: 1068, name: bank/pgbench_branches
+2026-11-26T05:53:47.351210Z 0 [Note] [MY-014019] [InnoDB] Acquired lock on table ID: 1069, name: bank/pgbench_tellers
+2026-11-26T05:53:47.351222Z 0 [Note] [MY-014019] [InnoDB] Acquired lock on table ID: 1070, name: bank/pgbench_accounts
+2026-11-26T05:53:47.351228Z 0 [Note] [MY-014019] [InnoDB] Acquired lock on table ID: 1091, name: bank/pgbench_history
+2026-11-26T05:53:47.351242Z 0 [Note] [MY-014019] [InnoDB] Acquired lock on table ID: 1068, name: bank/pgbench_branches
+2026-11-26T05:53:47.351249Z 0 [Note] [MY-014019] [InnoDB] Acquired lock on table ID: 1069, name: bank/pgbench_tellers
+2026-11-26T05:53:47.351256Z 0 [Note] [MY-014019] [InnoDB] Acquired lock on table ID: 1070, name: bank/pgbench_accounts
+2026-11-26T05:53:47.351260Z 0 [Note] [MY-014019] [InnoDB] Acquired lock on table ID: 1068, name: bank/pgbench_branches
+2026-11-26T05:53:47.351263Z 0 [Note] [MY-014019] [InnoDB] Acquired lock on table ID: 1069, name: bank/pgbench_tellers
+2026-11-26T05:53:47.351266Z 0 [Note] [MY-014019] [InnoDB] Acquired lock on table ID: 1070, name: bank/pgbench_accounts
+2026-11-26T05:53:47.351277Z 0 [Note] [MY-013014] [InnoDB] Starting in background the rollback of uncommitted transactions
+2026-11-26T05:53:47.351295Z 0 [Note] [MY-013011] [InnoDB] Rolling back trx with id 2644298, 2 rows to undo
+2026-11-26T05:53:47.351433Z 0 [Note] [MY-011946] [InnoDB] Loading buffer pool(s) from /var/lib/mysql/ib_buffer_pool
+2026-11-26T05:53:47.354569Z 0 [Note] [MY-012922] [InnoDB] Waiting for purge to start
+2026-11-26T05:53:47.364404Z 0 [Note] [MY-013012] [InnoDB] Rollback of trx with id 2644298 completed
+2026-11-26T05:53:47.364419Z 0 [Note] [MY-013011] [InnoDB] Rolling back trx with id 2644297, 3 rows to undo
+2026-11-26T05:53:47.387137Z 0 [Note] [MY-013012] [InnoDB] Rollback of trx with id 2644297 completed
+2026-11-26T05:53:47.387151Z 0 [Note] [MY-013011] [InnoDB] Rolling back trx with id 2644296, 3 rows to undo
+2026-11-26T05:53:47.398744Z 0 [Note] [MY-013012] [InnoDB] Rollback of trx with id 2644296 completed
+2026-11-26T05:53:47.398763Z 0 [Note] [MY-013011] [InnoDB] Rolling back trx with id 2644293, 3 rows to undo
+2026-11-26T05:53:47.410067Z 0 [Note] [MY-013012] [InnoDB] Rollback of trx with id 2644293 completed
+2026-11-26T05:53:47.410082Z 0 [Note] [MY-013011] [InnoDB] Rolling back trx with id 2644292, 3 rows to undo
+2026-11-26T05:53:47.414366Z 0 [Note] [MY-011946] [InnoDB] Buffer pool(s) load completed at 261126  5:53:47
+2026-11-26T05:53:47.433871Z 0 [Note] [MY-013012] [InnoDB] Rollback of trx with id 2644292 completed
+2026-11-26T05:53:47.433884Z 0 [Note] [MY-013011] [InnoDB] Rolling back trx with id 2644289, 4 rows to undo
+2026-11-26T05:53:47.480665Z 0 [Note] [MY-010913] [Server] You have not provided a mandatory server-id. Servers in a replication topology must have unique server-ids. Please refer to the proper server start-up parameters documentation.
+2026-11-26T05:53:47.480748Z 0 [Note] [MY-010182] [Server] Found ca.pem, server-cert.pem and server-key.pem in data directory. Trying to enable SSL support using them.
+2026-11-26T05:53:47.483362Z 0 [Note] [MY-010304] [Server] Skipping generation of SSL certificates as certificate files are present in data directory.
+2026-11-26T05:53:47.485546Z 0 [Warning] [MY-010068] [Server] CA certificate ca.pem is self signed.
+2026-11-26T05:53:47.485568Z 0 [System] [MY-013602] [Server] Channel mysql_main configured to support TLS. Encrypted connections are now supported for this channel.
+2026-11-26T05:53:47.485808Z 0 [Note] [MY-010308] [Server] Skipping generation of RSA key pair through --sha256_password_auto_generate_rsa_keys as key files are present in data directory.
+2026-11-26T05:53:47.486039Z 0 [Note] [MY-010308] [Server] Skipping generation of RSA key pair through --caching_sha2_password_auto_generate_rsa_keys as key files are present in data directory.
+2026-11-26T05:53:47.486592Z 0 [Note] [MY-010252] [Server] Server hostname (bind-address): '*'; port: 3306
+2026-11-26T05:53:47.486648Z 0 [Note] [MY-010253] [Server] IPv6 is available.
+2026-11-26T05:53:47.486661Z 0 [Note] [MY-010264] [Server]   - '::' resolves to '::';
+2026-11-26T05:53:47.486672Z 0 [Note] [MY-010251] [Server] Server socket created on IP: '::'.
+2026-11-26T05:53:47.492736Z 0 [Note] [MY-013012] [InnoDB] Rollback of trx with id 2644289 completed
+2026-11-26T05:53:47.492771Z 0 [Note] [MY-013011] [InnoDB] Rolling back trx with id 2644287, 3 rows to undo
+2026-11-26T05:53:47.538925Z 0 [Warning] [MY-011810] [Server] Insecure configuration for --pid-file: Location '/var/run/mysqld' in the path is accessible to all OS users. Consider choosing a different directory.
+2026-11-26T05:53:47.549670Z 0 [Note] [MY-011025] [Repl] Failed to start replica threads for channel ''.
+2026-11-26T05:53:47.550701Z 5 [Note] [MY-010051] [Server] Event Scheduler: scheduler thread started with id 5
+2026-11-26T05:53:47.550775Z 0 [Note] [MY-011240] [Server] Plugin mysqlx reported: 'Using SSL configuration from MySQL Server'
+2026-11-26T05:53:47.551410Z 0 [Note] [MY-011243] [Server] Plugin mysqlx reported: 'Using OpenSSL for TLS connections'
+2026-11-26T05:53:47.551498Z 0 [System] [MY-011323] [Server] X Plugin ready for connections. Bind-address: '::' port: 33060, socket: /var/run/mysqld/mysqlx.sock
+2026-11-26T05:53:47.551551Z 0 [System] [MY-010931] [Server] /usr/sbin/mysqld: ready for connections. Version: '8.4.13'  socket: '/var/run/mysqld/mysqld.sock'  port: 3306  MySQL Community Server - GPL.
+2026-11-26T05:53:47.553052Z 0 [Note] [MY-013012] [InnoDB] Rollback of trx with id 2644287 completed
+2026-11-26T05:53:47.553088Z 0 [Note] [MY-013015] [InnoDB] Rollback of non-prepared transactions completed

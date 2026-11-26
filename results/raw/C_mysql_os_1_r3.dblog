@@ -1,0 +1,105 @@
+2026-11-26 05:46:11+00:00 [Note] [Entrypoint]: Entrypoint script for MySQL Server 8.4.13.1-1.el9 started.
+2026-11-26 05:46:11+00:00 [Note] [Entrypoint]: Switching to dedicated user 'mysql'
+2026-11-26 05:46:11+00:00 [Note] [Entrypoint]: Entrypoint script for MySQL Server 8.4.13.1-1.el9 started.
+'/var/lib/mysql/mysql.sock' -> '/var/run/mysqld/mysqld.sock'
+2026-11-26T05:46:11.979521Z 0 [Note] [MY-013667] [Server] Error-log destination "stderr" is not a file. Can not restore error log messages from previous run.
+2026-11-26T05:46:11.811665Z 0 [System] [MY-015015] [Server] MySQL Server - start.
+2026-11-26T05:46:11.978108Z 0 [Note] [MY-013932] [Server] BuildID[sha1]=18305b011c78f065d9fefe828230636637cd2ef8
+2026-11-26T05:46:11.978112Z 0 [Note] [MY-010949] [Server] Basedir set to /usr/.
+2026-11-26T05:46:11.978119Z 0 [System] [MY-010116] [Server] /usr/sbin/mysqld (mysqld 8.4.13) starting as process 1
+2026-11-26T05:46:11.978122Z 0 [System] [MY-015150] [Server] Server version with update: '8.4.13.1'
+2026-11-26T05:46:11.981146Z 0 [Note] [MY-012366] [InnoDB] Using Linux native AIO
+2026-11-26T05:46:11.981223Z 0 [Note] [MY-015140] [InnoDB] Using innodb_flush_method=O_DIRECT
+2026-11-26T05:46:11.981367Z 0 [Note] [MY-010747] [Server] Plugin 'FEDERATED' is disabled.
+2026-11-26T05:46:11.981444Z 0 [Note] [MY-010747] [Server] Plugin 'ndbcluster' is disabled.
+2026-11-26T05:46:11.981470Z 0 [Note] [MY-010747] [Server] Plugin 'ndbinfo' is disabled.
+2026-11-26T05:46:11.981508Z 0 [Note] [MY-010747] [Server] Plugin 'ndb_transid_mysql_connection_map' is disabled.
+2026-11-26T05:46:11.981591Z 0 [Note] [MY-010747] [Server] Plugin 'mysql_native_password' is disabled.
+2026-11-26T05:46:11.982875Z 1 [System] [MY-013576] [InnoDB] InnoDB initialization has started.
+2026-11-26T05:46:11.982895Z 1 [Note] [MY-013546] [InnoDB] Atomic write enabled
+2026-11-26T05:46:11.982919Z 1 [Note] [MY-012932] [InnoDB] PUNCH HOLE support available
+2026-11-26T05:46:11.982933Z 1 [Note] [MY-012944] [InnoDB] Uses event mutexes
+2026-11-26T05:46:11.982938Z 1 [Note] [MY-012945] [InnoDB] GCC builtin __atomic_thread_fence() is used for memory barrier
+2026-11-26T05:46:11.982951Z 1 [Note] [MY-012948] [InnoDB] Compressed tables use zlib 1.3.2
+2026-11-26T05:46:11.984298Z 1 [Note] [MY-012951] [InnoDB] Using hardware accelerated crc32 and polynomial multiplication.
+2026-11-26T05:46:11.984501Z 1 [Note] [MY-012203] [InnoDB] Directories to scan './'
+2026-11-26T05:46:11.984554Z 1 [Note] [MY-012204] [InnoDB] Scanning './'
+2026-11-26T05:46:11.987061Z 1 [Note] [MY-012208] [InnoDB] Completed space ID check of 8 files.
+2026-11-26T05:46:11.987583Z 1 [Note] [MY-012955] [InnoDB] Initializing buffer pool, total size = 2.000000G, instances = 8, chunk size =128.000000M 
+2026-11-26T05:46:12.070458Z 1 [Note] [MY-012957] [InnoDB] Completed initialization of buffer pool
+2026-11-26T05:46:12.074332Z 0 [Note] [MY-011952] [InnoDB] If the mysqld execution user is authorized, page cleaner thread priority can be changed. See the man page of setpriority().
+2026-11-26T05:46:12.074615Z 1 [Note] [MY-013532] [InnoDB] Using './#ib_16384_0.dblwr' for doublewrite
+2026-11-26T05:46:12.083629Z 1 [Note] [MY-013532] [InnoDB] Using './#ib_16384_1.dblwr' for doublewrite
+2026-11-26T05:46:12.096384Z 1 [Note] [MY-013566] [InnoDB] Double write buffer files: 2, --innodb-doublewrite-files=2, segments_per_file=8
+2026-11-26T05:46:12.096417Z 1 [Note] [MY-013565] [InnoDB] Double write buffer pages per instance: 128
+2026-11-26T05:46:12.096440Z 1 [Note] [MY-013532] [InnoDB] Using './#ib_16384_0.dblwr' for doublewrite
+2026-11-26T05:46:12.096449Z 1 [Note] [MY-013532] [InnoDB] Using './#ib_16384_1.dblwr' for doublewrite
+2026-11-26T05:46:13.185809Z 1 [Note] [MY-013883] [InnoDB] The latest found checkpoint is at lsn = 1013195240 in redo log file ./#innodb_redo/#ib_redo7.
+2026-11-26T05:46:13.185858Z 1 [Note] [MY-012560] [InnoDB] The log sequence number 1007040587 in the system tablespace does not match the log sequence number 1013195240 in the redo log files!
+2026-11-26T05:46:13.185913Z 1 [Note] [MY-012551] [InnoDB] Database was not shutdown normally!
+2026-11-26T05:46:13.185919Z 1 [Note] [MY-012552] [InnoDB] Starting crash recovery.
+2026-11-26T05:46:13.267636Z 1 [Note] [MY-013086] [InnoDB] Starting to parse redo log at lsn = 1013194796, whereas checkpoint_lsn = 1013195240 and start_lsn = 1013194752
+2026-11-26T05:46:13.312812Z 1 [Note] [MY-012550] [InnoDB] Doing recovery: scanned up to log sequence number 1018437632
+2026-11-26T05:46:13.356108Z 1 [Note] [MY-012550] [InnoDB] Doing recovery: scanned up to log sequence number 1023680512
+2026-11-26T05:46:13.397201Z 1 [Note] [MY-012550] [InnoDB] Doing recovery: scanned up to log sequence number 1028923392
+2026-11-26T05:46:13.408614Z 1 [Note] [MY-012550] [InnoDB] Doing recovery: scanned up to log sequence number 1030629049
+2026-11-26T05:46:13.451523Z 1 [Note] [MY-013083] [InnoDB] Log background threads are being started...
+2026-11-26T05:46:13.452014Z 1 [Note] [MY-012532] [InnoDB] Applying a batch of 21162 redo log records ...
+2026-11-26T05:46:13.918351Z 1 [Note] [MY-012533] [InnoDB] 10%
+2026-11-26T05:46:14.042039Z 1 [Note] [MY-012533] [InnoDB] 20%
+2026-11-26T05:46:14.066208Z 1 [Note] [MY-012533] [InnoDB] 30%
+2026-11-26T05:46:14.067715Z 1 [Note] [MY-012533] [InnoDB] 40%
+2026-11-26T05:46:14.068845Z 1 [Note] [MY-012533] [InnoDB] 50%
+2026-11-26T05:46:14.069276Z 1 [Note] [MY-012533] [InnoDB] 60%
+2026-11-26T05:46:14.069647Z 1 [Note] [MY-012533] [InnoDB] 70%
+2026-11-26T05:46:14.070044Z 1 [Note] [MY-012533] [InnoDB] 80%
+2026-11-26T05:46:14.070370Z 1 [Note] [MY-012533] [InnoDB] 90%
+2026-11-26T05:46:14.084166Z 1 [Note] [MY-012533] [InnoDB] 100%
+2026-11-26T05:46:14.586955Z 1 [Note] [MY-012535] [InnoDB] Apply batch completed!
+2026-11-26T05:46:19.405360Z 1 [Note] [MY-013252] [InnoDB] Using undo tablespace './undo_001'.
+2026-11-26T05:46:19.405839Z 1 [Note] [MY-013252] [InnoDB] Using undo tablespace './undo_002'.
+2026-11-26T05:46:19.406539Z 1 [Note] [MY-012910] [InnoDB] Opened 2 existing undo tablespaces.
+2026-11-26T05:46:19.406628Z 1 [Note] [MY-011980] [InnoDB] GTID recovery trx_no: 635324
+2026-11-26T05:46:19.409104Z 1 [Note] [MY-013776] [InnoDB] Parallel initialization of rseg complete
+2026-11-26T05:46:19.409303Z 1 [Note] [MY-013777] [InnoDB] Time taken to initialize rseg using 4 thread: 2 ms.
+2026-11-26T05:46:19.455570Z 1 [Note] [MY-012255] [InnoDB] Removed temporary tablespace data file: "ibtmp1"
+2026-11-26T05:46:19.455635Z 1 [Note] [MY-012923] [InnoDB] Creating shared tablespace for temporary tables
+2026-11-26T05:46:19.495464Z 1 [Note] [MY-012265] [InnoDB] Setting file './ibtmp1' size to 12 MB. Physically writing the file full; Please wait ...
+2026-11-26T05:46:19.620630Z 1 [Note] [MY-012266] [InnoDB] File './ibtmp1' size is now 12 MB.
+2026-11-26T05:46:19.620915Z 1 [Note] [MY-013627] [InnoDB] Scanning temp tablespace dir:'./#innodb_temp/'
+2026-11-26T05:46:20.730720Z 1 [Note] [MY-013018] [InnoDB] Created 128 and tracked 128 new rollback segment(s) in the temporary tablespace. 128 are now active.
+2026-11-26T05:46:20.731220Z 0 [Note] [MY-011953] [InnoDB] Page cleaner took 8656ms to flush 0 and evict 0 pages
+2026-11-26T05:46:20.731410Z 1 [Note] [MY-012976] [InnoDB] 8.4.13 started; log sequence number 1030629059
+2026-11-26T05:46:20.731471Z 1 [System] [MY-013577] [InnoDB] InnoDB initialization has ended.
+2026-11-26T05:46:20.739032Z 1 [Note] [MY-011089] [Server] Data dictionary restarting version '80300'.
+2026-11-26T05:46:20.801600Z 1 [Note] [MY-012357] [InnoDB] Reading DD tablespace files
+2026-11-26T05:46:20.803101Z 1 [Note] [MY-012356] [InnoDB] Scanned 10 tablespaces. Validated 10.
+2026-11-26T05:46:20.864091Z 1 [Note] [MY-010006] [Server] Using data dictionary with version '80300'.
+2026-11-26T05:46:20.873421Z 0 [Note] [MY-011332] [Server] Plugin mysqlx reported: 'IPv6 is available'
+2026-11-26T05:46:20.907666Z 0 [Note] [MY-011323] [Server] Plugin mysqlx reported: 'X Plugin ready for connections. bind-address: '::' port: 33060'
+2026-11-26T05:46:20.907744Z 0 [Note] [MY-011323] [Server] Plugin mysqlx reported: 'X Plugin ready for connections. socket: '/var/run/mysqld/mysqlx.sock''
+2026-11-26T05:46:20.929489Z 0 [Note] [MY-010902] [Server] Thread priority attribute setting in Resource Group SQL shall be ignored due to unsupported platform or insufficient privilege.
+2026-11-26T05:46:20.970859Z 0 [Note] [MY-013911] [Server] Crash recovery finished in InnoDB engine. No attempts to commit, rollback or prepare any transactions.
+2026-11-26T05:46:20.975391Z 0 [Note] [MY-012487] [InnoDB] DDL log recovery : begin
+2026-11-26T05:46:20.976442Z 0 [Note] [MY-012488] [InnoDB] DDL log recovery : end
+2026-11-26T05:46:20.976715Z 0 [Note] [MY-011946] [InnoDB] Loading buffer pool(s) from /var/lib/mysql/ib_buffer_pool
+2026-11-26T05:46:20.984071Z 0 [Note] [MY-012922] [InnoDB] Waiting for purge to start
+2026-11-26T05:46:21.101504Z 0 [Note] [MY-010913] [Server] You have not provided a mandatory server-id. Servers in a replication topology must have unique server-ids. Please refer to the proper server start-up parameters documentation.
+2026-11-26T05:46:21.101720Z 0 [Note] [MY-010182] [Server] Found ca.pem, server-cert.pem and server-key.pem in data directory. Trying to enable SSL support using them.
+2026-11-26T05:46:21.104526Z 0 [Note] [MY-010304] [Server] Skipping generation of SSL certificates as certificate files are present in data directory.
+2026-11-26T05:46:21.107553Z 0 [Warning] [MY-010068] [Server] CA certificate ca.pem is self signed.
+2026-11-26T05:46:21.107600Z 0 [System] [MY-013602] [Server] Channel mysql_main configured to support TLS. Encrypted connections are now supported for this channel.
+2026-11-26T05:46:21.108119Z 0 [Note] [MY-010308] [Server] Skipping generation of RSA key pair through --sha256_password_auto_generate_rsa_keys as key files are present in data directory.
+2026-11-26T05:46:21.108527Z 0 [Note] [MY-010308] [Server] Skipping generation of RSA key pair through --caching_sha2_password_auto_generate_rsa_keys as key files are present in data directory.
+2026-11-26T05:46:21.109383Z 0 [Note] [MY-010252] [Server] Server hostname (bind-address): '*'; port: 3306
+2026-11-26T05:46:21.109447Z 0 [Note] [MY-010253] [Server] IPv6 is available.
+2026-11-26T05:46:21.109454Z 0 [Note] [MY-010264] [Server]   - '::' resolves to '::';
+2026-11-26T05:46:21.109460Z 0 [Note] [MY-010251] [Server] Server socket created on IP: '::'.
+2026-11-26T05:46:21.150222Z 0 [Warning] [MY-011810] [Server] Insecure configuration for --pid-file: Location '/var/run/mysqld' in the path is accessible to all OS users. Consider choosing a different directory.
+2026-11-26T05:46:21.165243Z 0 [Note] [MY-011025] [Repl] Failed to start replica threads for channel ''.
+2026-11-26T05:46:21.166642Z 5 [Note] [MY-010051] [Server] Event Scheduler: scheduler thread started with id 5
+2026-11-26T05:46:21.166999Z 0 [Note] [MY-011240] [Server] Plugin mysqlx reported: 'Using SSL configuration from MySQL Server'
+2026-11-26T05:46:21.167780Z 0 [Note] [MY-011243] [Server] Plugin mysqlx reported: 'Using OpenSSL for TLS connections'
+2026-11-26T05:46:21.168032Z 0 [System] [MY-011323] [Server] X Plugin ready for connections. Bind-address: '::' port: 33060, socket: /var/run/mysqld/mysqlx.sock
+2026-11-26T05:46:21.168153Z 0 [System] [MY-010931] [Server] /usr/sbin/mysqld: ready for connections. Version: '8.4.13'  socket: '/var/run/mysqld/mysqld.sock'  port: 3306  MySQL Community Server - GPL.
+2026-11-26T05:46:21.262647Z 0 [Note] [MY-011946] [InnoDB] Buffer pool(s) load completed at 261126  5:46:21
