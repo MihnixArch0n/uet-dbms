@@ -51,7 +51,7 @@
   ]
   #v(2cm)
   #text(12pt)[
-    *Nhóm XX*\
+    *Nhóm 05*\
     \
     Thành viên 1 (TV1): Vũ Việt Anh – 24020033\
     Thành viên 2 (TV2): Phạm Tuấn Minh – 24020240\

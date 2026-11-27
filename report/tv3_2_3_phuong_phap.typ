@@ -117,7 +117,7 @@ Script kiểm tra bất biến được kiểm chứng theo hai chiều trên m�
   caption: [Kiểm chứng script bất biến trên PostgreSQL. Trên: dữ liệu đúng sau khi chạy tải (`OK`). Dưới: cố ý làm lệch một số dư (`FAIL`), rồi đưa dữ liệu về trạng thái ban đầu.],
 )
 
-Trước mỗi lần chạy, script đưa dữ liệu về trạng thái ban đầu (xóa bảng lịch sử, đưa mọi số dư về 0) và dừng lại nếu bất biến chưa phải `0|0|0|0|0`.
+Ở thí nghiệm B và C, trước mỗi lần chạy, script đưa dữ liệu về trạng thái ban đầu (xóa bảng lịch sử, đưa mọi số dư về 0) và dừng lại nếu bất biến chưa phải `0|0|0|0|0`. Ở thí nghiệm A việc này chỉ làm một lần trước mỗi loạt (mỗi DBMS), nên dữ liệu tích lũy qua các lần chạy trong loạt (mục 2.4).
 
 === Tóm tắt thiết kế ba thí nghiệm
 
