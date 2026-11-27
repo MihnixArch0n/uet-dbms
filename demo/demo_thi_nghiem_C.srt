@@ -1,0 +1,95 @@
+1
+00:00:10,000 --> 00:00:19,000
+DBMS chạy trong Docker, bên trong máy ảo KVM "dbvm" (khung phải dưới: trạng thái máy ảo)
+
+2
+00:00:19,000 --> 00:00:27,000
+Hai container bench-pg và bench-mysql đang chạy trong máy ảo
+
+3
+00:00:27,000 --> 00:00:36,300
+Kiểm tra bất biến: bốn tổng A = T = B = H bằng nhau trên cả hai hệ (OK)
+
+4
+00:00:40,300 --> 00:00:48,300
+innodb_flush_log_at_trx_commit = 2: COMMIT ghi log vào page cache của hệ điều hành, mỗi giây mới fsync
+
+5
+00:00:48,300 --> 00:00:56,800
+Bơm tải 8 luồng; khung phải trên: số giao dịch đã được xác nhận COMMIT
+
+6
+00:00:56,800 --> 00:01:08,800
+Sau 30 giây: kill tiến trình MySQL bằng SIGKILL. Số giao dịch xác nhận dừng lại
+
+7
+00:01:08,800 --> 00:01:11,550
+Khởi động lại MySQL, chờ sẵn sàng nhận kết nối
+
+8
+00:01:11,567 --> 00:01:18,067
+Đối soát: 134.666 giao dịch đã xác nhận, tất cả đều còn trong DB. MẤT 0, RPO = 0
+
+9
+00:01:18,067 --> 00:01:24,167
+Kill tiến trình không xóa page cache, nên log vẫn được hệ điều hành ghi xuống đĩa
+
+10
+00:01:28,167 --> 00:01:36,167
+Cùng cấu hình = 2, lần này DBMS chạy trong máy ảo
+
+11
+00:01:36,167 --> 00:01:44,667
+Bơm tải 8 luồng trong 30 giây
+
+12
+00:01:44,667 --> 00:01:52,667
+virsh destroy: ngắt nguồn máy ảo, giống như rút điện. Trạng thái dbvm: shut off
+
+13
+00:01:52,667 --> 00:02:02,667
+Bật lại máy ảo; container MySQL tự khởi động và chạy phục hồi
+
+14
+00:02:02,667 --> 00:02:06,167
+Chờ MySQL sẵn sàng
+
+15
+00:02:06,167 --> 00:02:12,667
+Đối soát: 142.870 giao dịch đã xác nhận, MẤT 3.109 giao dịch, RPO ≈ 655 ms
+
+16
+00:02:12,667 --> 00:02:19,267
+Log chưa fsync trong page cache mất theo hệ điều hành. Nhưng không có giao dịch lạ, bất biến vẫn OK
+
+17
+00:02:23,267 --> 00:02:30,767
+synchronous_commit = on: mỗi COMMIT chờ WAL được fsync rồi mới báo thành công
+
+18
+00:02:30,767 --> 00:02:43,017
+Bơm tải 8 luồng trong 30 giây
+
+19
+00:02:43,033 --> 00:02:52,033
+Ngắt nguồn máy ảo (virsh destroy). Số giao dịch xác nhận dừng ở 20.735
+
+20
+00:02:52,033 --> 00:03:01,033
+Bật lại máy ảo; PostgreSQL tự phục hồi bằng cách phát lại WAL
+
+21
+00:03:01,033 --> 00:03:06,033
+Chờ PostgreSQL sẵn sàng
+
+22
+00:03:06,033 --> 00:03:13,533
+Đối soát: 20.735 giao dịch đã xác nhận, MẤT 0, RPO = 0, bất biến OK
+
+23
+00:03:13,533 --> 00:03:21,433
+20.736 dòng: 1 giao dịch đang dở đã commit nhưng chưa kịp trả lời client. Hợp lệ, không phải lỗi
+
+24
+00:03:21,433 --> 00:03:32,333
+Log phục hồi của PostgreSQL: redo xong trong 2,90 giây, sau đó sẵn sàng nhận kết nối

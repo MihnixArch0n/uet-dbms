@@ -8,7 +8,7 @@
 
 #let shot(path, cap, w: 100%) = figure(image(path, width: w), caption: cap)
 // Bảng: chữ nhỏ hơn, không căn đều hai bên (tránh khoảng trắng giãn trong ô hẹp)
-#show table: set text(size: 9.5pt)
+#show table: set text(size: 11pt)
 #show table: set par(justify: false)
 
 == Phương pháp thực nghiệm
@@ -24,7 +24,7 @@ Tất cả số liệu chính thức được đo trên *một máy duy nhất*,
     columns: (auto, 1fr),
     align: (left, left),
     stroke: 0.5pt,
-    inset: 6pt,
+    inset: 4.5pt,
     table.header([*Thành phần*], [*Cấu hình*]),
     [CPU], [AMD Ryzen AI 9 HX 370, 12 nhân / 24 luồng],
     [Bộ nhớ], [30 GiB],
@@ -47,7 +47,7 @@ Con số fsync ở bảng B1 là giới hạn trên của thông lượng khi ch
     columns: (auto, 1fr),
     align: (left, left),
     stroke: 0.5pt,
-    inset: 6pt,
+    inset: 4.5pt,
     table.header([*Thành phần*], [*Cấu hình*]),
     [Ảo hóa], [KVM/QEMU, quản lý bằng libvirt],
     [Tài nguyên], [4 vCPU, 8 GB RAM, đĩa ảo qcow2 40 GB đặt trên cùng ổ SSD của máy đo],
@@ -57,8 +57,6 @@ Con số fsync ở bảng B1 là giới hạn trên của thông lượng khi ch
   ),
   caption: [Máy ảo dùng cho mức sự cố hệ điều hành, bảng B1b.],
 )
-
-#shot("img/M_02_vm_crash_recovery.png", [Sau khi máy ảo bị ngắt nguồn và bật lại, hai container tự khởi động và PostgreSQL tự phục hồi (phát lại ~640 MB WAL trong 2,76 giây).], w: 80%)
 
 === Dữ liệu
 
@@ -78,7 +76,7 @@ Mỗi giao dịch mô phỏng một lần gửi hoặc rút tiền theo đúng g
     columns: (3.2cm, 1fr, 1fr),
     align: (left, left, left),
     stroke: 0.5pt,
-    inset: 6pt,
+    inset: 4.5pt,
     table.header([*Mục*], [*PostgreSQL*], [*MySQL InnoDB*]),
     [Bộ đệm dữ liệu], [`shared_buffers = 2GB`], [`innodb_buffer_pool_size = 2G`],
     [Log trước checkpoint], [`max_wal_size = 4GB`, `checkpoint_timeout = 5min`], [`innodb_redo_log_capacity = 4G`],
@@ -94,23 +92,16 @@ Mỗi giao dịch mô phỏng một lần gửi hoặc rút tiền theo đúng g
 
 === Bất biến và kiểm chứng tính đúng
 
-Gọi $A$ là tổng số dư tài khoản, $T$ là tổng số dư giao dịch viên, $B$ là tổng số dư chi nhánh và $H$ là tổng `delta` trong bảng lịch sử.
-
-1. *Trạng thái ban đầu:* sau khi sinh dữ liệu, $A = T = B = H = 0$. Điều này được kiểm tra bằng truy vấn và lưu lại (hình đối chiếu dữ liệu ở phần Dữ liệu), không giả định.
-2. *Logic giao dịch:* mỗi giao dịch cộng cùng một `delta` vào cả bốn đại lượng, trong một giao dịch duy nhất.
-3. *Hệ quả:* nếu mọi giao dịch hoặc được áp dụng toàn bộ, hoặc không được áp dụng gì (tính nguyên tử), thì $A = T = B = H$ luôn đúng. Một giao dịch chỉ được ghi một phần sẽ làm lệch các tổng.
-4. *Giới hạn:* bất biến không phát hiện được việc mất trọn vẹn một giao dịch, vì khi đó bốn tổng vẫn bằng nhau. Việc phát hiện mất giao dịch do bước đối soát của thí nghiệm C đảm nhận.
-
-Script kiểm tra bất biến được kiểm chứng theo hai chiều trên máy đo. *Kiểm chứng dương:* sau 60 giây chạy workload, bốn tổng bằng nhau và số dòng lịch sử bằng đúng số giao dịch sysbench báo. *Kiểm chứng âm:* cố ý sửa số dư của một tài khoản thì script báo `FAIL`. Hai kiểm chứng này được làm cho cả PostgreSQL (hình dưới) và MySQL.
+Gọi $A, T, B$ là tổng số dư tài khoản, giao dịch viên, chi nhánh và $H$ là tổng `delta` bảng lịch sử. Ban đầu $A = T = B = H = 0$ (kiểm tra bằng truy vấn). Vì mỗi giao dịch cộng cùng một `delta` vào cả bốn đại lượng trong một giao dịch nguyên tử, bất biến $A = T = B = H$ luôn đúng (riêng mất trọn vẹn giao dịch được phát hiện qua đối soát ở thí nghiệm C). Script kiểm tra đã được kiểm chứng hai chiều trên cả PostgreSQL (hình dưới) và MySQL: chạy tải 60 giây trả về `OK`, cố ý sửa một số dư báo ngay `FAIL`.
 
 #figure(
   grid(
     columns: 2,
     gutter: 8pt,
-    image("img/M_04_kiem_chung_duong_pg.png", width: 100%),
-    image("img/M_06_kiem_chung_am_pg.png", width: 100%),
+    image("img/M_04_kiem_chung_duong_pg.png", width: 70%),
+    image("img/M_06_kiem_chung_am_pg.png", width: 70%),
   ),
-  caption: [Kiểm chứng script bất biến trên PostgreSQL. Trái: dữ liệu đúng sau khi chạy tải (`OK`). Phải: cố ý làm lệch một số dư (`FAIL`), rồi đưa dữ liệu về trạng thái ban đầu.],
+  caption: [Kiểm chứng script bất biến trên PostgreSQL: dữ liệu đúng (`OK`, trái) và cố ý làm lệch một số dư (`FAIL`, phải).],
 )
 
 Ở thí nghiệm B và C, trước mỗi lần chạy, script đưa dữ liệu về trạng thái ban đầu (xóa bảng lịch sử, đưa mọi số dư về 0) và dừng lại nếu bất biến chưa phải `0|0|0|0|0`. Ở thí nghiệm A việc này chỉ làm một lần trước mỗi loạt (mỗi DBMS), nên dữ liệu tích lũy qua các lần chạy trong loạt (mục 2.4).
@@ -122,7 +113,7 @@ Script kiểm tra bất biến được kiểm chứng theo hai chiều trên m�
     columns: (auto, 1fr, 1fr, 1fr),
     align: (left, left, left, left),
     stroke: 0.5pt,
-    inset: 6pt,
+    inset: 4.5pt,
     table.header([], [*A – Chi phí flush log*], [*B – Chi phí bảo vệ trang*], [*C – Crash và phục hồi*]),
     [Thay đổi], [Tham số flush log (PostgreSQL on/off; InnoDB 1/2/0) và số client (1, 8, 32)], [Bảo vệ trang bật/tắt (PostgreSQL Full-Page Writes; InnoDB doublewrite); 8 client], [5 cấu hình flush × 2 mức sự cố],
     [Giữ cố định], [Bảo vệ trang bật], [Flush log chặt], [Bảo vệ trang bật, 8 luồng tải],
@@ -145,7 +136,7 @@ Câu hỏi: với từng cấu hình flush và từng loại sự cố, có giao
     columns: (2.6cm, 1fr, 1fr, 2.6cm),
     align: (left, left, left, left),
     stroke: 0.5pt,
-    inset: 6pt,
+    inset: 4.5pt,
     table.header([*Mức*], [*Cách gây sự cố*], [*Dữ liệu bị xóa*], [*Chạy trên*]),
     [1. Crash tiến trình], [`docker kill -s KILL` container DBMS khi đang có tải], [Bộ nhớ của DBMS (bộ đệm, WAL buffers, log buffer). Page cache của hệ điều hành còn nguyên], [Máy đo],
     [2. Crash hệ điều hành], [Ngắt nguồn máy ảo (`virsh destroy`) khi đang có tải], [Thêm page cache của hệ điều hành khách: dữ liệu đã `write()` nhưng chưa `fsync()`], [Máy ảo KVM],
@@ -179,7 +170,7 @@ Công cụ được kiểm chứng khi không có sự cố: sau 30 giây chạy
     columns: (2.9cm, 4.6cm, 1fr),
     align: (left, left, left),
     stroke: 0.5pt,
-    inset: 6pt,
+    inset: 4.5pt,
     table.header([*Chỉ số*], [*Công thức*], [*Ý nghĩa và yêu cầu*]),
     [Giao dịch bị mất], [ACK ∖ PRESENT], [Đã xác nhận với client nhưng không còn. Phải bằng 0 với cấu hình bền vững],
     [Đang dở lúc crash], [SENT ∖ ACK], [Đã gửi COMMIT nhưng chưa nhận trả lời. Có thể đã commit hoặc chưa; cả hai đều hợp lệ],
@@ -202,11 +193,11 @@ Công cụ được kiểm chứng khi không có sự cố: sau 30 giây chạy
     columns: (4.2cm, 1fr),
     align: (left, left),
     stroke: 0.5pt,
-    inset: 6pt,
+    inset: 5pt,
     table.header([*Nhận xét*], [*Cách xử lý trong thiết kế*]),
-    [1. Phân biệt crash tiến trình, crash hệ điều hành và mất điện], [Kill tiến trình không xóa page cache của hệ điều hành: dữ liệu đã `write()` nhưng chưa `fsync()` vẫn còn, nên không chứng minh được việc mất giao dịch do chưa flush. Thí nghiệm C có hai mức tách riêng: kill tiến trình DBMS, và ngắt nguồn máy ảo chạy DBMS (mất page cache của hệ điều hành khách). Mất điện thật, liên quan bộ đệm ghi của ổ đĩa, được nêu là giới hạn và giải thích bằng lý thuyết.],
-    [2. Bất biến cần được định nghĩa, kiểm chứng bằng script, và cần đối soát số giao dịch thành công], [Bất biến được định nghĩa hình thức, trạng thái ban đầu được kiểm tra bằng truy vấn, script được kiểm chứng cả chiều dương lẫn chiều âm. Vì bất biến không phát hiện được việc mất trọn vẹn giao dịch, mỗi giao dịch mang mã `txn_id` và client ghi nhật ký các mã đã được xác nhận; sau crash, nhật ký được đối soát với bảng lịch sử để đếm chính xác số giao dịch bị mất.],
-    [3. Tách thí nghiệm flush log khỏi thí nghiệm bảo vệ trang; xác định cấu hình bền vững và cách đo RTO/RPO], [Thí nghiệm A chỉ đổi tham số flush, giữ bảo vệ trang bật; thí nghiệm B chỉ đổi bảo vệ trang, giữ flush chặt. Cấu hình bền vững được định nghĩa ở bảng B2. RPO và RTO được định nghĩa bằng công thức ở bảng trên và đo cho từng lần crash.],
+    [1. Phân biệt crash tiến trình, HĐH và mất điện], [Thí nghiệm C tách 2 mức: `docker kill` (còn page cache) và `virsh destroy` máy ảo KVM (mất page cache). Mất điện thật (bộ đệm ổ đĩa) nêu trong giới hạn và giải thích lý thuyết.],
+    [2. Định nghĩa/kiểm chứng bất biến & đối soát giao dịch], [Định nghĩa $A = T = B = H$, kiểm chứng script hai chiều (`OK`/`FAIL`), và gán `txn_id` ghi nhật ký client để đối soát chính xác giao dịch mất sau crash.],
+    [3. Tách thí nghiệm flush khỏi bảo vệ trang; rõ cấu hình bền vững & RPO/RTO], [Thí nghiệm A chỉ đổi flush (giữ bảo vệ trang), B chỉ đổi bảo vệ trang (giữ flush chặt). Cấu hình bền vững (bảng B2) và công thức RPO/RTO đo cho từng lần crash.],
   ),
   caption: [Đối chiếu nhận xét của giảng viên với thiết kế thí nghiệm.],
 )

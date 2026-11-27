@@ -8,21 +8,27 @@
 
 #set document(
   title: "Durability & Crash Recovery – PostgreSQL vs MySQL InnoDB",
-  author: "Nhóm 2",
+  author: "Vũ Việt Anh, Phạm Tuấn Minh, Trần Minh Hiếu",
 )
 #set page(
   paper: "a4",
-  margin: (top: 2cm, bottom: 2cm, left: 2.2cm, right: 2cm),
+  // Lề theo file mẫu của trường: trên 2,5 cm, dưới 3 cm, trái 3 cm, phải 2 cm
+  margin: (top: 2.5cm, bottom: 3cm, left: 3cm, right: 2cm),
   numbering: "1",
 )
-#set text(font: "New Computer Modern", size: 11pt, lang: "vi")
-#set par(justify: true, leading: 0.68em)
+// Nội dung: Times New Roman 13 pt (Liberation Serif là phông thay thế cùng kích thước chữ).
+#set text(font: ("Times New Roman", "Liberation Serif"), size: 13pt, lang: "vi")
+// Giãn dòng 1,3 lines như Word: khoảng cách hai dòng = 1,3 × 1,15 em ≈ 1,49 em,
+// tức leading 0,83 em (Typst đo từ chân dòng trên tới đỉnh chữ hoa dòng dưới). Cách đoạn thêm 6 pt.
+#set par(justify: true, leading: 0.83em, spacing: 0.83em + 6pt)
+#show raw: set text(size: 0.85em)
 #set heading(numbering: "1.1.")
+// Chỉ các mục lớn bắt đầu trang mới: Phân công, 1., 2., Tài liệu tham khảo (và Mục lục).
 #show heading.where(level: 1): it => {
   pagebreak(weak: true)
-  v(0.8em)
+  v(0.6em)
   it
-  v(0.4em)
+  v(0.6em)
 }
 #show heading.where(level: 2): it => {
   v(0.6em)
@@ -30,44 +36,51 @@
   v(0.3em)
 }
 #show figure: set block(breakable: true)
-#let shot(path, cap, w: 100%) = figure(image(path, width: w), caption: cap)
-#import "diagrams.typ": diagram-data-path, diagram-pg-arch
+// Bảng: chữ 11 pt, giãn dòng hẹp hơn nội dung, không căn đều trong ô. Chú thích hình/bảng 12 pt.
+#show table: set text(size: 11pt)
+#show table: set par(justify: false, leading: 0.55em)
+#show figure.caption: set text(size: 12pt)
+// Hình nằm đúng vị trí trong văn bản. Riêng vài hình lớn ở giữa mục được đặt pl: top:
+// nếu không đủ chỗ, hình lên đầu trang sau và phần chữ phía sau lấp chỗ trống ở trang hiện tại.
+#let shot(path, cap, w: 100%, pl: none) = figure(image(path, width: w), caption: cap, placement: pl)
+#import "diagrams.typ": diagram-data-path
 
 // ============================================================
 // BÌA
 // ============================================================
-#align(center)[
-  #v(1cm)
-  #text(14pt)[ĐẠI HỌC QUỐC GIA HÀ NỘI]
-  #v(0.3cm)
-  #text(13pt)[TRƯỜNG ĐẠI HỌC CÔNG NGHỆ]
-  #v(0.8cm)
-  #image("img/uet.jpg", width: 3.5cm)
-  #v(0.8cm)
-  #text(16pt, weight: "bold")[BÁO CÁO BÀI TẬP LỚN]
-  #v(0.4cm)
-  #text(14pt)[Hệ quản trị cơ sở dữ liệu]
-  #v(1.0cm)
-  #text(15pt, weight: "bold")[
-    Durability \& Crash Recovery:\
-    So sánh PostgreSQL và MySQL InnoDB
-  ]
-  #v(1.4cm)
-  #text(12pt)[
-    *Nhóm 2*\
-    \
-    Thành viên 1 (TV1): Vũ Việt Anh – 24020033\
-    Thành viên 2 (TV2): Phạm Tuấn Minh – 24020240\
-    Thành viên 3 (TV3): Trần Minh Hiếu – 24020132\
-  ]
-  #v(1fr)
-  #text(11pt)[
-    Hà Nội, 11/2026
-  ]
-  #v(0.5cm)
+// Theo trang bìa mẫu của Trường ĐHCN (khung viền đôi, logo, các dòng căn giữa).
+// Khung đặt đúng vị trí như mẫu: cách mép trái 2,79 cm, mép trên 2,5 cm, rộng 16,23 cm, cao 25,45 cm.
+#let navy = rgb(0, 31, 95)
+#page(
+  numbering: none,
+  margin: (left: 2.79cm, top: 2.5cm, right: 21cm - 2.79cm - 16.23cm, bottom: 29.7cm - 2.5cm - 25.45cm),
+)[
+  #set text(font: ("Times New Roman", "Liberation Serif"), weight: "bold")
+  #set par(justify: false, leading: 0.6em)
+  // Khung viền đôi: đường mảnh bên ngoài, đường đậm bên trong
+  #place(top + left, rect(width: 100%, height: 100%, stroke: 0.75pt + navy))
+  #place(top + left, dx: 2.6pt, dy: 2.6pt, rect(width: 100% - 5.2pt, height: 100% - 5.2pt, stroke: 2.6pt + navy))
+
+  #place(top + center, dy: 0.85cm, align(center, text(12pt)[ĐẠI HỌC QUỐC GIA HÀ NỘI \ #v(0.15cm) TRƯỜNG ĐẠI HỌC CÔNG NGHỆ]))
+  #place(top + center, dy: 4.2cm, image("img/logo_uet.png", width: 3.34cm))
+  #place(top + center, dy: 9.6cm, block(width: 13.5cm, align(center, text(18pt)[
+    DURABILITY \& CRASH RECOVERY: \ SO SÁNH POSTGRESQL VÀ MYSQL INNODB
+  ])))
+  #place(top + center, dy: 12.3cm, align(center, text(14pt)[Báo cáo bài tập lớn môn Hệ quản trị cơ sở dữ liệu]))
+  #place(top + center, dy: 15.2cm, align(center, text(14pt)[
+    NHÓM 02 \
+    #v(0.15cm)
+    Sinh viên thực hiện \
+    #v(0.2cm)
+    #text(14pt, weight: "regular")[
+      Vũ Việt Anh – 24020033 \
+      Phạm Tuấn Minh – 24020240 \
+      Trần Minh Hiếu – 24020132
+    ]
+  ]))
+  #place(bottom + center, dy: -1.6cm, text(12pt)[HÀ NỘI 2026])
 ]
 
-#pagebreak()
 
 // ============================================================
 // MỤC LỤC + PHÂN CÔNG
@@ -93,7 +106,9 @@
 )
 
 #v(0.8cm)
-Repository GitHub: #link("https://github.com/MihnixArch0n/uet-dbms")
+Repository GitHub (mã nguồn, dữ liệu, kịch bản demo, kết quả thực nghiệm): #link("https://github.com/MihnixArch0n/uet-dbms")
+
+Video demo thí nghiệm C (3 phút 42 giây, có phụ đề): #link("https://github.com/MihnixArch0n/uet-dbms/blob/main/demo/demo_thi_nghiem_C.mp4")
 
 #pagebreak()
 
@@ -104,67 +119,33 @@ Repository GitHub: #link("https://github.com/MihnixArch0n/uet-dbms")
 
 == Tổng quan
 
-PostgreSQL bắt nguồn từ dự án POSTGRES tại Đại học California, Berkeley (1986) do Michael Stonebraker dẫn dắt. Năm 1996 dự án được đổi tên thành PostgreSQL và trở thành phần mềm mã nguồn mở. Hiện nay PostgreSQL là một trong những hệ quản trị cơ sở dữ liệu quan hệ (RDBMS) mạnh mẽ nhất, hỗ trợ đầy đủ chuẩn SQL và nhiều tính năng hướng đối tượng.
+PostgreSQL bắt nguồn từ dự án POSTGRES tại Đại học California, Berkeley (1986) do Michael Stonebraker dẫn dắt. Năm 1996 dự án được đổi tên thành PostgreSQL và trở thành phần mềm mã nguồn mở. Hiện nay PostgreSQL là một trong những hệ quản trị cơ sở dữ liệu quan hệ (RDBMS) mạnh mẽ nhất, tuân thủ phần lớn chuẩn SQL và nhiều tính năng hướng đối tượng.
 
 Điểm khác biệt nổi bật so với MySQL là mô hình *object-relational*: PostgreSQL cho phép người dùng định nghĩa kiểu dữ liệu mới, toán tử, hàm và chỉ mục tùy biến. MySQL (đặc biệt với engine InnoDB) tập trung vào hiệu năng web và dễ triển khai, trong khi PostgreSQL hướng tới tính đúng đắn, khả năng mở rộng và tuân thủ chuẩn. Oracle và SQL Server là các hệ thương mại có nhiều tính năng enterprise tương tự, nhưng PostgreSQL cung cấp hầu hết các khả năng đó dưới giấy phép mở (PostgreSQL License – tương tự BSD).
 
 == Kiến trúc
 
-PostgreSQL sử dụng mô hình *process-per-connection*. Tiến trình chính (postmaster / postgres) lắng nghe kết nối; mỗi client mới được fork thành một backend process riêng. Cách tiếp cận này đơn giản, cô lập lỗi tốt, nhưng tiêu tốn nhiều bộ nhớ hơn mô hình thread của MySQL.
+PostgreSQL dùng mô hình *process-per-connection*: tiến trình chính (`postmaster`) lắng nghe kết nối và fork một `backend process` riêng cho mỗi client (cô lập lỗi tốt, tốn bộ nhớ hơn thread của MySQL). Các tiến trình nền chính gồm: *checkpointer* (ghi trang bẩn định kỳ và tạo checkpoint), *background writer* (ghi dần trang bẩn), *WAL writer* (đẩy WAL theo chu kỳ `wal_writer_delay`), và *autovacuum* (dọn phiên bản cũ MVCC).
 
-Các tiến trình nền quan trọng:
+Bộ nhớ chia thành *Shared memory* (shared buffers, WAL buffers, lock table) và *Backend-private memory* (`work_mem`, `maintenance_work_mem`). Lưu trữ vật lý dưới `$PGDATA` gồm `base/` (dữ liệu bảng/chỉ mục dạng trang 8 KB, dữ liệu lớn tách sang TOAST), `pg_wal/` (các file WAL 16 MB) và `global/` (catalog toàn cục, `pg_control`).
 
-- *checkpointer*: định kỳ ghi các trang bẩn từ shared buffers xuống đĩa và tạo checkpoint.
-- *background writer*: ghi dần các trang bẩn để giảm áp lực lên checkpointer.
-- *WAL writer*: đẩy các bản ghi WAL từ bộ nhớ ra đĩa theo chu kỳ `wal_writer_delay`.
-- *autovacuum launcher* và worker: dọn dẹp phiên bản cũ của hàng (MVCC).
-
-Bộ nhớ chia thành hai vùng chính:
-
-- *Shared memory*: shared buffers (cache trang dữ liệu), WAL buffers, lock table…
-- *Backend-private memory*: `work_mem`, `maintenance_work_mem`, vùng sắp xếp và hash tạm.
-
-Lưu trữ vật lý nằm dưới thư mục `$PGDATA`:
-
-- `base/` – dữ liệu từng database (mỗi bảng/chỉ mục là một hoặc nhiều file heap).
-- `pg_wal/` – các file WAL kích thước cố định 16 MB.
-- `global/` – catalog toàn cục và file điều khiển `pg_control`.
-- Trang dữ liệu mặc định 8 KB. Dữ liệu lớn được tách sang TOAST.
-
-#figure(
-  diagram-pg-arch(),
-  kind: image,
-  caption: [Sơ đồ kiến trúc tiến trình và bộ nhớ PostgreSQL: postmaster, backend, bộ nhớ chung, tiến trình nền và các thư mục dữ liệu.],
-)
+#shot("img/H2_kien_truc_pg.png", [Sơ đồ kiến trúc tiến trình và bộ nhớ PostgreSQL: postmaster, backend, bộ nhớ chung, tiến trình nền và các thư mục dữ liệu.], w: 62%)
 
 == Tính năng chính
 
-PostgreSQL hỗ trợ nhiều kiểu dữ liệu nâng cao: JSONB (lưu trữ nhị phân có chỉ mục), mảng, range type, hstore, geometric… Hệ thống chỉ mục phong phú: B-tree (mặc định), GIN (cho mảng và JSONB), GiST (dữ liệu hình học và full-text), BRIN (bảng rất lớn, dữ liệu có thứ tự).
-
-Cơ chế MVCC (Multi-Version Concurrency Control) cho phép đọc không bị chặn bởi ghi. Các phiên bản cũ của hàng được dọn bởi VACUUM. Mức cô lập hỗ trợ đầy đủ từ Read Committed đến Serializable (bằng SSI). Người dùng có thể viết hàm bằng PL/pgSQL, Python, Perl…, tạo trigger, view, materialised view và mở rộng hệ thống bằng extension (PostGIS, pg_stat_statements, timescaledb…).
+PostgreSQL hỗ trợ nhiều kiểu dữ liệu nâng cao (JSONB, mảng, range, hstore, geometric) và chỉ mục phong phú (B-tree, GIN, GiST, BRIN). Cơ chế MVCC giúp đọc không bị chặn bởi ghi, hỗ trợ cô lập từ Read Committed đến Serializable (SSI), cùng khả năng mở rộng bằng PL/pgSQL, trigger, view và extension (PostGIS, `pg_stat_statements`…).
 
 == Cài đặt, cấu hình và vận hành
 
-Trong dự án này, PostgreSQL được chạy bằng Docker Compose. Image chính thức `postgres:16` được cấu hình qua file `docker/pg/postgresql.conf` với các tham số nền:
-
-- `shared_buffers = 2GB`
-- `max_wal_size = 4GB`
-- `checkpoint_timeout = 5min`
-- `full_page_writes = on`
-- `fsync = on`
-- `synchronous_commit = on` (cấu hình bền vững mặc định)
-
-Các tham số này được chọn để hai hệ (PostgreSQL và MySQL) có bộ đệm và dung lượng log tương đương, giúp so sánh công bằng chi phí flush log. Chi tiết lệnh khởi tạo và cấu hình đầy đủ được đặt trên repository GitHub; báo cáo chỉ nêu các tham số then chốt liên quan đến durability.
-
-Hai container `bench-pg` (postgres:16) và `bench-mysql` (mysql:8.4) cùng chạy trên máy đo, mỗi container ánh xạ cổng riêng (5432 và 3306).
+Hai container `bench-pg` (`postgres:16`, cổng 5432) và `bench-mysql` (`mysql:8.4`, cổng 3306) chạy qua Docker Compose với cấu hình nền tương đương: `shared_buffers = 2GB`, `max_wal_size = 4GB`, `checkpoint_timeout = 5min`, `full_page_writes = on`, `fsync = on`, `synchronous_commit = on`.
 
 #figure(
   grid(
     columns: 2,
     align: center,
     gutter: 8pt,
-    image("img/P1_01_docker_ps.png", width: 82%),
-    image("img/P1_02_cau_hinh_nap.png", width: 82%),
+    image("img/P1_01_docker_ps.png", width: 68%),
+    image("img/P1_02_cau_hinh_nap.png", width: 68%),
   ),
   caption: [Hai container PostgreSQL 16 và MySQL 8.4 (trái) và đối chiếu cấu hình nạp trước thí nghiệm (phải).],
 )
@@ -182,8 +163,8 @@ Máy chủ là PostgreSQL 16.16 với các tham số đúng thiết kế: `wal_l
     columns: 2,
     align: center,
     gutter: 8pt,
-    image("img/P1_03_phien_ban_tham_so.png", width: 82%),
-    image("img/P1_04_tien_trinh.png", width: 82%),
+    image("img/P1_03_phien_ban_tham_so.png", width: 68%),
+    image("img/P1_04_tien_trinh.png", width: 68%),
   ),
   caption: [Phiên bản, tham số durability (trái) và các tiến trình nền qua `pg_stat_activity` (phải).],
 )
@@ -197,8 +178,8 @@ Trước khi COMMIT, vị trí ghi WAL là `F/2D950208`. Sau một giao dịch `
     columns: 2,
     align: center,
     gutter: 8pt,
-    image("img/P1_07_wal_lsn.png", width: 82%),
-    image("img/P1_08_thong_ke_wal.png", width: 82%),
+    image("img/P1_07_wal_lsn.png", width: 68%),
+    image("img/P1_08_thong_ke_wal.png", width: 68%),
   ),
   caption: [LSN trước/sau COMMIT (trái) và thống kê `pg_stat_wal` / `pg_stat_bgwriter` (phải).],
 )
@@ -279,17 +260,7 @@ Khi bật binlog, InnoDB còn phải đồng bộ thêm một lần nữa (`sync
 
 === Cấu hình bền vững dùng trong thí nghiệm
 
-#table(
-  columns: (auto, 1fr),
-  align: left,
-  stroke: 0.5pt,
-  inset: 6pt,
-  [*Hệ*], [*Cấu hình bền vững*],
-  [PostgreSQL], [`fsync = on`, `synchronous_commit = on`, `full_page_writes = on`],
-  [MySQL InnoDB], [`innodb_flush_log_at_trx_commit = 1`, `innodb_doublewrite = ON`],
-)
-
-Thí nghiệm A *chỉ* thay đổi tham số flush log, giữ nguyên cơ chế bảo vệ trang. Nhờ vậy có thể đo riêng chi phí của việc chờ fsync khi COMMIT.
+Cấu hình bền vững (`fsync = on`, `synchronous_commit = on`, `full_page_writes = on` cho PostgreSQL; `innodb_flush_log_at_trx_commit = 1`, `innodb_doublewrite = ON` cho InnoDB — chi tiết ở bảng B2) được giữ làm nền. Thí nghiệm A *chỉ* thay đổi tham số flush log và giữ nguyên bảo vệ trang để đo riêng chi phí chờ `fsync` khi COMMIT.
 
 #include "tv2_2_2_bao_ve_trang.typ"
 
@@ -310,13 +281,13 @@ Trước mỗi loạt (một DBMS), script đưa dữ liệu về trạng thái 
 === Bảng kết quả
 
 #[
-  #set text(size: 9.5pt)
+  #set text(size: 11pt)
   #figure(
     table(
       columns: (auto, auto, auto, auto, auto, auto, auto, auto),
       align: center,
       stroke: 0.5pt,
-      inset: 5pt,
+      inset: 4pt,
       table.header([*Cấu hình*], [*Clients*], [*TPS*], [*CV*], [*p50 (ms)*], [*p95 (ms)*], [*p99 (ms)*], [*fsync mỗi giao dịch*]),
       [PG `on`], [1], [389], [12,3%], [2,35], [2,7], [8,9], [1,000],
       [PG `on`], [8], [1.149], [4,4%], [4,82], [18,5], [47,2], [0,270],
@@ -341,13 +312,13 @@ Trước mỗi loạt (một DBMS), script đưa dữ liệu về trạng thái 
 Số fsync mỗi giao dịch cho thấy hai nhóm cấu hình khác hẳn nhau. Với cấu hình bền vững ở 1 client, PostgreSQL gần như đúng 1 fsync cho mỗi giao dịch; với `off`, `=0` và `=2`, số này gần 0 (từ 0,000 đến 0,002) vì log chỉ được flush định kỳ. Đây là cơ sở để phân tích hiệu quả group commit ở bảng sau.
 
 #[
-  #set text(size: 9.5pt)
+  #set text(size: 11pt)
   #figure(
     table(
       columns: (auto, auto, auto, auto, auto, auto),
       align: center,
       stroke: 0.5pt,
-      inset: 5pt,
+      inset: 4pt,
       table.header([*Cấu hình*], [*Clients*], [*fsync mỗi giây*], [*Giao dịch mỗi fsync*], [*Nhóm lấp đầy so với số client*], [*So với trần fsync của ổ đĩa*]),
       [PG `on`], [1], [389], [1,0], [100%], [92%],
       [PG `on`], [8], [310], [3,7], [46%], [73%],
@@ -365,20 +336,20 @@ Số fsync mỗi giao dịch cho thấy hai nhóm cấu hình khác hẳn nhau. 
 Từ lý thuyết ở mục 2.2 có thể rút ra các dự đoán sau. Bảng dưới đối chiếu từng dự đoán với kết quả đo.
 
 #[
-  #set text(size: 9.5pt)
+  #set text(size: 11pt)
   #figure(
     table(
       columns: (1.3fr, 1.7fr, auto),
       align: (left, left, center),
       stroke: 0.5pt,
-      inset: 5pt,
+      inset: 4pt,
       table.header([*Dự kiến theo lý thuyết*], [*Kết quả đo*], [*Đánh giá*]),
       [Ở 1 client với cấu hình bền vững, TPS xấp xỉ tốc độ fsync của ổ đĩa], [PostgreSQL `on`: 389 TPS (hai lần ổn định đạt 417, bằng 98% trần 424). MySQL `=1`: 214 TPS so với trần 210], [Khớp],
       [Tăng số client thì số fsync mỗi giao dịch giảm (group commit)], [PostgreSQL `on`: 1,000 → 0,270 → 0,090. MySQL `=1`: 1,391 → 0,251 → 0,064], [Khớp],
       [Cấu hình mềm cao hơn cấu hình bền vững nhiều lần], [PostgreSQL `off` gấp 13,4 đến 18,2 lần ở 1 và 8 client; MySQL `=0` gấp 6,2 đến 11,7 lần], [Khớp],
       [Khoảng cách thu hẹp khi tăng số client], [Thu hẹp ở 32 client (PostgreSQL còn 3,7 lần, MySQL còn 2,8 lần), nhưng với PostgreSQL khoảng cách ở 8 client (18,2 lần) lớn hơn ở 1 client (13,4 lần)], [Khớp một phần],
       [InnoDB `=2` gần `=0` ở tải thấp, đều cao hơn `=1`], [1 client: `=2` đạt 2.420, `=0` đạt 2.511, `=1` đạt 214 TPS. Thứ tự `=0` ≥ `=2` ≥ `=1` đúng ở cả ba mức client], [Khớp],
-      [TPS tăng theo số client ở mọi cấu hình], [PostgreSQL `off` giảm từ 20.930 (8 client) xuống 12.773 (32 client); các cấu hình khác tăng], [Không khớp, cần giải thích (phân tích mục 6)],
+      [TPS tăng theo số client ở mọi cấu hình], [PostgreSQL `off` giảm từ 20.930 (8 client) xuống 12.773 (32 client); các cấu hình khác tăng], [Không khớp, cần giải thích (ý 6 phần phân tích)],
       [Cấu hình mềm gần như không có fsync mỗi giao dịch], [Từ 0,000 đến 0,002 fsync mỗi giao dịch], [Khớp],
       [Mỗi giao dịch của MySQL có khoảng 1 fsync khi `=1`], [1,391 fsync mỗi giao dịch ở 1 client, lớn hơn 1], [Giải thích được từ kiến trúc `log_writer`/`log_flusher` (mục 1)],
     ),
@@ -390,9 +361,7 @@ Từ lý thuyết ở mục 2.2 có thể rút ra các dự đoán sau. Bảng d
 
 *1. Với 1 client, TPS bị chặn đúng bằng tốc độ fsync của ổ đĩa.* Với PostgreSQL `on`, mỗi giao dịch dùng đúng 1,000 lần fsync; hai trong ba lần chạy đạt ~417 TPS (98% trần 424 của `fdatasync`), độ trễ p50 là 2,35 ms (khớp 1/424 s ≈ 2,36 ms). Với MySQL `=1`, TPS ổn định quanh 198 (một lần 246), gần trần 210 của `fsync`, p50 là 2,90 ms (trung bình ~4,7 ms ≈ 1/210 s). Sở dĩ InnoDB ghi nhận trung bình `1,391` fsync/giao dịch (298 fsync/giây) là do `Innodb_os_log_fsyncs` chỉ đếm `fsync()` trên file redo log; khi `=1`, cặp luồng `log_writer` và `log_flusher` kích hoạt `fsync()` mỗi khi `write_lsn` tiến lên (bao gồm cả các mini-transaction trước `COMMIT` và tác vụ nền), còn tốc độ 298 fsync/s có thể do ghi lô nhỏ khác kịch bản 8 KB cố định của `pg_test_fsync`.
 
-*2. Group commit làm tăng TPS nhưng không làm tăng số fsync mỗi giây.* Ở PostgreSQL `on`, số fsync mỗi giây là 389, 310 và 308 khi số client là 1, 8 và 32: gần như không đổi từ 8 lên 32 client, và đạt khoảng 73% trần của ổ đĩa. TPS vẫn tăng từ 1.149 lên 3.441 vì mỗi lần fsync phục vụ trung bình 3,7 giao dịch ở 8 client và 11,2 giao dịch ở 32 client. Nhóm không bao giờ đầy: chỉ bằng 46% số client ở 8 client và 35% ở 32 client, nhiều khả năng vì các giao dịch đến không đồng bộ và mỗi giao dịch còn nhiều thao tác khác ngoài COMMIT. Với MySQL `=1`, số giao dịch mỗi fsync tăng từ 4,0 (8 client) lên 15,7 (32 client), nhưng số fsync mỗi giây lại giảm từ 185 xuống 112, chỉ còn khoảng một nửa trần. Nghĩa là ở 32 client MySQL không còn bị chặn bởi fsync mà bởi yếu tố khác (mục 6).
-
-#shot("img/H5_fsync_per_txn.png", [H5 – Số lần fsync log trên mỗi giao dịch theo số client: group commit làm số fsync mỗi giao dịch giảm mạnh.], w: 72%)
+*2. Group commit làm tăng TPS nhưng không làm tăng số fsync mỗi giây.* Ở PostgreSQL `on`, số fsync mỗi giây là 389, 310 và 308 khi số client là 1, 8 và 32 (~73% trần ổ đĩa), nhưng TPS vẫn tăng từ 1.149 lên 3.441 nhờ mỗi lần fsync phục vụ 3,7 giao dịch (8 client) và 11,2 giao dịch (32 client). Nhóm chỉ lấp đầy 46% (8 client) và 35% (32 client) do giao dịch đến không đồng bộ. Với MySQL `=1`, số giao dịch mỗi fsync tăng từ 4,0 lên 15,7, nhưng fsync/giây giảm từ 185 xuống 112 (~53% trần) vì ở 32 client đã bị nghẽn bởi tranh chấp khóa (ý 6).
 
 *3. Cái giá của durability: bao nhiêu lần, và thay đổi theo số client.* Bảng sau là tỉ lệ TPS giữa cấu hình mềm và cấu hình bền vững.
 
@@ -401,7 +370,7 @@ Từ lý thuyết ở mục 2.2 có thể rút ra các dự đoán sau. Bảng d
     columns: (auto, auto, auto, auto),
     align: center,
     stroke: 0.5pt,
-    inset: 6pt,
+    inset: 5pt,
     table.header([*So sánh*], [*1 client*], [*8 client*], [*32 client*]),
     [PG `off` / `on`], [13,4×], [18,2×], [3,7×],
     [MySQL `=0` / `=1`], [11,7×], [6,2×], [2,8×],
@@ -410,19 +379,29 @@ Từ lý thuyết ở mục 2.2 có thể rút ra các dự đoán sau. Bảng d
   caption: [Tỉ lệ TPS giữa cấu hình mềm và cấu hình bền vững.],
 )
 
-Khoảng cách lớn nhất ở tải thấp đến trung bình rồi thu hẹp ở 32 client, vì group commit đã chia nhỏ chi phí fsync cho nhiều giao dịch. Riêng PostgreSQL có khoảng cách ở 8 client lớn hơn ở 1 client, vì `off` đạt đỉnh 20.930 TPS ở 8 client trong khi `on` mới đạt 1.149 TPS.
+Khoảng cách lớn nhất ở tải thấp đến trung bình rồi thu hẹp ở 32 client nhờ group commit (riêng PG ở 8 client đạt đỉnh 20.930 TPS nên tỉ lệ tới 18,2×).
 
-#shot("img/H3_tps_vs_clients.png", [H3 – Thông lượng (TPS) theo cấu hình flush log và số client (trung bình ± độ lệch chuẩn).], w: 85%)
+#figure(
+  grid(
+    columns: 2,
+    align: center,
+    gutter: 8pt,
+    image("img/H5_fsync_per_txn.png", width: 88%),
+    image("img/H3_tps_vs_clients.png", width: 88%),
+  ),
+  caption: [H5 – Số lần fsync mỗi giao dịch (trái) và H3 – Thông lượng TPS theo cấu hình và số client (phải).],
+  placement: top,
+)
 
 *4. Độ trễ: cấu hình bền vững chậm hơn nhiều lần ở tải thấp.* Độ trễ p50 của PostgreSQL `on` là 2,35 / 4,82 / 4,94 ms ở 1 / 8 / 32 client, chậm hơn `off` (0,18 / 0,35 / 1,19 ms) từ 4,2 đến 13,8 lần. Với `on`, p50 ở 8 và 32 client (~4,8–4,9 ms) xấp xỉ gấp đôi một lần fsync, gợi ý giao dịch phải chờ đợt fsync đang chạy xong rồi mới đến nhóm mình. Đuôi độ trễ của MySQL `=1` dài hơn (p95 10,5–49,7 ms; p99 lên tới 178,4 ms ở 32 client).
 
-#shot("img/H4_latency.png", [H4 – Độ trễ p50, p95, p99 theo cấu hình flush log.], w: 85%)
+#shot("img/H4_latency.png", [H4 – Độ trễ p50, p95, p99 theo cấu hình flush log.], w: 56%)
 
 *5. MySQL `=2` nằm giữa `=1` và `=0`, và khoảng cách với `=0` rộng ra khi tăng tải.* Ở 1 client, `=2` đạt 2.420 TPS, gần `=0` (2.511) và cao hơn `=1` ~11 lần vì không chờ `fsync`. Ở 8 và 32 client, `=2` thấp hơn `=0` (3.607 so với 4.539, và 3.728 so với 4.893), do mỗi COMMIT của `=2` vẫn phải gọi `write()` đẩy log sang page cache, còn `=0` chỉ ghi định kỳ.
 
-*6. Ở 32 client, hiệu năng bị giới hạn bởi tranh chấp khóa chứ không chỉ bởi fsync.* PostgreSQL `off` đạt 20.930 TPS ở 8 client nhưng chỉ 12.773 TPS ở 32 client, đồng thời p99 tăng từ 0,5 ms lên 52,9 ms, trong khi p95 chỉ 1,9 ms (nghĩa là chỉ 1% giao dịch cuối bị chậm hẳn). Nhiều khả năng nguyên nhân là tranh chấp khóa dòng trên bảng `pgbench_branches` chỉ có 50 dòng (scale 50): 32 client cùng cập nhật 50 dòng, nên các giao dịch cùng chi nhánh phải xếp hàng. Với MySQL, p99 ở 32 client đều quanh 180 đến 200 ms ở cả ba cấu hình (182 ms với `=0`, 178 ms với `=1`, 197 ms với `=2`), kể cả khi gần như không còn fsync, và TPS của `=0` chỉ tăng thêm 8% khi từ 8 lên 32 client (4.539 lên 4.893). Cả hai quan sát cùng gợi ý một điểm nghẽn không liên quan đến flush log. Giá trị p99 giống hệt nhau ở ba lần chạy của PostgreSQL `off` (52,9 ms) nhiều khả năng do sysbench báo percentile theo các nhóm (bucket) của histogram.
+*6. Ở 32 client, hiệu năng bị giới hạn bởi tranh chấp khóa chứ không chỉ bởi fsync.* PostgreSQL `off` giảm từ 20.930 TPS (8 client) xuống 12.773 TPS (32 client) và p99 vọt từ 0,5 lên 52,9 ms (p95 chỉ 1,9 ms) do 32 client tranh chấp khóa dòng trên bảng `pgbench_branches` chỉ có 50 dòng. Với MySQL, p99 ở 32 client đều quanh 178–197 ms ở cả ba cấu hình và `=0` chỉ tăng 8% TPS từ 8 lên 32 client (4.539 lên 4.893).
 
-*7. So sánh hai hệ, và phần chênh không đến từ flush.* Ở cấu hình bền vững, PostgreSQL `on` đạt 389, 1.149 và 3.441 TPS, cao hơn MySQL `=1` (214, 735 và 1.760 TPS) lần lượt 1,8 lần, 1,6 lần và 2,0 lần. Ở 1 client, tỉ lệ 1,8 lần gần với tỉ lệ trần fsync của hai hệ (424 so với 210, khoảng 2,0 lần), phù hợp với giả thuyết PostgreSQL dùng `fdatasync` còn InnoDB dùng `fsync` mặc định. Tuy nhiên ở cấu hình mềm, PostgreSQL `off` vẫn hơn MySQL `=0` (5.217 so với 2.511 ở 1 client, 20.930 so với 4.539 ở 8 client), tức khoảng cách này không thể giải thích bằng flush log mà đến từ các khác biệt khác của hai engine. Vì vậy chỉ nên so sánh hai hệ theo tỉ lệ giữa cấu hình mềm và cấu hình bền vững của từng hệ, không so TPS tuyệt đối.
+*7. So sánh hai hệ, và phần chênh không đến từ flush.* Ở cấu hình bền vững, PostgreSQL `on` (389 / 1.149 / 3.441 TPS) cao hơn MySQL `=1` (214 / 735 / 1.760 TPS) 1,6–2,0 lần (khớp tỉ lệ trần `fdatasync`/`fsync` 424/210). Tuy nhiên ở cấu hình mềm, PostgreSQL `off` vẫn hơn MySQL `=0` tới 2,1–4,6 lần, nên chỉ nên so sánh tỉ lệ mềm/bền vững của từng hệ.
 
 *8. Đánh đổi giữa hiệu năng (thí nghiệm A) và dữ liệu mất (thí nghiệm C).* Bảng sau đặt TPS thu được ở 8 client cạnh lượng dữ liệu bị mất khi sự cố ở thí nghiệm C (mục 2.6), để thấy cái giá thực sự của việc nới lỏng flush.
 
@@ -431,7 +410,7 @@ Khoảng cách lớn nhất ở tải thấp đến trung bình rồi thu hẹp 
     columns: (auto, auto, auto, auto),
     align: center,
     stroke: 0.5pt,
-    inset: 6pt,
+    inset: 4pt,
     table.header([*Cấu hình mềm*], [*TPS so với bền vững (8 client)*], [*Mất khi kill tiến trình*], [*Mất khi hệ điều hành sập (RPO lớn nhất)*]),
     [PG `off`], [18,2×], [tối đa 69 giao dịch, 20 ms], [tối đa 897 giao dịch, 197 ms],
     [MySQL `=0`], [6,2×], [tối đa 108 giao dịch, 19 ms], [tối đa 3.517 giao dịch, 630 ms],
@@ -447,13 +426,13 @@ Nếu ứng dụng chấp nhận mất vài trăm mili giây dữ liệu cuối 
 Năm ô có hệ số biến thiên trên 10% (bảng dưới): phần lớn ở 1 client do một lần chạy lệch (PG `on`: 417, 416, 334; MySQL `=1`: 246, 195, 201), còn MySQL `=1` ở 32 client (CV 23,5%) bị ảnh hưởng bởi tranh chấp khóa. Các giới hạn chung của thiết kế đo được tổng hợp ở mục 2.7.
 
 #[
-  #set text(size: 9.5pt)
+  #set text(size: 11pt)
   #figure(
     table(
       columns: (auto, auto, auto, auto),
       align: center,
       stroke: 0.5pt,
-      inset: 5pt,
+      inset: 4pt,
       table.header([*Cấu hình*], [*Clients*], [*TPS ba lần chạy*], [*CV*]),
       [MySQL `=1`], [32], [1.710, 1.373, 2.195], [23,5%],
       [MySQL `=2`], [8], [4.257, 3.497, 3.067], [16,7%],
@@ -482,7 +461,7 @@ Cả 12 lần chạy đều có bất biến $A = T = B = H$ đúng và 0 lỗi.
 === Bảng kết quả
 
 #[
-  #set text(size: 9pt)
+  #set text(size: 10pt)
   #show table: set par(justify: false)
   #figure(
     table(
@@ -503,13 +482,13 @@ Cả 12 lần chạy đều có bất biến $A = T = B = H$ đúng và 0 lỗi.
 === Đối chiếu với kết quả dự kiến
 
 #[
-  #set text(size: 9.5pt)
+  #set text(size: 11pt)
   #figure(
     table(
       columns: (1.3fr, 1.7fr, auto),
       align: (left, left, center),
       stroke: 0.5pt,
-      inset: 5pt,
+      inset: 4pt,
       table.header([*Dự kiến trước khi đo (theo mục 2.2.4)*], [*Kết quả đo*], [*Đánh giá*]),
       [PostgreSQL: bật `full_page_writes` làm tăng mạnh lượng WAL, chủ yếu là ảnh trang], [WAL mỗi giao dịch tăng từ 402 lên 2.281 byte (5,7 lần); FPI chiếm 82%], [Khớp],
       [Với 5 triệu tài khoản cập nhật ngẫu nhiên, tỉ lệ FPI cao], [82% byte WAL là FPI; tổng WAL mỗi lần chạy khoảng 874 MB so với 141 MB], [Khớp],
@@ -525,25 +504,33 @@ Cả 12 lần chạy đều có bất biến $A = T = B = H$ đúng và 0 lỗi.
 
 === Phân tích
 
-*1. PostgreSQL: chi phí nằm trong WAL, và gần như toàn bộ là ảnh trang đầy đủ.* Khi bật `full_page_writes`, mỗi giao dịch sinh 2.281 byte WAL so với 402 byte khi tắt, gấp khoảng 5,7 lần. Phần bản ghi thường gần như không đổi (408 và 402 byte); phần tăng thêm là 1.871 byte FPI, chiếm 82% WAL. Tổng lượng ghi đĩa đo độc lập bằng `iostat` tăng từ 3.998,4 lên 5.882,6 byte mỗi giao dịch (tăng 47,1%); phần chênh 1.884 byte khớp với phần FPI 1.871 byte. Nghĩa là số đo trong DBMS và số đo từ hệ điều hành xác nhận lẫn nhau. Số liệu cũng khớp với thí nghiệm A: ở 8 client, PostgreSQL `on` có 2.406 byte log mỗi giao dịch (mục 2.4), gần với 2.281 byte ở đây. Điều này cũng giải thích sự biến động byte log mỗi giao dịch của PostgreSQL giữa các ô ở thí nghiệm A.
+*1. PostgreSQL: chi phí nằm trong WAL, và gần như toàn bộ là ảnh trang đầy đủ.* Bật `full_page_writes` làm WAL tăng 5,7 lần (từ 402 lên 2.281 B/giao dịch; phần bản ghi thường giữ ~402–408 B, phần tăng là 1.871 B FPI chiếm 82%). Tổng ghi đĩa `iostat` tăng tương ứng từ 3.998,4 lên 5.882,6 B (+1.884 B, khớp 1.871 B FPI) và khớp mức 2.406 B/giao dịch của thí nghiệm A ở 8 client.
 
-#shot("img/H6_page_protection_cost.png", [H6 – Lượng ghi trên mỗi giao dịch khi bật và tắt bảo vệ trang. Chi phí của PostgreSQL nằm trong WAL, chi phí của InnoDB nằm ở ghi trang dữ liệu.], w: 75%)
+*2. Phân loại WAL cho biết FPI đến từ đâu.* Theo `pg_waldump`, tổng WAL mỗi lần chạy ~874 MB (bật) so với 141 MB (tắt); FPI chiếm 82% chủ yếu từ `Heap/HOT_UPDATE` (~47%), `Heap2/PRUNE` (~33%) và `XLOG/FPI_FOR_HINT` (~8% do bật `--data-checksums`), vì 5 triệu tài khoản cập nhật ngẫu nhiên khiến hầu hết giao dịch chạm trang chưa sửa sau checkpoint.
 
-*2. Phân loại WAL cho biết FPI đến từ đâu.* Kết quả `pg_waldump` cho thấy tổng WAL mỗi lần chạy khoảng 874 MB khi bật và 141 MB khi tắt, với FPI chiếm 82% khi bật. Trong phần FPI, nguồn lớn nhất là `Heap/HOT_UPDATE` (~47%) và `Heap2/PRUNE` (~33%), kế đến là `XLOG/FPI_FOR_HINT` (~8%, dao động 4,87–87,15 MB khi bật so với 0,21–0,81 MB khi tắt do cụm bật `--data-checksums`). Vì dữ liệu có 5 triệu tài khoản cập nhật ngẫu nhiên, hầu như mỗi giao dịch chạm một trang chưa sửa sau checkpoint và phải kèm ảnh 8 KB.
+#figure(
+  grid(
+    columns: 2,
+    align: center,
+    gutter: 8pt,
+    image("img/H6_page_protection_cost.png", width: 88%),
+    image("img/H8_wal_composition.png", width: 88%),
+  ),
+  caption: [H6 – Lượng ghi mỗi giao dịch (trái) và H8 – Thành phần WAL theo `pg_waldump` (phải).],
+  placement: top,
+)
 
-#shot("img/H8_wal_composition.png", [H8 – Thành phần WAL theo `pg_waldump`: ảnh trang đầy đủ (FPI) chiếm 82% khi `full_page_writes = on`.], w: 72%)
+*3. Chi phí tập trung ngay sau checkpoint.* Hình H7 vẽ lần chạy r1: khi bật `full_page_writes`, WAL đạt đỉnh 8–14 MB/s trong 30 giây đầu đo, giảm về ~0,6 MB/s từ giây 50 (r2, r3 đỉnh ~5 MB/s) và tăng lại ~10 MB/s ở mốc `checkpoint_timeout = 5min`. Điều này chứng tỏ FPI chỉ ghi ở lần sửa đầu sau mỗi checkpoint: checkpoint càng dày thì WAL càng phình nhưng RTO càng ngắn.
 
-*3. Chi phí tập trung ngay sau checkpoint.* Hình H7 vẽ lần chạy r1 của mỗi cấu hình. Khi bật `full_page_writes`, WAL sinh ra ở mức 8 đến 14 MB/giây trong khoảng 30 giây đầu của giai đoạn đo (60 đến 90 giây sau `CHECKPOINT` thủ công), rồi giảm xuống khoảng 0,6 MB/giây từ giây thứ 50, bằng mức khi tắt. Hai lần chạy còn lại (r2, r3) đỉnh thấp hơn (~5 MB/giây) và giảm chậm hơn. Cả ba lần đều tăng lại khoảng 10 MB/giây khi đến thời điểm checkpoint định kỳ (`checkpoint_timeout = 5min`). Chu kỳ lặp lại này cho thấy FPI chỉ được ghi ở lần sửa đầu tiên của trang sau mỗi checkpoint; do đó checkpoint càng dày thì WAL càng phình nhưng thời gian phục hồi (RTO) càng ngắn.
+#shot("img/H7_wal_rate.png", [H7 – Tốc độ sinh WAL theo thời gian (lần chạy r1 của mỗi cấu hình): đỉnh sau mỗi checkpoint khi `full_page_writes = on`.], w: 54%)
 
-#shot("img/H7_wal_rate.png", [H7 – Tốc độ sinh WAL theo thời gian (lần chạy r1 của mỗi cấu hình): đỉnh sau mỗi checkpoint khi `full_page_writes = on`.], w: 75%)
+*4. TPS của PostgreSQL không phân biệt được hai cấu hình.* TPS đạt 1.294 (bật, CV 17,0%: 1.547,5 / 1.189,3 / 1.145,4) so với 1.170 (tắt: 1.197,9 / 1.116,2 / 1.196,8), p50 trùng 4,82 ms và fsync/giao dịch giữ 0,270–0,269: ở 8 client nút thắt vẫn là chờ fsync khi COMMIT chứ không phải ghi tuần tự WAL.
 
-*4. TPS của PostgreSQL không phân biệt được hai cấu hình.* TPS là 1.294 khi bật và 1.170 khi tắt, nhưng độ biến thiên lớn (CV 17,0% khi bật) và các lần chạy khi bật (1.547,5, 1.189,3 và 1.145,4) chồng lấn với khi tắt (1.197,9, 1.116,2, 1.196,8). Độ trễ p50 của hai cấu hình trùng nhau (4,82 ms). Cùng lúc WAL tăng 5,7 lần, số fsync mỗi giao dịch gần như không đổi (0,270 và 0,269). Điều này gợi ý ở 8 client nút thắt vẫn là chờ fsync lúc COMMIT, chứ không phải lượng byte WAL, vì WAL được ghi tuần tự. Kết luận này khớp với thí nghiệm A, nơi ở 8 client PostgreSQL `on` đã bị giới hạn bởi tốc độ fsync.
+*5. InnoDB: chi phí nằm ở ghi trang dữ liệu, redo log không đổi.* Redo log giữ nguyên (1.069 vs 1.071 B/giao dịch). Với doublewrite ON, mỗi giao dịch ghi thêm 10.945 B qua doublewrite (0,668 trang 16 KB/giao dịch), bằng lượng ghi trang thật (10.948 B). Dù doublewrite ghi tuần tự theo lô, tổng ghi đĩa thực tế vẫn tăng 1,8 lần (từ 13.724 lên 24.749 B/giao dịch, hai nhóm tách rời hoàn toàn).
 
-*5. InnoDB: chi phí nằm ở ghi trang dữ liệu, redo log không đổi.* Redo log gần như không thay đổi giữa hai cấu hình (1.069 và 1.071 byte mỗi giao dịch). Với doublewrite ON, mỗi giao dịch ghi thêm khoảng 10.945 byte qua doublewrite (0,668 trang mỗi giao dịch, mỗi trang 16 KB), gần bằng lượng trang dữ liệu ghi thật (10.948 byte). Nghĩa là mỗi trang flush bị ghi hai lần. Điều này không nhân đôi số thao tác I/O ngẫu nhiên, vì doublewrite được ghi thành từng lô tuần tự lớn chỉ với một lần `fsync()` (mục 2.2.4), nhưng vẫn làm tăng gấp đôi lượng byte ghi trang. Ghi đĩa thực tế tăng từ 13.724 lên 24.749 byte mỗi giao dịch, gấp khoảng 1,8 lần (hay giảm 44,5% khi tắt doublewrite), và ba lần chạy của hai cấu hình tách rời nhau (22.351 đến 26.026 so với 12.967 đến 14.248 byte). Chi phí doublewrite tỉ lệ với số trang flush; ở workload này mỗi giao dịch cập nhật một trang ngẫu nhiên nên có khoảng 0,67 trang flush mỗi giao dịch, và chi phí không hề nhỏ.
+*6. TPS của InnoDB cho thấy xu hướng, chưa đủ kết luận.* Tắt doublewrite tăng TPS 25,8% (884 vs 703) và giảm p99 (63,1 vs 72,3 ms), nhưng CV lớn (17%–20%) và khoảng giá trị chồng lấn (619,2–866,8 vs 718,7–1.016,0).
 
-*6. TPS của InnoDB cho thấy xu hướng, chưa đủ kết luận.* Tắt doublewrite làm TPS tăng từ 703 lên 884 (tăng 25,8%) và p99 giảm từ 72,3 xuống 63,1 ms; nói cách khác, bật doublewrite thấp hơn khoảng 20%. Tuy nhiên độ biến thiên rất lớn (CV 17% và 20%) và khoảng giá trị hai cấu hình chồng nhau (917,2, 718,7, 1.016,0 so với 619,2, 622,1, 866,8), nên với 3 lần chạy chỉ có thể nói xu hướng phù hợp với việc ghi trang gấp đôi.
-
-*7. Chi phí ở hai vị trí khác nhau.* Chống rách trang tốn thêm khoảng 1,9 KB mỗi giao dịch trong WAL ở PostgreSQL, và khoảng 10,9 KB mỗi giao dịch ở ghi trang dữ liệu ở InnoDB. Số byte ở InnoDB lớn hơn nhiều, nhiều khả năng vì InnoDB ghi lại cả trang 16 KB mỗi lần flush, còn PostgreSQL chỉ chụp trang một lần sau mỗi checkpoint. So sánh tổng ghi đĩa thực tế mỗi giao dịch ở cấu hình bền vững (hình H6), InnoDB (24,7 KB) cao hơn khoảng 4,2 lần PostgreSQL (5,9 KB), do trang 16 KB lớn gấp đôi trang 8 KB và mọi trang bẩn đều ghi qua doublewrite. Hai con số không thể so trực tiếp thành "hệ nào rẻ hơn", vì đo ở hai vị trí khác nhau (log và trang dữ liệu), và PostgreSQL còn phụ thuộc vào tần suất checkpoint. Điều quan trọng là đúng như lý thuyết ở mục 2.2.4: chi phí của PostgreSQL nằm trong log, còn chi phí của InnoDB nằm trong ghi trang. Điều này có hệ quả thực tế: PostgreSQL có thể giảm chi phí này bằng cách giảm tần suất checkpoint (đánh đổi bằng RTO dài hơn), còn InnoDB nên chú ý băng thông ghi trang dữ liệu.
+*7. Chi phí ở hai vị trí khác nhau.* Chống rách trang tốn ~1,9 KB/giao dịch trong WAL (PostgreSQL) so với ~10,9 KB/giao dịch ở ghi trang dữ liệu (InnoDB), khiến tổng ghi đĩa InnoDB (24,7 KB) cao hơn 4,2 lần PostgreSQL (5,9 KB). Do đó PostgreSQL giảm FPI bằng cách giãn checkpoint (đánh đổi RTO), còn InnoDB cần tối ưu băng thông ghi trang.
 
 === Độ tin cậy số liệu
 
@@ -555,15 +542,15 @@ Ba trong bốn cấu hình có CV TPS 17%–20% (PG `fpw=on`: 1.547,5 / 1.189,3 
 
 Tổng hợp kết quả ba thí nghiệm:
 
-- *Thí nghiệm A (chi phí flush log):* Chờ `fsync` làm TPS cấu hình bền vững thấp hơn cấu hình mềm 3,7–18,2 lần ở PostgreSQL và 2,8–11,7 lần ở MySQL. Group commit giúp giảm số `fsync` mỗi giao dịch xuống dưới 0,1 ở 32 client nhưng không triệt tiêu hoàn toàn chi phí.
-- *Thí nghiệm B (chi phí bảo vệ trang):* Hai hệ trả chi phí ở hai vị trí khác nhau — PostgreSQL tăng WAL 5,7 lần (82% là FPI ngay sau checkpoint), còn InnoDB tăng ghi đĩa 1,8 lần do doublewrite ghi mỗi trang flush hai lần (redo log không đổi). Không được tắt hai cơ chế này trên hệ thống thật vì rủi ro rách trang khi crash OS hoặc mất điện. Với PostgreSQL có thể tăng `checkpoint_timeout` / `max_wal_size` để giảm FPI (đổi lấy RTO dài hơn); với InnoDB có thể đặt `innodb_doublewrite_dir` trên ổ nhanh riêng.
-- *Thí nghiệm C (crash và phục hồi):* Cấu hình bền vững (`on`, `=1`) không mất giao dịch nào qua 12 lần crash ở cả hai mức sự cố. InnoDB `=2` là "bẫy": an toàn khi kill tiến trình nhưng mất tới 2.674 giao dịch (~552 ms) khi hệ điều hành sập. Mọi cấu hình đều giữ đúng bất biến $A = T = B = H$ (42/42 lần) và `amcheck` / `CHECK TABLE` không thấy hỏng trang. RPO luôn nằm dưới chu kỳ flush định kỳ (≤ 197 ms với PG `off`, ≤ 630 ms với InnoDB `=2`/`=0`); RTO theo log 7–19 giây chủ yếu do các bước khởi động sau redo.
+- *Thí nghiệm A (flush log):* Chờ `fsync` làm TPS cấu hình bền vững thấp hơn cấu hình mềm 3,7–18,2× (PostgreSQL) và 2,8–11,7× (MySQL); group commit giảm xuống < 0,1 fsync/GD ở 32 client nhưng không triệt tiêu chi phí.
+- *Thí nghiệm B (bảo vệ trang):* PostgreSQL trả chi phí vào WAL (tăng 5,7×, 82% là FPI sau checkpoint), InnoDB trả vào ghi đĩa qua doublewrite (tăng 1,8×, redo không đổi). Không tắt trên hệ thật; PG có thể tăng `checkpoint_timeout`/`max_wal_size`, InnoDB đặt `innodb_doublewrite_dir` trên ổ nhanh.
+- *Thí nghiệm C (crash & phục hồi):* Cấu hình bền vững (`on`, `=1`) không mất giao dịch (0/12 lần); InnoDB `=2` an toàn khi kill tiến trình nhưng mất tới 2.674 GD (~552 ms) khi sập HĐH. Mọi cấu hình giữ bất biến 42/42 lần và không hỏng trang; RPO luôn dưới chu kỳ flush (≤ 197 ms PG `off`, ≤ 630 ms InnoDB `=2`/`=0`), RTO 7–19 s chủ yếu do khởi động sau redo.
 
 Cấu hình khuyến nghị phụ thuộc vào yêu cầu ứng dụng:
 
 #figure(
   table(
-    columns: (1.3fr, auto, auto, 2fr),
+    columns: (1.4fr, 1.15fr, 0.75fr, 2.2fr),
     align: (left, left, left, left),
     stroke: 0.5pt,
     inset: 5pt,
@@ -575,7 +562,7 @@ Cấu hình khuyến nghị phụ thuộc vào yêu cầu ứng dụng:
   caption: [Bảng B4 – Đề xuất cấu hình theo loại ứng dụng.],
 )
 
-Giới hạn chung của nghiên cứu: (1) chỉ đo trên một máy và một ổ SSD SATA gắn ngoài qua USB 3 (`write back`); (2) không mô phỏng mất điện vật lý thật hay tạo rách trang ở tầng block device; (3) tắt binlog MySQL để so sánh công bằng với WAL; (4) số lần lặp còn ít (3 lần mỗi ô ở A/B, 3–5 lần crash ở C) nên một số ô có CV > 10% và RPO/RTO chỉ mang tính định hướng.
+Giới hạn của nghiên cứu: (1) đo trên một máy và một ổ SSD SATA gắn ngoài qua USB 3 (`write back`); (2) không mô phỏng mất điện vật lý thật và tắt binlog MySQL để so sánh công bằng với WAL; (3) số lần lặp ít (3 lần mỗi ô ở A/B, 3–5 lần crash ở C) nên RPO/RTO mang tính định hướng.
 
 // ============================================================
 // TÀI LIỆU THAM KHẢO
