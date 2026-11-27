@@ -1,0 +1,22 @@
+Phần của TV2 nằm trong 2 file ở report/:
+
+- tv2_2_2_bao_ve_trang.typ: mục con "Bảo vệ trang dữ liệu (Full-Page Writes và Doublewrite Buffer)", đặt trong mục 2.2.
+- tv2_2_5_ket_qua_B.typ: toàn bộ mục 2.5 Kết quả thí nghiệm B (bao gồm kiểm chứng bất biến MySQL D1.1/D1.2).
+
+Hai file này dùng đường dẫn ảnh img/... tương đối theo thư mục report/, tương thích với quy tắc ghép của TV3.
+
+Hướng dẫn ghép vào bao_cao_tv1_nhap.typ:
+
+1. Mục 2.2 (Cơ chế của hai hệ):
+   Ngay sau phần flush log của TV1 và TRƯỚC dòng `#include "tv3_2_2_checkpoint_phuc_hoi.typ"`, thêm:
+   #include "tv2_2_2_bao_ve_trang.typ"
+
+2. Mục 2.5 (Kết quả thí nghiệm B):
+   Thay dòng chờ `// == Kết quả thí nghiệm B  ← phần của TV2 (2.5)` (giữa mục 2.4 Kết quả A và `#include "tv3_2_6_ket_qua_C.typ"`) bằng:
+   #include "tv2_2_5_ket_qua_B.typ"
+
+3. Mục 2.7 (Kết luận) & Tài liệu tham khảo:
+   Cuối file tv2_2_5_ket_qua_B.typ có khối comment "GỢI Ý CHO MỤC 2.7" (4 ý tổng hợp từ thí nghiệm B) và "TÀI LIỆU THAM KHẢO BỔ SUNG" (link PostgreSQL 16 WAL Configuration và MySQL 8.4 Doublewrite Buffer).
+
+4. Kiểm tra ảnh trước khi biên dịch:
+   Trong report/img/ cần có: M_05_kiem_chung_duong_mysql.png, M_07_kiem_chung_am_mysql.png, R_B1_waldump_on_off.png, H6_page_protection_cost.png, H7_wal_rate.png, H8_wal_composition.png (đã chép đủ vào report/img/).
