@@ -96,7 +96,7 @@ def fig_A(s):
                     label=f"{DBNAME[db]}: {PNAME.get(g['param'].iloc[0], g['param'].iloc[0])} = {val}")
         hi = s[s["log_fsyncs_per_txn_mean"] > 1.05]
         for _, r in hi.iterrows():
-            ax.annotate("> 1: gồm cả fsync của luồng nền\n(master thread, checkpoint)",
+            ax.annotate("> 1: chưa giải thích được\n(xem phân tích mục 1, thí nghiệm A)",
                         (r["clients"], r["log_fsyncs_per_txn_mean"]), xytext=(18, -6),
                         textcoords="offset points", fontsize=7, arrowprops=dict(arrowstyle="-", lw=.6))
         ax.text(0.98, 0.42, "Các cấu hình không fsync khi COMMIT (PG off, MySQL 0 và 2)\n"
@@ -228,6 +228,8 @@ def table_C(c):
         # máy ảo khởi động ở mức os: dùng cột này khi so sánh hai mức sự cố
         "RTO theo log DBMS, trung vị (s)": pd.to_numeric(c["rto_log_s"], errors="coerce").groupby([c["db"], c["level"], c["value"]]).median().round(2),
         "redo trung bình (s)": pd.to_numeric(c["redo_s"], errors="coerce").groupby([c["db"], c["level"], c["value"]]).mean().round(3),
+        # Báo cáo (bảng B3) dùng trung vị cho thời gian redo, nên có thêm cột này để đối chiếu
+        "redo trung vị (s)": pd.to_numeric(c["redo_s"], errors="coerce").groupby([c["db"], c["level"], c["value"]]).median().round(2),
     }).reset_index()
     t.to_csv(os.path.join(RES, "C_table.csv"), index=False)
     with open(os.path.join(RES, "C_table.md"), "w") as f:
