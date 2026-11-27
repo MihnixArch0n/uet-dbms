@@ -56,4 +56,4 @@ Thí nghiệm C mức "crash hệ điều hành" chạy DBMS trong máy ảo KVM
 
 ## Kết quả
 
-Báo cáo: `report/` · Video demo: (điền link) · Bảng tổng hợp: `results/*_summary.csv`, `results/C_table.md`
+Báo cáo: `report/` · Video demo: [`demo/demo_thi_nghiem_C.mp4`](demo/demo_thi_nghiem_C.mp4) (phụ đề riêng: `demo/demo_thi_nghiem_C.srt`) · Bảng tổng hợp: `results/*_summary.csv`, `results/C_table.md`

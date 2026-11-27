@@ -8,7 +8,7 @@
 
 #let shot(path, cap, w: 100%) = figure(image(path, width: w), caption: cap)
 // Bảng: chữ nhỏ hơn, không căn đều hai bên (tránh khoảng trắng giãn trong ô hẹp)
-#show table: set text(size: 9.5pt)
+#show table: set text(size: 11pt)
 #show table: set par(justify: false)
 
 == Phương pháp thực nghiệm

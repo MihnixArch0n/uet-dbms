@@ -5,7 +5,7 @@
 //   #include "tv2_2_2_bao_ve_trang.typ"
 // ============================================================
 
-#show table: set text(size: 9.5pt)
+#show table: set text(size: 11pt)
 #show table: set par(justify: false)
 
 === Bảo vệ trang dữ liệu (Full-Page Writes và Doublewrite Buffer)
