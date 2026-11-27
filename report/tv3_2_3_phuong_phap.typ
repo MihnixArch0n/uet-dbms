@@ -38,11 +38,9 @@ Tất cả số liệu chính thức được đo trên *một máy duy nhất*,
   caption: [Cấu hình máy đo, bảng B1 (chép từ `results/env/hardware.txt`).],
 )
 
-Con số fsync ở bảng B1 là giới hạn trên của thông lượng khi chỉ có một client và mỗi COMMIT phải chờ một lần fsync. Nó được dùng để giải thích kết quả thí nghiệm A (mục 2.4).
+Con số fsync ở bảng B1 là giới hạn trên của thông lượng khi chỉ có 1 client và mỗi COMMIT phải chờ một lần fsync, dùng để giải thích kết quả thí nghiệm A (mục 2.4).
 
-#shot("img/M_01_pg_test_fsync.png", [Tốc độ đồng bộ đĩa của máy đo theo `pg_test_fsync`.], w: 85%)
-
-*Máy ảo cho crash hệ điều hành.* Mức sự cố thứ hai của thí nghiệm C cần tắt ngang cả hệ điều hành đang chạy DBMS, nên hai hệ được đặt trong một máy ảo trên chính máy đo. Nhóm dự kiến dùng VirtualBox, nhưng mô-đun nhân của VirtualBox không biên dịch được với kernel 7.0 khi Secure Boot đang bật, nên chuyển sang KVM/QEMU quản lý bằng libvirt. KVM có sẵn trong nhân Linux và có một ưu điểm cho thí nghiệm: lệnh flush của máy ảo được chuyển xuống đĩa của máy thật, nên dữ liệu đã fsync trong máy ảo thực sự nằm trên đĩa.
+*Máy ảo cho crash hệ điều hành.* Để tắt ngang cả hệ điều hành đang chạy DBMS, hai hệ được đặt trong máy ảo KVM/QEMU (quản lý bằng `libvirt`, do VirtualBox không biên dịch được mô-đun nhân trên kernel 7.0 khi bật Secure Boot). Lệnh flush của máy ảo KVM được chuyển thẳng xuống đĩa máy thật nên dữ liệu đã `fsync` thực sự nằm trên đĩa.
 
 #figure(
   table(
@@ -60,13 +58,11 @@ Con số fsync ở bảng B1 là giới hạn trên của thông lượng khi ch
   caption: [Máy ảo dùng cho mức sự cố hệ điều hành, bảng B1b.],
 )
 
-#shot("img/M_02_vm_crash_recovery.png", [Sau khi máy ảo bị ngắt nguồn và bật lại, hai container tự khởi động, PostgreSQL phát hiện lần tắt không sạch và tự phục hồi (phát lại khoảng 640 MB WAL trong 2,76 giây).])
+#shot("img/M_02_vm_crash_recovery.png", [Sau khi máy ảo bị ngắt nguồn và bật lại, hai container tự khởi động và PostgreSQL tự phục hồi (phát lại ~640 MB WAL trong 2,76 giây).], w: 80%)
 
 === Dữ liệu
 
-Dữ liệu là lược đồ ngân hàng của pgbench (chuẩn TPC-B) với hệ số scale 50: 50 chi nhánh, 500 giao dịch viên, 5.000.000 tài khoản, cùng bảng lịch sử giao dịch ban đầu rỗng. Bảng lịch sử có thêm cột `txn_id` để đối soát ở thí nghiệm C. Dữ liệu được sinh một lần trong PostgreSQL bằng `pgbench -i -s 50`, xuất ra CSV và nạp nguyên vẹn sang MySQL, nên hai hệ chứa đúng cùng một bộ dữ liệu (khoảng 755 MB trong PostgreSQL và 603 MB trong MySQL). Với bộ đệm 2 GB mỗi hệ, toàn bộ dữ liệu nằm gọn trong bộ nhớ, nên chi phí đo được chủ yếu là chi phí ghi log và ghi trang chứ không phải đọc dữ liệu.
-
-#shot("img/M_03_doi_chieu_du_lieu.png", [Đối chiếu dữ liệu hai hệ sau khi nạp: số dòng và các tổng khóa giống hệt nhau, bất biến ban đầu bằng 0 trên cả hai hệ.])
+Dữ liệu là lược đồ ngân hàng của pgbench (chuẩn TPC-B, scale 50): 50 chi nhánh, 500 giao dịch viên, 5.000.000 tài khoản, cùng bảng lịch sử ban đầu rỗng (thêm cột `txn_id` để đối soát ở thí nghiệm C). Dữ liệu sinh một lần trong PostgreSQL bằng `pgbench -i -s 50`, xuất CSV và nạp nguyên vẹn sang MySQL (~755 MB trong PostgreSQL, ~603 MB trong MySQL), đối chiếu số dòng và các tổng ban đầu bằng 0 trên cả hai hệ. Với bộ đệm 2 GB mỗi hệ, toàn bộ dữ liệu nằm gọn trong bộ nhớ nên chi phí đo được chủ yếu là ghi log và ghi trang.
 
 === Workload
 
@@ -109,12 +105,12 @@ Script kiểm tra bất biến được kiểm chứng theo hai chiều trên m�
 
 #figure(
   grid(
-    columns: 1,
-    gutter: 10pt,
+    columns: 2,
+    gutter: 8pt,
     image("img/M_04_kiem_chung_duong_pg.png", width: 100%),
     image("img/M_06_kiem_chung_am_pg.png", width: 100%),
   ),
-  caption: [Kiểm chứng script bất biến trên PostgreSQL. Trên: dữ liệu đúng sau khi chạy tải (`OK`). Dưới: cố ý làm lệch một số dư (`FAIL`), rồi đưa dữ liệu về trạng thái ban đầu.],
+  caption: [Kiểm chứng script bất biến trên PostgreSQL. Trái: dữ liệu đúng sau khi chạy tải (`OK`). Phải: cố ý làm lệch một số dư (`FAIL`), rồi đưa dữ liệu về trạng thái ban đầu.],
 )
 
 Ở thí nghiệm B và C, trước mỗi lần chạy, script đưa dữ liệu về trạng thái ban đầu (xóa bảng lịch sử, đưa mọi số dư về 0) và dừng lại nếu bất biến chưa phải `0|0|0|0|0`. Ở thí nghiệm A việc này chỉ làm một lần trước mỗi loạt (mỗi DBMS), nên dữ liệu tích lũy qua các lần chạy trong loạt (mục 2.4).
@@ -165,9 +161,7 @@ Câu hỏi: với từng cấu hình flush và từng loại sự cố, có giao
 - nhật ký *đã gửi*: `txn_id` ngay *trước* khi gửi COMMIT;
 - nhật ký *đã xác nhận*: `txn_id` và thời điểm ngay *sau* khi COMMIT trả về thành công.
 
-Công cụ được kiểm chứng khi không có sự cố: sau 30 giây chạy, số giao dịch đã xác nhận đúng bằng số dòng có `txn_id` trong bảng lịch sử, và bất biến đúng (hình dưới).
-
-#shot("img/M_08_kiem_chung_crash_client.png", [Kiểm chứng công cụ đối soát khi không crash: 24.005 giao dịch đã xác nhận, 24.005 dòng trong bảng lịch sử, bất biến `OK`.])
+Công cụ được kiểm chứng khi không có sự cố: sau 30 giây chạy, số giao dịch đã xác nhận đúng bằng số dòng có `txn_id` trong bảng lịch sử (24.005 giao dịch), và bất biến `OK`.
 
 *Quy trình mỗi lần crash* (`scripts/run_expC.sh`):
 

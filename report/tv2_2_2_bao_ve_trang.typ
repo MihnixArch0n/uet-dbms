@@ -50,7 +50,7 @@ Các chế độ cấu hình của `innodb_doublewrite` trong MySQL 8.4:
     [Thời điểm bảo vệ], [Chỉ lần sửa đầu tiên của trang sau mỗi checkpoint], [Mỗi lần đẩy trang bẩn từ buffer pool xuống đĩa],
     [Ảnh hưởng của checkpoint], [Mạnh: tạo đỉnh WAL ngay sau mỗi checkpoint], [Gián tiếp qua tốc độ đẩy trang bẩn (fuzzy checkpoint)],
     [Tính chất I/O phụ thêm], [Tăng dung lượng WAL tuần tự (và chi phí lưu trữ/archiving)], [Nhân đôi lượng ghi trang (một lượt tuần tự vào dblwr + một lượt vào tablespace)],
-    [Rủi ro khi tắt], [Rách trang không sửa được khi crash OS / mất điện], [Rách trang không sửa được khi crash tiến trình / OS / mất điện],
+    [Rủi ro khi tắt], [Rách trang không sửa được khi crash OS / mất điện], [Rách trang không sửa được khi crash OS / mất điện],
   ),
   caption: [So sánh cơ chế chống rách trang giữa PostgreSQL 16 và MySQL 8.4 InnoDB.],
 )
