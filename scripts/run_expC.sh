@@ -3,11 +3,11 @@
 # Dùng: bash scripts/run_expC.sh <pg|mysql> <process|os> <giá_trị_tham_số_flush> <lần>
 #   ví dụ: bash scripts/run_expC.sh pg process off 1
 #          bash scripts/run_expC.sh mysql process 2 1
-# Mức os (DBMS chạy trong máy ảo) cần đặt thêm:
-#   REMOTE="ssh bench@192.168.56.10"  DB_HOST=192.168.56.10
+# Mức os (DBMS chạy trong máy ảo KVM/libvirt tên dbvm) cần đặt thêm:
+#   REMOTE="ssh bench@<IP_máy_ảo>"  DB_HOST=<IP_máy_ảo>
 #   COMPOSE=/home/bench/uet-dbms/docker/docker-compose.yml   (đường dẫn TRONG máy ảo)
-#   VM_CRASH_CMD="VBoxManage controlvm dbvm poweroff"
-#   VM_START_CMD="VBoxManage startvm dbvm --type headless"
+#   VM_CRASH_CMD="virsh destroy dbvm"      # ngắt nguồn đột ngột
+#   VM_START_CMD="virsh start dbvm"        # bật lại (container tự chạy lại nhờ restart: always)
 # Tùy chỉnh: THREADS=8 MIN_LOAD=60 MAX_LOAD=120
 source "$(dirname "$0")/common.sh"
 DB=${1:?pg|mysql}; LEVEL=${2:?process|os}; CFG=${3:?giá trị tham số}; REP=${4:-1}

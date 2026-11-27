@@ -44,7 +44,7 @@ bash scripts/run_expC.sh mysql process 1 1
 uv run python analysis/parse_results.py && uv run python analysis/plots.py
 ```
 
-Thí nghiệm C mức "crash hệ điều hành" chạy DBMS trong máy ảo; xem phần đầu `scripts/run_expC.sh` cho các biến môi trường.
+Thí nghiệm C mức "crash hệ điều hành" chạy DBMS trong máy ảo KVM/libvirt (tắt ngang bằng `virsh destroy`); xem phần đầu `scripts/run_expC.sh` cho các biến môi trường.
 
 ## Định nghĩa đo
 
