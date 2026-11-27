@@ -2,7 +2,7 @@
 // BÁO CÁO TỔNG HỢP – cả nhóm
 // Đề tài: Durability & Crash Recovery (PostgreSQL vs MySQL InnoDB)
 // Ghép phần TV1 (mục 1, 2.1, 2.2, 2.4, 2.7), TV3 (2.2.4, 2.3, 2.6) – cập nhật 26/11/2026.
-// Mục 2.2.4 và 2.5 (thí nghiệm B) do TV1 viết từ số liệu results/B_*.csv, TV2 cần rà soát lại.
+// Mục 2.2.4 do TV2 viết (tv2_2_2_bao_ve_trang.typ). Mục 2.5 (thí nghiệm B) do TV1 viết lại chi tiết, đã đối chiếu và đồng bộ số liệu theo bản của TV2.
 // Biên dịch: typst compile report/bao_cao_tong_hop.typ
 // ============================================================
 
@@ -314,30 +314,7 @@ Khi bật binlog, InnoDB còn phải đồng bộ thêm một lần nữa (`sync
 
 Thí nghiệm A *chỉ* thay đổi tham số flush log, giữ nguyên cơ chế bảo vệ trang. Nhờ vậy có thể đo riêng chi phí của việc chờ fsync khi COMMIT.
 
-=== Bảo vệ trang: Full-Page Writes và doublewrite
-
-Flush log (các mục trên) chỉ giải quyết việc không mất giao dịch đã COMMIT. Một vấn đề khác là *trang bị rách* (torn page): trang của DBMS (8 KB ở PostgreSQL, 16 KB ở InnoDB) lớn hơn đơn vị ghi nguyên tử của hệ điều hành và ổ đĩa (thường 4 KB), nên nếu hệ thống sập giữa lúc ghi một trang, trang trên đĩa có thể nửa cũ nửa mới. Bản ghi redo chỉ mô tả thay đổi trên một trang nguyên vẹn, nên không thể sửa được trang đã rách. Cần giữ một bản sao nguyên vẹn của trang ở nơi khác. Hai hệ làm việc này theo hai cách, và chi phí nằm ở hai chỗ khác nhau.
-
-*PostgreSQL – Full-Page Writes (`full_page_writes = on`).* Lần sửa đầu tiên của mỗi trang sau một checkpoint, PostgreSQL ghi cả ảnh 8 KB của trang (full-page image, FPI) vào WAL. Khi phục hồi, ảnh này thay thế trang có thể đã rách, rồi các bản ghi WAL sau đó được áp dụng tiếp. Chi phí nằm trong *WAL*: lượng WAL tăng vọt ngay sau mỗi checkpoint, càng nhiều khi checkpoint càng dày và các trang được sửa càng phân tán.
-
-*MySQL InnoDB – doublewrite buffer (`innodb_doublewrite = ON`).* Trước khi ghi trang dữ liệu về vị trí thật, InnoDB ghi trang đó vào vùng doublewrite rồi fsync. Nếu trang thật bị rách, phục hồi lấy bản nguyên vẹn trong doublewrite. Chi phí nằm ở *ghi trang dữ liệu*: mỗi trang được flush bị ghi hai lần, nên chi phí tỉ lệ với số trang flush chứ không phải số giao dịch. Redo log không thay đổi.
-
-#figure(
-  table(
-    columns: (auto, 1fr, 1fr),
-    align: left,
-    stroke: 0.5pt,
-    inset: 6pt,
-    table.header([*Khía cạnh*], [*PostgreSQL*], [*MySQL InnoDB*]),
-    [Log phục hồi], [WAL (redo)], [Redo log và undo log],
-    [Điều khiển flush khi COMMIT], [`synchronous_commit` (on / off)], [`innodb_flush_log_at_trx_commit` (1 / 2 / 0)],
-    [Chống rách trang], [Full-Page Writes: ảnh trang nằm trong WAL, sau mỗi checkpoint], [Doublewrite buffer: ghi trang hai lần khi flush trang],
-    [Chi phí chống rách trang nằm ở], [Khối lượng WAL, tăng theo tần suất checkpoint], [Lượng ghi trang dữ liệu],
-    [Các pha phục hồi], [Redo], [Redo, rồi rollback bằng undo],
-    [Kích thước trang], [8 KB], [16 KB],
-  ),
-  caption: [So sánh lý thuyết cơ chế của hai hệ.],
-)
+#include "tv2_2_2_bao_ve_trang.typ"
 
 Thí nghiệm B (mục 2.5) đo chi phí này, và chỉ thay đổi cơ chế bảo vệ trang, giữ nguyên flush log chặt, để tách khỏi thí nghiệm A (nhận xét 3 của giảng viên).
 
@@ -541,24 +518,41 @@ Mỗi lần chạy bắt đầu từ trạng thái dữ liệu ban đầu (bất
 
 Cả 12 lần chạy đều có bất biến $A = T = B = H$ đúng và 0 lỗi. Hình H6 ban đầu gộp chung chi phí doublewrite và ảnh trang đầy đủ; nhóm đã sửa để tách riêng hai thành phần và thêm điểm đo `iostat` đối chiếu, nên số liệu ở H6 là bản đã hiệu chỉnh.
 
+=== Kiểm chứng bất biến trên MySQL
+
+Hàm `check_invariant` xuất ra 6 trường phân cách bởi dấu `|`: trạng thái, bốn tổng (`SUM(abalance)`, `SUM(tbalance)`, `SUM(bbalance)` và tổng `delta` của bảng lịch sử) và số dòng của bảng lịch sử. Trước khi chạy thí nghiệm B, TV2 kiểm chứng hàm này trên MySQL theo cả hai chiều (kiểm chứng trên PostgreSQL ở mục 2.3).
+
+- *Kiểm chứng dương:* chạy tải TPC-B 8 client trong 60 giây trên dữ liệu sạch (`A = T = B = H = 0` sau `reset_state.sql`). Kết quả 70.756 giao dịch (1.179,09 TPS), `ignored errors: 0`, và bất biến trả về `OK|-107122|-107122|-107122|-107122|70756`. Bốn tổng khớp tuyệt đối, và số dòng lịch sử đúng bằng số giao dịch sysbench báo. Tổng mang dấu âm vì mỗi giao dịch cộng một `delta` ngẫu nhiên trong khoảng từ -5000 đến +5000 vào nền bằng 0.
+- *Kiểm chứng âm:* cố ý cộng lệch +1 vào `abalance` của tài khoản `aid = 1` ngoài giao dịch TPC-B, làm riêng `SUM(abalance)` tăng từ -107122 lên -107121. Script báo ngay `FAIL|-107121|-107122|-107122|-107122|70756`. Sau `reset_state.sql`, kiểm tra lại trả về `OK|0|0|0|0|0`.
+
+#figure(
+  grid(
+    columns: 1,
+    gutter: 8pt,
+    image("img/M_05_kiem_chung_duong_mysql.png", width: 100%),
+    image("img/M_07_kiem_chung_am_mysql.png", width: 100%),
+  ),
+  caption: [Kiểm chứng bất biến bốn tổng trên MySQL. Trên: 70.756 giao dịch, `ignored errors: 0`, bất biến `OK`. Dưới: phát hiện sai lệch +1 (`FAIL`), rồi trở về `OK|0|0|0|0|0` sau khi reset.],
+)
+
 === Bảng kết quả
 
 #[
-  #set text(size: 9.5pt)
+  #set text(size: 9pt)
   #show table: set par(justify: false)
   #figure(
     table(
-      columns: (auto, auto, auto, auto, auto, auto, auto),
-      align: (left, center, center, center, center, center, center),
+      columns: (auto, auto, auto, auto, auto, auto, auto, auto),
+      align: (left, center, center, center, center, center, center, center),
       stroke: 0.5pt,
-      inset: 5pt,
-      table.header([*Cấu hình*], [*TPS (CV)*], [*p99 (ms)*], [*Byte log mỗi giao dịch*], [*Byte trang dữ liệu mỗi giao dịch*], [*Byte doublewrite mỗi giao dịch*], [*Byte ghi đĩa (iostat) mỗi giao dịch*]),
-      [PG `full_page_writes = on`], [1.294 (17,0%)], [33,8], [2.281 (gồm 1.871 FPI)], [–], [–], [5.883],
-      [PG `full_page_writes = off`], [1.170 (4,0%)], [46,4], [402], [–], [–], [3.998],
-      [MySQL `doublewrite = ON`], [703 (20,2%)], [72,3], [1.069], [10.948], [10.945], [24.749],
-      [MySQL `doublewrite = OFF`], [884 (17,1%)], [63,1], [1.071], [10.554], [0], [13.724],
+      inset: 4.5pt,
+      table.header([*Cấu hình*], [*TPS (CV)*], [*p50 (ms)*], [*p95 (ms)*], [*p99 (ms)*], [*Log mỗi giao dịch (B)*], [*Bảo vệ mỗi giao dịch (B)*], [*Ghi đĩa mỗi giao dịch (B)*]),
+      [PG `fpw = on`], [1.294 (17,0%)], [4,82], [9,74], [33,8], [2.280,5], [1.871,4 (FPI)], [5.882,6],
+      [PG `fpw = off`], [1.170 (4,0%)], [4,82], [10,44], [46,4], [401,7], [0], [3.998,4],
+      [MySQL `dblwr = ON`], [703 (20,2%)], [6,91], [23,83], [72,3], [1.068,6], [10.945,0 (doublewrite)], [24.749,0],
+      [MySQL `dblwr = OFF`], [884 (17,1%)], [6,91], [14,50], [63,1], [1.071,4], [0], [13.723,6],
     ),
-    caption: [Kết quả thí nghiệm B ở 8 client, trung bình 3 lần chạy (`results/B_summary.csv`). CV là hệ số biến thiên của TPS giữa 3 lần. "Byte log" là WAL của PostgreSQL hoặc redo log của InnoDB. Dấu – là chỉ số không đo ở hệ đó.],
+    caption: [Kết quả thí nghiệm B ở 8 client, trung bình 3 lần chạy (`results/B_summary.csv`). CV là hệ số biến thiên của TPS giữa 3 lần. "Log" là WAL của PostgreSQL hoặc redo log của InnoDB. "Bảo vệ" là dung lượng FPI trong WAL (PostgreSQL) hoặc lượng ghi qua doublewrite (MySQL). "Ghi đĩa" là tổng lượng ghi đo bằng `iostat` (gồm log, doublewrite, trang dữ liệu và metadata hệ tệp) chia cho số giao dịch. p50 của hai cấu hình trùng nhau do sysbench báo percentile theo các nhóm của histogram.],
   )
 ]
 
@@ -579,7 +573,7 @@ Cả 12 lần chạy đều có bất biến $A = T = B = H$ đúng và 0 lỗi.
       [InnoDB: doublewrite làm mỗi trang flush bị ghi hai lần], [Lượng ghi qua doublewrite (10.945 byte) bằng lượng ghi trang dữ liệu (10.948 byte)], [Khớp],
       [InnoDB: redo log không đổi], [1.069 và 1.071 byte mỗi giao dịch], [Khớp],
       [Chi phí của InnoDB nhỏ nếu dữ liệu nằm gọn trong bộ đệm], [Mỗi giao dịch flush khoảng 0,67 trang nên chi phí đáng kể], [Không khớp],
-      [TPS giảm khi bật bảo vệ trang], [PostgreSQL: không phân biệt được (1.294 so với 1.170, chồng lấn). InnoDB: thấp hơn khoảng 20% nhưng chồng lấn], [Chưa kết luận được],
+      [TPS giảm khi bật bảo vệ trang], [PostgreSQL: không phân biệt được (1.294 so với 1.170, chồng lấn). InnoDB: tắt doublewrite tăng TPS 25,8% (884 so với 703), tức bật làm giảm khoảng 20%, nhưng hai khoảng giá trị chồng lấn], [Chưa kết luận được],
       [Checkpoint dày làm WAL phình hơn (thí nghiệm phụ `checkpoint_timeout`)], [Chưa chạy thí nghiệm phụ này; chỉ có quan sát từ H7], [Chưa kiểm chứng],
     ),
     caption: [Đối chiếu dự đoán lý thuyết với kết quả thí nghiệm B.],
@@ -588,27 +582,27 @@ Cả 12 lần chạy đều có bất biến $A = T = B = H$ đúng và 0 lỗi.
 
 === Phân tích
 
-*1. PostgreSQL: chi phí nằm trong WAL, và gần như toàn bộ là ảnh trang đầy đủ.* Khi bật `full_page_writes`, mỗi giao dịch sinh 2.281 byte WAL so với 402 byte khi tắt, gấp khoảng 5,7 lần. Phần bản ghi thường gần như không đổi (408 và 402 byte); phần tăng thêm là 1.871 byte FPI, chiếm 82% WAL. Chênh lệch ghi đĩa đo độc lập bằng `iostat` là 1.884 byte mỗi giao dịch (5.883 so với 3.998), khớp với phần FPI 1.871 byte. Nghĩa là số đo trong DBMS và số đo từ hệ điều hành xác nhận lẫn nhau. Số liệu cũng khớp với thí nghiệm A: ở 8 client, PostgreSQL `on` có 2.406 byte log mỗi giao dịch (mục 2.4), gần với 2.281 byte ở đây.
+*1. PostgreSQL: chi phí nằm trong WAL, và gần như toàn bộ là ảnh trang đầy đủ.* Khi bật `full_page_writes`, mỗi giao dịch sinh 2.281 byte WAL so với 402 byte khi tắt, gấp khoảng 5,7 lần. Phần bản ghi thường gần như không đổi (408 và 402 byte); phần tăng thêm là 1.871 byte FPI, chiếm 82% WAL. Tổng lượng ghi đĩa đo độc lập bằng `iostat` tăng từ 3.998,4 lên 5.882,6 byte mỗi giao dịch (tăng 47,1%); phần chênh 1.884 byte khớp với phần FPI 1.871 byte. Nghĩa là số đo trong DBMS và số đo từ hệ điều hành xác nhận lẫn nhau. Số liệu cũng khớp với thí nghiệm A: ở 8 client, PostgreSQL `on` có 2.406 byte log mỗi giao dịch (mục 2.4), gần với 2.281 byte ở đây. Điều này cũng giải thích sự biến động byte log mỗi giao dịch của PostgreSQL giữa các ô ở thí nghiệm A.
 
 #shot("img/H6_page_protection_cost.png", [H6 – Lượng ghi trên mỗi giao dịch khi bật và tắt bảo vệ trang. Chi phí của PostgreSQL nằm trong WAL, chi phí của InnoDB nằm ở ghi trang dữ liệu.])
 
-*2. Phân loại WAL cho biết FPI đến từ đâu.* Kết quả `pg_waldump` cho thấy tổng WAL mỗi lần chạy khoảng 874 MB khi bật và 141 MB khi tắt, với FPI chiếm 82% khi bật. Trong phần FPI, nguồn lớn nhất là `Heap/HOT_UPDATE` (khoảng 47%) và `Heap2/PRUNE` (khoảng 33%), tức bản ghi cập nhật dòng tài khoản và thao tác dọn dẹp trang; kế đến là `XLOG/FPI_FOR_HINT` (khoảng 8%), loại bản ghi nhiều khả năng xuất hiện vì cụm đã bật `data_checksums`. Nguyên nhân gốc là dữ liệu có 5 triệu tài khoản và mỗi giao dịch cập nhật một tài khoản ngẫu nhiên, nên hầu như mỗi giao dịch chạm một trang chưa được sửa kể từ checkpoint và phải kèm ảnh 8 KB.
+*2. Phân loại WAL cho biết FPI đến từ đâu.* Kết quả `pg_waldump` cho thấy tổng WAL mỗi lần chạy khoảng 874 MB khi bật và 141 MB khi tắt, với FPI chiếm 82% khi bật. Trong phần FPI, nguồn lớn nhất là `Heap/HOT_UPDATE` (khoảng 47%) và `Heap2/PRUNE` (khoảng 33%), tức bản ghi cập nhật dòng tài khoản và thao tác dọn dẹp trang; kế đến là `XLOG/FPI_FOR_HINT` (khoảng 8%). Loại bản ghi này xuất hiện vì cụm được khởi tạo với `--data-checksums`: khi đó mọi cập nhật hint bits trên trang sau checkpoint cũng phải ghi ảnh trang đầy đủ. Tổng dung lượng `XLOG/FPI_FOR_HINT` trong một lần chạy 300 giây khi bật `full_page_writes` dao động từ 4,87 MB (lần r1, khớp ảnh `R_B1`) đến 87,15 MB (lần r3), trong khi khi tắt chỉ 0,21 đến 0,81 MB. Như vậy bật checksum dữ liệu làm khuếch đại thêm lượng WAL khi kết hợp với `full_page_writes`. Nguyên nhân gốc là dữ liệu có 5 triệu tài khoản và mỗi giao dịch cập nhật một tài khoản ngẫu nhiên, nên hầu như mỗi giao dịch chạm một trang chưa được sửa kể từ checkpoint và phải kèm ảnh 8 KB.
 
 #shot("img/H8_wal_composition.png", [H8 – Thành phần WAL theo `pg_waldump`: ảnh trang đầy đủ (FPI) chiếm 82% khi `full_page_writes = on`.], w: 85%)
 
 #shot("img/R_B1_waldump_on_off.png", [Kết quả `pg_waldump --stats=record` của một lần chạy với `full_page_writes` bật (trên) và tắt (dưới).])
 
-*3. Chi phí tập trung ngay sau checkpoint.* Hình H7 vẽ lần chạy r1 của mỗi cấu hình. Khi bật `full_page_writes`, WAL sinh ra ở mức 8 đến 14 MB/giây trong khoảng 30 giây đầu của giai đoạn đo (tức 60 đến 90 giây sau `CHECKPOINT` thủ công, vì 60 giây đầu là làm nóng không đo), rồi giảm xuống khoảng 0,6 MB/giây từ giây thứ 50, bằng mức khi tắt. Lúc này phần lớn trang đã có ảnh trong chu kỳ checkpoint nên không cần ghi lại. Hai lần chạy còn lại (r2, r3) không có đỉnh cao như vậy: tốc độ cao nhất chỉ khoảng 5 MB/giây rồi giảm dần xuống khoảng 1 đến 2 MB/giây trong vài trăm giây, kèm vài đoạn thấp 0,1 đến 0,2 MB/giây, nên thời điểm FPI giảm hẳn khác nhau giữa các lần chạy. Cả ba lần đều có chung một điểm: đến thời điểm checkpoint định kỳ (`checkpoint_timeout = 5min`, tức khoảng 240 giây sau khi bắt đầu đo) tốc độ WAL lại tăng lên khoảng 10 MB/giây. Như vậy lượng FPI phụ thuộc vào tần suất checkpoint: checkpoint càng dày thì WAL càng phình, nhưng thời gian phục hồi (RTO) càng ngắn (mục 2.2.5 và 2.6). Nhóm chưa chạy thí nghiệm phụ thay đổi `checkpoint_timeout`, nên nhận định này dựa trên hình H7 và lý thuyết, chưa được kiểm chứng trực tiếp.
+*3. Chi phí tập trung ngay sau checkpoint.* Hình H7 vẽ lần chạy r1 của mỗi cấu hình. Khi bật `full_page_writes`, WAL sinh ra ở mức 8 đến 14 MB/giây trong khoảng 30 giây đầu của giai đoạn đo (tức 60 đến 90 giây sau `CHECKPOINT` thủ công, vì 60 giây đầu là làm nóng không đo), rồi giảm xuống khoảng 0,6 MB/giây từ giây thứ 50, bằng mức khi tắt. Lúc này phần lớn trang đã có ảnh trong chu kỳ checkpoint nên không cần ghi lại. Hai lần chạy còn lại (r2, r3) không có đỉnh cao như vậy: tốc độ cao nhất chỉ khoảng 5 MB/giây rồi giảm dần xuống khoảng 1 đến 2 MB/giây trong vài trăm giây, kèm vài đoạn thấp 0,1 đến 0,2 MB/giây, nên thời điểm FPI giảm hẳn khác nhau giữa các lần chạy. Cả ba lần đều có chung một điểm: đến thời điểm checkpoint định kỳ (`checkpoint_timeout = 5min`, tức khoảng 240 giây sau khi bắt đầu đo) tốc độ WAL lại tăng lên khoảng 10 MB/giây. Chu kỳ lặp lại này cho thấy FPI chỉ được ghi ở lần sửa đầu tiên của trang sau mỗi checkpoint. Như vậy lượng FPI phụ thuộc vào tần suất checkpoint: checkpoint càng dày thì WAL càng phình, nhưng thời gian phục hồi (RTO) càng ngắn (mục 2.2.5 và 2.6). Nhóm chưa chạy thí nghiệm phụ thay đổi `checkpoint_timeout`, nên nhận định này dựa trên hình H7 và lý thuyết, chưa được kiểm chứng trực tiếp.
 
 #shot("img/H7_wal_rate.png", [H7 – Tốc độ sinh WAL theo thời gian (lần chạy r1 của mỗi cấu hình): đỉnh sau mỗi checkpoint khi `full_page_writes = on`.])
 
-*4. TPS của PostgreSQL không phân biệt được hai cấu hình.* TPS là 1.294 khi bật và 1.170 khi tắt, nhưng độ biến thiên lớn (CV 17,0% khi bật) và các lần chạy khi bật (1.548, 1.189, 1.145) chồng lấn với khi tắt (1.198, 1.116, 1.197). Cùng lúc WAL tăng 5,7 lần, số fsync mỗi giao dịch gần như không đổi (0,270 và 0,269). Điều này gợi ý ở 8 client nút thắt vẫn là chờ fsync lúc COMMIT, chứ không phải lượng byte WAL, vì WAL được ghi tuần tự. Kết luận này khớp với thí nghiệm A, nơi ở 8 client PostgreSQL `on` đã bị giới hạn bởi tốc độ fsync.
+*4. TPS của PostgreSQL không phân biệt được hai cấu hình.* TPS là 1.294 khi bật và 1.170 khi tắt, nhưng độ biến thiên lớn (CV 17,0% khi bật) và các lần chạy khi bật (1.547,5, 1.189,3 và 1.145,4) chồng lấn với khi tắt (1.197,9, 1.116,2, 1.196,8). Độ trễ p50 của hai cấu hình trùng nhau (4,82 ms). Cùng lúc WAL tăng 5,7 lần, số fsync mỗi giao dịch gần như không đổi (0,270 và 0,269). Điều này gợi ý ở 8 client nút thắt vẫn là chờ fsync lúc COMMIT, chứ không phải lượng byte WAL, vì WAL được ghi tuần tự. Kết luận này khớp với thí nghiệm A, nơi ở 8 client PostgreSQL `on` đã bị giới hạn bởi tốc độ fsync.
 
-*5. InnoDB: chi phí nằm ở ghi trang dữ liệu, redo log không đổi.* Redo log gần như không thay đổi giữa hai cấu hình (1.069 và 1.071 byte mỗi giao dịch). Với doublewrite ON, mỗi giao dịch ghi thêm khoảng 10.945 byte qua doublewrite (0,668 trang mỗi giao dịch, mỗi trang 16 KB), gần bằng lượng trang dữ liệu ghi thật (10.948 byte). Nghĩa là mỗi trang flush bị ghi hai lần. Ghi đĩa thực tế tăng từ 13.724 lên 24.749 byte mỗi giao dịch, gấp khoảng 1,8 lần, và ba lần chạy của hai cấu hình tách rời nhau (22.351 đến 26.026 so với 12.967 đến 14.248 byte). Chi phí doublewrite tỉ lệ với số trang flush; ở workload này mỗi giao dịch cập nhật một trang ngẫu nhiên nên có khoảng 0,67 trang flush mỗi giao dịch, và chi phí không hề nhỏ.
+*5. InnoDB: chi phí nằm ở ghi trang dữ liệu, redo log không đổi.* Redo log gần như không thay đổi giữa hai cấu hình (1.069 và 1.071 byte mỗi giao dịch). Với doublewrite ON, mỗi giao dịch ghi thêm khoảng 10.945 byte qua doublewrite (0,668 trang mỗi giao dịch, mỗi trang 16 KB), gần bằng lượng trang dữ liệu ghi thật (10.948 byte). Nghĩa là mỗi trang flush bị ghi hai lần. Điều này không nhân đôi số thao tác I/O ngẫu nhiên, vì doublewrite được ghi thành từng lô tuần tự lớn chỉ với một lần `fsync()` (mục 2.2.4), nhưng vẫn làm tăng gấp đôi lượng byte ghi trang. Ghi đĩa thực tế tăng từ 13.724 lên 24.749 byte mỗi giao dịch, gấp khoảng 1,8 lần (hay giảm 44,5% khi tắt doublewrite), và ba lần chạy của hai cấu hình tách rời nhau (22.351 đến 26.026 so với 12.967 đến 14.248 byte). Chi phí doublewrite tỉ lệ với số trang flush; ở workload này mỗi giao dịch cập nhật một trang ngẫu nhiên nên có khoảng 0,67 trang flush mỗi giao dịch, và chi phí không hề nhỏ.
 
-*6. TPS của InnoDB cho thấy xu hướng, chưa đủ kết luận.* TPS là 884 khi tắt doublewrite và 703 khi bật, thấp hơn khoảng 20%. Tuy nhiên độ biến thiên rất lớn (CV 17% và 20%) và khoảng giá trị hai cấu hình chồng nhau (917, 719, 1.016 so với 619, 622, 867), nên với 3 lần chạy chỉ có thể nói xu hướng phù hợp với việc ghi trang gấp đôi.
+*6. TPS của InnoDB cho thấy xu hướng, chưa đủ kết luận.* Tắt doublewrite làm TPS tăng từ 703 lên 884 (tăng 25,8%) và p99 giảm từ 72,3 xuống 63,1 ms; nói cách khác, bật doublewrite thấp hơn khoảng 20%. Tuy nhiên độ biến thiên rất lớn (CV 17% và 20%) và khoảng giá trị hai cấu hình chồng nhau (917,2, 718,7, 1.016,0 so với 619,2, 622,1, 866,8), nên với 3 lần chạy chỉ có thể nói xu hướng phù hợp với việc ghi trang gấp đôi.
 
-*7. Chi phí ở hai vị trí khác nhau.* Chống rách trang tốn thêm khoảng 1,9 KB mỗi giao dịch trong WAL ở PostgreSQL, và khoảng 10,9 KB mỗi giao dịch ở ghi trang dữ liệu ở InnoDB. Số byte ở InnoDB lớn hơn nhiều, nhiều khả năng vì InnoDB ghi lại cả trang 16 KB mỗi lần flush, còn PostgreSQL chỉ chụp trang một lần sau mỗi checkpoint. Hai con số không thể so trực tiếp thành "hệ nào rẻ hơn", vì đo ở hai vị trí khác nhau (log và trang dữ liệu), và PostgreSQL còn phụ thuộc vào tần suất checkpoint. Điều quan trọng là đúng như lý thuyết ở mục 2.2.4: chi phí của PostgreSQL nằm trong log, còn chi phí của InnoDB nằm trong ghi trang. Điều này có hệ quả thực tế: PostgreSQL có thể giảm chi phí này bằng cách giảm tần suất checkpoint (đánh đổi bằng RTO dài hơn), còn InnoDB nên chú ý băng thông ghi trang dữ liệu.
+*7. Chi phí ở hai vị trí khác nhau.* Chống rách trang tốn thêm khoảng 1,9 KB mỗi giao dịch trong WAL ở PostgreSQL, và khoảng 10,9 KB mỗi giao dịch ở ghi trang dữ liệu ở InnoDB. Số byte ở InnoDB lớn hơn nhiều, nhiều khả năng vì InnoDB ghi lại cả trang 16 KB mỗi lần flush, còn PostgreSQL chỉ chụp trang một lần sau mỗi checkpoint. So sánh tổng ghi đĩa thực tế mỗi giao dịch ở cấu hình bền vững (hình H6), InnoDB (24,7 KB) cao hơn khoảng 4,2 lần PostgreSQL (5,9 KB), do trang 16 KB lớn gấp đôi trang 8 KB và mọi trang bẩn đều ghi qua doublewrite. Hai con số không thể so trực tiếp thành "hệ nào rẻ hơn", vì đo ở hai vị trí khác nhau (log và trang dữ liệu), và PostgreSQL còn phụ thuộc vào tần suất checkpoint. Điều quan trọng là đúng như lý thuyết ở mục 2.2.4: chi phí của PostgreSQL nằm trong log, còn chi phí của InnoDB nằm trong ghi trang. Điều này có hệ quả thực tế: PostgreSQL có thể giảm chi phí này bằng cách giảm tần suất checkpoint (đánh đổi bằng RTO dài hơn), còn InnoDB nên chú ý băng thông ghi trang dữ liệu.
 
 === Độ tin cậy và giới hạn
 
@@ -623,16 +617,16 @@ Bảng dưới liệt kê TPS của từng lần chạy, để thấy mức bi�
       stroke: 0.5pt,
       inset: 5pt,
       table.header([*Cấu hình*], [*TPS ba lần chạy*], [*CV*]),
-      [PG `full_page_writes = on`], [1.548, 1.189, 1.145], [17,0%],
-      [PG `full_page_writes = off`], [1.198, 1.116, 1.197], [4,0%],
-      [MySQL `doublewrite = ON`], [619, 622, 867], [20,2%],
-      [MySQL `doublewrite = OFF`], [917, 719, 1.016], [17,1%],
+      [PG `full_page_writes = on`], [1.547,5, 1.189,3, 1.145,4], [17,0%],
+      [PG `full_page_writes = off`], [1.197,9, 1.116,2, 1.196,8], [4,0%],
+      [MySQL `doublewrite = ON`], [619,2, 622,1, 866,8], [20,2%],
+      [MySQL `doublewrite = OFF`], [917,2, 718,7, 1.016,0], [17,1%],
     ),
     caption: [TPS từng lần chạy của thí nghiệm B.],
   )
 ]
 
-Ba trong bốn cấu hình có hệ số biến thiên từ 17% đến 20%, cao hơn thí nghiệm A. Lần chạy đầu tiên của PostgreSQL `on` (1.548 TPS) cao hơn hẳn hai lần sau, nên giá trị trung bình 1.294 bị kéo lên; vì vậy nhóm không kết luận về chiều của tác động lên TPS. Ngược lại, các chỉ số đếm byte (byte log, byte doublewrite, ghi đĩa mỗi giao dịch) ổn định hơn nhiều giữa các lần chạy, nên là phần đáng tin của thí nghiệm này.
+Ba trong bốn cấu hình có hệ số biến thiên từ 17% đến 20%, cao hơn thí nghiệm A. Theo TV2, điều này phản ánh dao động hiệu năng của ổ SSD gắn ngoài qua USB 3 khi phải gánh đồng thời ghi trang và `fsync`. Lần chạy đầu tiên của PostgreSQL `on` (1.547,5 TPS) cao hơn hẳn hai lần sau, nên giá trị trung bình 1.294 bị kéo lên; vì vậy nhóm không kết luận về chiều của tác động lên TPS. Ngược lại, các chỉ số đếm byte (byte log, byte doublewrite, ghi đĩa mỗi giao dịch) ổn định hơn nhiều giữa các lần chạy, nên là phần đáng tin của thí nghiệm này.
 
 Giới hạn của thí nghiệm B:
 
@@ -647,7 +641,7 @@ Giới hạn của thí nghiệm B:
 
 Thí nghiệm A cho thấy chi phí của việc đảm bảo durability bằng flush log là rất đáng kể: trên cùng một workload TPC-B, việc chờ fsync làm TPS của PostgreSQL thấp hơn cấu hình mềm từ 3,7 đến 18,2 lần tùy số client, và của MySQL từ 2,8 đến 11,7 lần. Group commit giảm bớt gánh nặng khi có nhiều client (số fsync mỗi giao dịch giảm xuống dưới 0,1 ở 32 client) nhưng không xóa bỏ hoàn toàn.
 
-Thí nghiệm B cho thấy chi phí chống rách trang nằm ở hai vị trí khác nhau. Ở PostgreSQL, bật `full_page_writes` làm WAL mỗi giao dịch tăng khoảng 5,7 lần (từ 402 lên 2.281 byte), trong đó 82% là ảnh trang đầy đủ, tập trung ngay sau mỗi checkpoint. Ở InnoDB, doublewrite làm mỗi trang flush bị ghi hai lần, nâng lượng ghi đĩa mỗi giao dịch khoảng 1,8 lần (từ 13.724 lên 24.749 byte), còn redo log không đổi. Ở 8 client, TPS không phân biệt được rõ hai cấu hình vì độ biến thiên lớn. Hai cơ chế này bảo vệ trước một loại lỗi khác với flush log, và không nên tắt trên hệ thống thật.
+Thí nghiệm B cho thấy chi phí chống rách trang nằm ở hai vị trí khác nhau. Ở PostgreSQL, bật `full_page_writes` làm WAL mỗi giao dịch tăng khoảng 5,7 lần (từ 402 lên 2.281 byte), trong đó 82% là ảnh trang đầy đủ, tập trung ngay sau mỗi checkpoint. Ở InnoDB, doublewrite làm mỗi trang flush bị ghi hai lần, nâng lượng ghi đĩa mỗi giao dịch khoảng 1,8 lần (từ 13.724 lên 24.749 byte), còn redo log không đổi. Ở 8 client, TPS không phân biệt được rõ hai cấu hình vì độ biến thiên lớn. Hai cơ chế này bảo vệ trước một loại lỗi khác với flush log, và không nên tắt trên hệ thống thật: tắt chúng không làm mất giao dịch trong điều kiện bình thường nhưng để lại nguy cơ hỏng trang không phục hồi được khi hệ điều hành sập hoặc mất điện. Với PostgreSQL, tăng `checkpoint_timeout` hoặc `max_wal_size` giúp giảm tần suất ghi FPI, đánh đổi bằng thời gian redo (RTO) dài hơn ở thí nghiệm C. Với InnoDB, doublewrite chiếm khoảng 44% tổng lượng ghi đĩa; có thể đặt `innodb_doublewrite_dir` trên ổ nhanh riêng hoặc cân nhắc lưu trữ hỗ trợ ghi nguyên tử.
 
 Thí nghiệm C cho biết cái giá đó đổi lấy điều gì khi sự cố thật xảy ra:
 
@@ -696,4 +690,6 @@ Giới hạn của nghiên cứu hiện tại:
 7. PostgreSQL Global Development Group. *PostgreSQL 16 Documentation – amcheck*. https://www.postgresql.org/docs/16/amcheck.html
 8. Oracle Corporation. *MySQL 8.4 Reference Manual – InnoDB Recovery*. https://dev.mysql.com/doc/refman/8.4/en/innodb-recovery.html
 9. libvirt. *virsh – công cụ dòng lệnh quản lý máy ảo (virsh destroy)*. https://libvirt.org/manpages/virsh.html
-10. Repo mã nguồn nhóm: https://github.com/MihnixArch0n/uet-dbms
+10. PostgreSQL Global Development Group. *PostgreSQL 16 Documentation – Write Ahead Log (full_page_writes, wal_log_hints)*. https://www.postgresql.org/docs/16/runtime-config-wal.html
+11. Oracle Corporation. *MySQL 8.4 Reference Manual – 17.6.4 Doublewrite Buffer (innodb_doublewrite)*. https://dev.mysql.com/doc/refman/8.4/en/innodb-doublewrite-buffer.html
+12. Repo mã nguồn nhóm: https://github.com/MihnixArch0n/uet-dbms

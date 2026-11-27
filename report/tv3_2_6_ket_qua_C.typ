@@ -94,13 +94,13 @@ Nghĩa là cả hai hệ chỉ làm *mất trọn vẹn* một số giao dịch 
 
 *5. Thời gian phục hồi.* RTO theo log DBMS (trung vị) của PostgreSQL khoảng 9 đến 11 giây, của InnoDB khoảng 18 đến 19 giây khi kill tiến trình và 7 đến 12 giây trong máy ảo. RTO không chỉ là thời gian redo:
 
-- PostgreSQL phát lại khoảng 600 đến 1.050 MB WAL chỉ trong 0,6 đến 4,3 giây, nhưng sau đó phải ghi một checkpoint kết thúc phục hồi (ghi mọi trang bẩn xuống đĩa) rồi mới nhận kết nối; phần này chiếm phần lớn RTO.
-- InnoDB có lượng redo cần phát lại nhỏ hơn nhiều (12 đến 100 MB tùy lần chạy) vì fuzzy checkpoint liên tục tiến điểm checkpoint, nhưng phần còn lại của quá trình khởi động (khởi tạo bộ đệm 2 GB, kiểm tra doublewrite, các plugin) chiếm thời gian đáng kể.
+- PostgreSQL phát lại 600 đến 1.000 MB WAL chỉ trong 0,6 đến 4 giây, nhưng sau đó phải ghi một checkpoint kết thúc phục hồi (ghi mọi trang bẩn xuống đĩa) rồi mới nhận kết nối; phần này chiếm phần lớn RTO.
+- InnoDB có lượng redo cần phát lại nhỏ hơn nhiều (17 đến 81 MB) vì fuzzy checkpoint liên tục tiến điểm checkpoint, nhưng phần còn lại của quá trình khởi động (khởi tạo bộ đệm 2 GB, kiểm tra doublewrite, các plugin) chiếm thời gian đáng kể.
 - Giữa các cấu hình trong cùng một mức sự cố, RTO chênh nhau ít. Cấu hình flush không ảnh hưởng nhiều đến thời gian phục hồi; điều quyết định là lượng log từ checkpoint cuối và cách hệ quản trị khởi động.
 
 #shot("img/H9_redo_time.png", [H9 – Thời gian redo theo lượng log cần phát lại, 42 lần crash.], w: 90%)
 
-Hình H9 cho thấy một điểm đáng chú ý: thời gian redo không chỉ phụ thuộc lượng log. Khi kill tiến trình trên máy đo, InnoDB mất 7 đến 12 giây để phát lại chỉ 23 đến 65 MB redo, trong khi PostgreSQL phát lại khoảng 900 MB trong khoảng 1 giây. Nhiều khả năng nguyên nhân là cách đọc trang khi phát lại. InnoDB đọc trang trực tiếp từ đĩa (`O_DIRECT`, bỏ qua page cache), nên mỗi trang cần sửa là một lần đọc ngẫu nhiên trên ổ SSD gắn ngoài. PostgreSQL đọc qua page cache của hệ điều hành, và page cache này vẫn còn nguyên sau khi tiến trình bị kill. Trong máy ảo, PostgreSQL redo chậm hơn trên máy đo ở cùng lượng log (vì page cache của hệ điều hành khách đã mất cùng sự cố), còn InnoDB lại nhanh hơn (đĩa ảo được máy thật lưu đệm). Vì môi trường hai mức khác nhau (máy đo và máy ảo), nhóm không so sánh RTO giữa hai mức, chỉ so sánh giữa các cấu hình trong cùng một mức.
+Hình H9 cho thấy một điểm đáng chú ý: thời gian redo không chỉ phụ thuộc lượng log. Khi kill tiến trình trên máy đo, InnoDB mất 7 đến 12 giây để phát lại chỉ 20 đến 65 MB redo, trong khi PostgreSQL phát lại khoảng 900 MB trong khoảng 1 giây. Nhiều khả năng nguyên nhân là cách đọc trang khi phát lại. InnoDB đọc trang trực tiếp từ đĩa (`O_DIRECT`, bỏ qua page cache), nên mỗi trang cần sửa là một lần đọc ngẫu nhiên trên ổ SSD gắn ngoài. PostgreSQL đọc qua page cache của hệ điều hành, và page cache này vẫn còn nguyên sau khi tiến trình bị kill. Trong máy ảo, PostgreSQL redo chậm hơn trên máy đo ở cùng lượng log (vì page cache của hệ điều hành khách đã mất cùng sự cố), còn InnoDB lại nhanh hơn (đĩa ảo được máy thật lưu đệm). Vì môi trường hai mức khác nhau (máy đo và máy ảo), nhóm không so sánh RTO giữa hai mức, chỉ so sánh giữa các cấu hình trong cùng một mức.
 
 #figure(
   grid(
@@ -112,7 +112,7 @@ Hình H9 cho thấy một điểm đáng chú ý: thời gian redo không chỉ 
   caption: [Log phục hồi sau khi kill tiến trình. Trên: PostgreSQL (`database system was interrupted`, `redo starts at`, `redo done at`, sẵn sàng nhận kết nối). Dưới: InnoDB (`Starting crash recovery`, áp dụng các lô redo, sẵn sàng nhận kết nối).],
 )
 
-*6. Quan hệ với thí nghiệm A.* Trong cùng thời gian bơm tải, các cấu hình lỏng nhận được nhiều xác nhận COMMIT hơn cấu hình bền vững khoảng 3 đến 4 lần (ví dụ khi kill tiến trình, trung bình 311.319 xác nhận với PostgreSQL `off` so với 91.192 với `on`), nhưng nhỏ hơn nhiều so với khoảng chênh TPS ở thí nghiệm A ở 8 client (PostgreSQL 18,2 lần, InnoDB `=0` so với `=1` 6,2 lần). Lý do là công cụ `crash_client.py` viết bằng Python với 8 luồng nên thông lượng bị chặn ở phía client (cấu hình lỏng chỉ đạt khoảng 3.500 đến 5.000 giao dịch mỗi giây, so với 20.930 của sysbench), vì vậy TPS ở thí nghiệm C không dùng để so sánh với thí nghiệm A. Đặt cạnh nhau, hai thí nghiệm cho thấy rõ đánh đổi: cấu hình lỏng tăng thông lượng nhiều lần, đổi lại có thể mất vài trăm millisecond giao dịch đã báo thành công khi hệ điều hành sập. Dữ liệu vẫn nhất quán, nhưng không còn đầy đủ.
+*6. Quan hệ với thí nghiệm A.* Trong cùng thời gian bơm tải, các cấu hình lỏng nhận được nhiều xác nhận COMMIT hơn cấu hình bền vững khoảng 3 đến 4 lần (ví dụ khi kill tiến trình, trung bình 311.319 xác nhận với PostgreSQL `off` so với 91.192 với `on`), khớp với khoảng chênh TPS ở thí nghiệm A. Đặt cạnh nhau, hai thí nghiệm cho thấy rõ đánh đổi: cấu hình lỏng tăng thông lượng nhiều lần, đổi lại có thể mất vài trăm millisecond giao dịch đã báo thành công khi hệ điều hành sập. Dữ liệu vẫn nhất quán, nhưng không còn đầy đủ.
 
 === Sự cố trong quá trình đo và giới hạn
 
