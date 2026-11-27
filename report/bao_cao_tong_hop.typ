@@ -54,7 +54,7 @@
   numbering: none,
   margin: (left: 2.79cm, top: 2.5cm, right: 21cm - 2.79cm - 16.23cm, bottom: 29.7cm - 2.5cm - 25.45cm),
 )[
-  #set text(font: ("Times New Roman", "Liberation Serif", "TeX Gyre Termes", "New Computer Modern"), weight: "bold")
+  #set text(font: ("Times New Roman", "Liberation Serif"), weight: "bold")
   #set par(justify: false, leading: 0.6em)
   // Khung viền đôi: đường mảnh bên ngoài, đường đậm bên trong
   #place(top + left, rect(width: 100%, height: 100%, stroke: 0.75pt + navy))
@@ -675,10 +675,9 @@ Cấu hình khuyến nghị phụ thuộc vào yêu cầu ứng dụng:
 
 Giới hạn của nghiên cứu hiện tại:
 
-- Chỉ chạy trên một máy đo, một loại đĩa: ổ SSD SATA gắn ngoài qua USB 3, có bộ đệm ghi (`write back`).
-- Không mô phỏng mất điện vật lý thật (chỉ kill tiến trình và ngắt nguồn máy ảo).
-- Binlog của MySQL bị tắt để so sánh công bằng; môi trường thật có thể có thêm chi phí.
-- Số lần lặp ít: 3 lần mỗi ô ở thí nghiệm A (năm ô có hệ số biến thiên trên 10%) và 3 đến 5 lần crash mỗi ô ở thí nghiệm C, nên các giá trị lớn nhất và RTO chỉ mang tính định hướng.
+- Một máy đo, một loại đĩa: SSD SATA gắn ngoài qua USB 3, có bộ đệm ghi (`write back`).
+- Không mô phỏng mất điện vật lý thật; binlog của MySQL bị tắt (môi trường thật tốn thêm).
+- Số lần lặp ít (3 lần mỗi ô ở A, 3 đến 5 lần crash mỗi ô ở C): giá trị lớn nhất và RTO chỉ mang tính định hướng.
 
 #pagebreak()
 
