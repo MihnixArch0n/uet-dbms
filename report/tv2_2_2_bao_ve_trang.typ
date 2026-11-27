@@ -10,31 +10,18 @@
 
 === Bảo vệ trang dữ liệu (Full-Page Writes và Doublewrite Buffer)
 
-Cơ chế WAL chỉ đảm bảo dữ liệu thay đổi ở mức logic/vật lý (physical-logical redo) đã được đẩy ra nhật ký trước khi COMMIT, nhưng không tự bảo vệ được *trang dữ liệu* khi trang đó đang được ghi dở xuống thiết bị lưu trữ. Kích thước một trang của hệ quản trị CSDL (8 KB ở PostgreSQL và 16 KB ở MySQL InnoDB) lớn hơn đơn vị ghi nguyên tử phổ biến của hệ điều hành và ổ đĩa (thường là 512 byte hoặc 4 KB). Nếu hệ điều hành sập hoặc mất điện đúng lúc trang đang được ghi, trên đĩa sẽ xuất hiện trạng thái *rách trang* (torn page / partial page write): một phần trang mang nội dung mới, phần còn lại vẫn giữ nội dung cũ. Khi khởi động lại, các bản ghi thay đổi mức dòng không đủ thông tin để tái tạo trang nền bị hỏng này.
+WAL đảm bảo thay đổi đã được đẩy ra log trước COMMIT, nhưng không chống được *rách trang* (torn page): trang dữ liệu (8 KB PostgreSQL, 16 KB InnoDB) lớn hơn đơn vị ghi nguyên tử của HĐH/ổ đĩa (512 B – 4 KB), nên nếu sập giữa lúc ghi, trang sẽ nửa cũ nửa mới và log thay đổi mức dòng không đủ sửa. Hai hệ giải quyết theo hai hướng khác nhau:
 
-Để xử lý triệt để nguy cơ rách trang, PostgreSQL và MySQL InnoDB chọn hai hướng thiết kế khác nhau: PostgreSQL nhúng ảnh trang vào chính luồng WAL (*Full-Page Writes*), còn InnoDB dùng một vùng đệm ghi kép tách biệt (*Doublewrite Buffer*).
+==== PostgreSQL – Full-Page Writes (`full_page_writes`)
 
-==== PostgreSQL - Full-Page Writes (`full_page_writes`)
+Khi `full_page_writes = on` (mặc định), ở *lần sửa đầu tiên* của mỗi trang sau mỗi checkpoint, PostgreSQL ghi toàn bộ nội dung trang (Full-Page Image – FPI, tối đa 8 KB) vào WAL. Khi phục hồi từ redo point của checkpoint gần nhất, FPI ghi đè trang có thể bị rách trước khi áp dụng các bản ghi redo tiếp theo.
+- *Chu kỳ checkpoint:* Sau mỗi checkpoint, hàng loạt trang sửa lần đầu tạo đỉnh WAL (tăng mạnh khi `checkpoint_timeout` = `5min` / `max_wal_size` = `4GB` ngắn).
+- *Ảnh hưởng của `--data-checksums` / `wal_log_hints`:* Khi bật checksum (như cấu hình nhóm), cả việc đánh dấu *hint bits* lần đầu sau checkpoint cũng phải ghi FPI (`XLOG/FPI_FOR_HINT`).
+- *Khi tắt (`off`):* Giảm mạnh WAL nhưng có nguy cơ hỏng dữ liệu khi sập HĐH/mất điện; chỉ tắt nếu lớp lưu trữ ghi nguyên tử 8 KB (như ZFS).
 
-Theo tài liệu chính thức của PostgreSQL 16, khi tham số `full_page_writes` ở trạng thái `on` (mặc định), ở *lần sửa đổi đầu tiên* của mỗi trang dữ liệu sau một lần checkpoint, server ghi *toàn bộ nội dung trang* (Full-Page Image - FPI, tối đa 8 KB trước khi nén) vào WAL. Trong pha phục hồi sau sự cố, PostgreSQL bắt đầu phát lại WAL từ redo point của checkpoint gần nhất; mọi trang bị sửa sau checkpoint đó đều có một bản FPI nguyên vẹn nằm trong WAL, giúp ghi đè hoàn toàn các trang có thể bị rách trước khi áp dụng các bản ghi thay đổi tiếp theo.
+==== MySQL InnoDB – Doublewrite Buffer (`innodb_doublewrite`)
 
-Các đặc điểm vận hành quan trọng của cơ chế này:
-
-- *Liên hệ trực tiếp với chu kỳ checkpoint:* Vì trạng thái "đã có FPI hay chưa" được đặt lại sau mỗi checkpoint, ngay sau khi checkpoint hoàn tất sẽ xuất hiện một đợt tăng vọt dung lượng WAL do hàng loạt trang nóng bị sửa lần đầu đều phải ghi kèm FPI. Khoảng cách giữa các checkpoint (`checkpoint_timeout`, nhóm dùng `5min`; `max_wal_size`, nhóm dùng `4GB`) càng ngắn thì chi phí FPI càng lớn.
-- *Tác động của `--data-checksums` và `wal_log_hints`:* Khi CSDL bật kiểm tra tổng kiểm (checksums) lúc khởi tạo - như cấu hình của nhóm - hoặc bật `wal_log_hints = on`, ngay cả những cập nhật không trọng yếu như đánh dấu *hint bits* (trạng thái khả kiến giao dịch trên header của tuple) ở lần đầu sau checkpoint cũng bắt buộc ghi FPI vào WAL qua bản ghi `XLOG/FPI_FOR_HINT`. Điều này đảm bảo checksum của trang luôn khớp khi phục hồi.
-- *Đánh đổi khi tắt:* Đặt `full_page_writes = off` giúp giảm mạnh lượng WAL sinh ra và áp lực I/O tuần tự, nhưng làm tăng rủi ro hỏng dữ liệu âm thầm hoặc không thể phục hồi sau sự cố hệ điều hành/mất điện. Tài liệu PostgreSQL khuyến cáo chỉ tắt khi lớp lưu trữ hoặc hệ thống tập tin (như ZFS) đảm bảo ghi nguyên tử trọn vẹn từng trang 8 KB.
-
-==== MySQL InnoDB - Doublewrite Buffer (`innodb_doublewrite`)
-
-Khác với PostgreSQL, MySQL 8.4 InnoDB không nhúng ảnh trang vào redo log mà sử dụng *doublewrite buffer*: một vùng lưu trữ trung gian nơi InnoDB ghi các trang bẩn được đẩy ra từ buffer pool *trước khi* ghi chúng vào đúng vị trí trong các file dữ liệu tablespace. Nếu tiến trình `mysqld`, hệ điều hành hoặc hệ thống lưu trữ gặp sự cố giữa lúc ghi trang vào tablespace, InnoDB sẽ tìm bản sao nguyên vẹn của trang trong doublewrite buffer để khôi phục trong quá trình crash recovery.
-
-Theo tài liệu MySQL 8.4, dù mỗi trang bẩn được ghi hai lần, doublewrite buffer không làm tăng gấp đôi số lượng thao tác I/O ngẫu nhiên: dữ liệu được ghi vào các file doublewrite (`#ib_*` trong `innodb_doublewrite_dir`, mặc định nằm cùng thư mục dữ liệu) thành từng lô tuần tự lớn chỉ với một lần gọi `fsync()`, sau đó mới ghi ra các vị trí đích trong tablespace.
-
-Các chế độ cấu hình của `innodb_doublewrite` trong MySQL 8.4:
-
-- `ON` / `DETECT_AND_RECOVER` (mặc định): ghi đầy đủ nội dung trang vào doublewrite buffer và dùng chúng để sửa các trang ghi dở khi phục hồi.
-- `DETECT_ONLY`: chỉ ghi metadata vào doublewrite buffer để phát hiện trang rách, không ghi nội dung trang và không tự phục hồi trang.
-- `OFF`: tắt hoàn toàn doublewrite buffer (chỉ nên dùng khi benchmark hoặc trên phần cứng hỗ trợ ghi nguyên tử như Fusion-io NVMFS). Trong MySQL 8.4, có thể đổi động giữa `ON`/`DETECT_AND_RECOVER` và `DETECT_ONLY`, nhưng chuyển đổi giữa bật và `OFF` bắt buộc phải khởi động lại server.
+InnoDB ghi các trang bẩn vào vùng đệm trung gian *doublewrite buffer* (`#ib_*` trong `innodb_doublewrite_dir`) thành từng lô tuần tự lớn với một lần `fsync()` *trước khi* ghi vào tablespace đích, nhờ đó tránh nhân đôi I/O ngẫu nhiên và có bản sao nguyên vẹn để cứu trang rách khi phục hồi. Các chế độ MySQL 8.4: `ON`/`DETECT_AND_RECOVER` (mặc định, ghi và sửa trang), `DETECT_ONLY` (chỉ ghi metadata phát hiện), và `OFF` (tắt hoàn toàn, đổi sang/từ `OFF` cần restart).
 
 ==== So sánh hai cơ chế bảo vệ trang
 
@@ -43,7 +30,7 @@ Các chế độ cấu hình của `innodb_doublewrite` trong MySQL 8.4:
     columns: (auto, 1fr, 1fr),
     align: (left, left, left),
     stroke: 0.5pt,
-    inset: 6pt,
+    inset: 4pt,
     table.header([*Tiêu chí*], [*PostgreSQL (`full_page_writes`)*], [*MySQL InnoDB (`innodb_doublewrite`)*]),
     [Kích thước trang], [8 KB], [16 KB],
     [Nơi lưu bản sao trang], [Ghi trực tiếp vào luồng WAL (FPI)], [Ghi vào file doublewrite riêng (`#ib_*`)],

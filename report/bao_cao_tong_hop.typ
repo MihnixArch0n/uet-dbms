@@ -129,7 +129,7 @@ PostgreSQL dùng mô hình *process-per-connection*: tiến trình chính (`post
 
 Bộ nhớ chia thành *Shared memory* (shared buffers, WAL buffers, lock table) và *Backend-private memory* (`work_mem`, `maintenance_work_mem`). Lưu trữ vật lý dưới `$PGDATA` gồm `base/` (dữ liệu bảng/chỉ mục dạng trang 8 KB, dữ liệu lớn tách sang TOAST), `pg_wal/` (các file WAL 16 MB) và `global/` (catalog toàn cục, `pg_control`).
 
-#shot("img/H2_kien_truc_pg.png", [Sơ đồ kiến trúc tiến trình và bộ nhớ PostgreSQL: postmaster, backend, bộ nhớ chung, tiến trình nền và các thư mục dữ liệu.], w: 62%)
+#shot("img/H2_kien_truc_pg.png", [Sơ đồ kiến trúc tiến trình và bộ nhớ PostgreSQL: postmaster, backend, bộ nhớ chung, tiến trình nền và các thư mục dữ liệu.], w: 85%)
 
 == Tính năng chính
 
@@ -144,8 +144,8 @@ Hai container `bench-pg` (`postgres:16`, cổng 5432) và `bench-mysql` (`mysql:
     columns: 2,
     align: center,
     gutter: 8pt,
-    image("img/P1_01_docker_ps.png", width: 68%),
-    image("img/P1_02_cau_hinh_nap.png", width: 68%),
+    image("img/P1_01_docker_ps.png", width: 96%),
+    image("img/P1_02_cau_hinh_nap.png", width: 96%),
   ),
   caption: [Hai container PostgreSQL 16 và MySQL 8.4 (trái) và đối chiếu cấu hình nạp trước thí nghiệm (phải).],
 )
@@ -163,8 +163,8 @@ Máy chủ là PostgreSQL 16.16 với các tham số đúng thiết kế: `wal_l
     columns: 2,
     align: center,
     gutter: 8pt,
-    image("img/P1_03_phien_ban_tham_so.png", width: 68%),
-    image("img/P1_04_tien_trinh.png", width: 68%),
+    image("img/P1_03_phien_ban_tham_so.png", width: 96%),
+    image("img/P1_04_tien_trinh.png", width: 96%),
   ),
   caption: [Phiên bản, tham số durability (trái) và các tiến trình nền qua `pg_stat_activity` (phải).],
 )
@@ -178,8 +178,8 @@ Trước khi COMMIT, vị trí ghi WAL là `F/2D950208`. Sau một giao dịch `
     columns: 2,
     align: center,
     gutter: 8pt,
-    image("img/P1_07_wal_lsn.png", width: 68%),
-    image("img/P1_08_thong_ke_wal.png", width: 68%),
+    image("img/P1_07_wal_lsn.png", width: 96%),
+    image("img/P1_08_thong_ke_wal.png", width: 96%),
   ),
   caption: [LSN trước/sau COMMIT (trái) và thống kê `pg_stat_wal` / `pg_stat_bgwriter` (phải).],
 )
@@ -193,31 +193,9 @@ Trước khi COMMIT, vị trí ghi WAL là `F/2D950208`. Sau một giao dịch `
 
 == Đặt vấn đề
 
-Trong mô hình ACID, thuộc tính *Durability* (độ bền) đòi hỏi: một khi hệ quản trị đã xác nhận COMMIT với client, dữ liệu của giao dịch đó không được mất dù hệ thống sập ngay sau đó.
+Thuộc tính *Durability* (ACID) đòi hỏi dữ liệu của giao dịch đã xác nhận COMMIT không được mất dù hệ thống sập ngay sau đó. Dữ liệu đi qua 4 tầng: (1) bộ đệm DBMS (`shared_buffers` / buffer pool) → (2) page cache HĐH (`write()`) → (3) cache bộ điều khiển đĩa → (4) bề mặt đĩa (`fsync()`). Theo đó, *crash tiến trình DBMS* (`kill -9`) chỉ mất tầng (1); *crash HĐH* (tắt nguồn ảo) mất thêm tầng (2); *mất điện thật* có thể mất cả tầng (3) nếu ổ không tôn trọng flush.
 
-Đường đi của dữ liệu từ lúc sửa đổi đến khi an toàn trên đĩa gồm nhiều tầng:
-
-1. Bộ đệm của DBMS (shared buffers / InnoDB buffer pool).
-2. Page cache của hệ điều hành (sau lệnh `write()`).
-3. Cache của bộ điều khiển ổ đĩa.
-4. Bề mặt từ tính / flash (sau `fsync()` hoặc tương đương).
-
-Mỗi loại sự cố xóa một số tầng khác nhau:
-
-- *Crash tiến trình DBMS* (kill -9, OOM…): mất toàn bộ bộ nhớ của tiến trình, nhưng page cache của hệ điều hành vẫn còn.
-- *Crash hệ điều hành* (kernel panic, tắt nguồn ảo…): mất thêm page cache.
-- *Mất điện thật*: có thể mất cả cache của ổ đĩa nếu ổ không tôn trọng lệnh flush.
-
-Ghi thẳng trang dữ liệu khi COMMIT sẽ rất chậm vì truy cập ngẫu nhiên. Nguyên tắc *Write-Ahead Logging* (WAL) giải quyết bằng cách: mọi thay đổi được ghi tuần tự vào log trước; chỉ khi log đã xuống đĩa thì mới được phép báo COMMIT thành công. Trang dữ liệu có thể được ghi sau (lazy).
-
-Tuy nhiên WAL không giải quyết hết mọi vấn đề. Trang dữ liệu của DBMS (8 KB ở PostgreSQL, 16 KB ở InnoDB) lớn hơn đơn vị ghi nguyên tử phổ biến của hệ điều hành và ổ đĩa (thường 4 KB). Nếu hệ thống sập giữa lúc ghi một trang, trang đó có thể bị *rách* (torn page) – nửa cũ nửa mới – và log thay đổi không đủ để sửa. Do đó cần cơ chế bảo vệ trang riêng (Full-Page Writes hoặc doublewrite buffer).
-
-Hai vấn đề trên là độc lập:
-
-- Mất giao dịch đã COMMIT → giải quyết bằng *flush log* khi COMMIT.
-- Trang hỏng do ghi dở → giải quyết bằng *bảo vệ trang*.
-
-Đây là lý do nhóm tách thành hai thí nghiệm A và B (đáp ứng nhận xét 3 của giảng viên).
+Ghi thẳng trang dữ liệu khi COMMIT rất chậm vì I/O ngẫu nhiên. *Write-Ahead Logging* (WAL) khắc phục bằng cách ghi tuần tự vào log trước khi báo COMMIT, còn trang dữ liệu ghi sau (lazy). Tuy nhiên, trang DBMS (8 KB PostgreSQL, 16 KB InnoDB) lớn hơn đơn vị ghi nguyên tử của HĐH/ổ đĩa (4 KB); nếu sập giữa lúc ghi, trang bị *rách* (torn page) và log thay đổi không đủ sửa. Hai vấn đề độc lập này — *flush log khi COMMIT* và *bảo vệ trang* — được tách thành hai thí nghiệm A và B (nhận xét 3 của giảng viên).
 
 #figure(
   diagram-data-path(),
@@ -225,38 +203,21 @@ Hai vấn đề trên là độc lập:
   caption: [Đường đi của dữ liệu từ DBMS đến đĩa và phạm vi mất dữ liệu của từng loại sự cố.],
 )
 
-Câu hỏi nghiên cứu chính của đề tài:
-
-1. Chi phí hiệu năng (TPS, độ trễ) của việc chờ fsync log khi COMMIT là bao nhiêu? (Thí nghiệm A)
-2. Chi phí của cơ chế bảo vệ trang là bao nhiêu? (Thí nghiệm B)
-3. Khi crash thật sự xảy ra, giao dịch đã COMMIT có bị mất không, hệ thống có còn nhất quán không, và thời gian phục hồi (RTO) là bao lâu? (Thí nghiệm C)
+Ba câu hỏi nghiên cứu: (1) Chi phí hiệu năng (TPS, độ trễ) của việc chờ `fsync` log khi COMMIT? *(Thí nghiệm A)*; (2) Chi phí của cơ chế bảo vệ trang? *(Thí nghiệm B)*; (3) Khi crash thật xảy ra, giao dịch đã COMMIT có mất không, dữ liệu có nhất quán không và RTO bao lâu? *(Thí nghiệm C)*.
 
 == Cơ chế của hai hệ
 
 === PostgreSQL – WAL và synchronous_commit
 
-Mọi thay đổi dữ liệu trong PostgreSQL đều sinh ra một hoặc nhiều bản ghi WAL trong *WAL buffers* (vùng nhớ chia sẻ). Khi một giao dịch thực hiện COMMIT, backend ghi các bản ghi WAL còn lại ra đĩa và – tùy cấu hình – gọi `fsync` (hoặc `fdatasync`) đến vị trí LSN của bản ghi commit.
+Mọi thay đổi sinh bản ghi trong *WAL buffers*. Khi COMMIT, backend ghi WAL ra đĩa và gọi `fsync`/`fdatasync` tùy cấu hình:
+- `synchronous_commit = on` (mặc định, bền vững): chờ WAL flush xuống đĩa rồi mới trả lời client.
+- `synchronous_commit = off`: trả lời ngay khi bản ghi vào WAL buffers; `walwriter` flush định kỳ theo `wal_writer_delay` (200 ms, cửa sổ mất tối đa ~3 lần chu kỳ nhưng không rách trang). Khác hoàn toàn `fsync = off` (có thể hỏng DB).
 
-Tham số then chốt:
-
-- `synchronous_commit = on` (mặc định): backend *chờ* WAL đã được flush xuống đĩa ổn định rồi mới trả lời client. Đây là cấu hình bền vững.
-- `synchronous_commit = off`: backend trả lời client ngay sau khi bản ghi commit đã nằm trong WAL buffers. Tiến trình WAL writer sẽ flush sau theo chu kỳ `wal_writer_delay` (mặc định 200 ms). Tài liệu chính thức nêu cửa sổ mất dữ liệu tối đa khoảng ba lần chu kỳ này, nhưng dữ liệu vẫn nhất quán (không bị rách).
-
-Lưu ý quan trọng: `synchronous_commit = off` *khác* với `fsync = off`. Tắt `fsync` có thể dẫn đến hỏng dữ liệu hoàn toàn và không được dùng trong thí nghiệm.
-
-*Group commit*: khi nhiều backend cùng chờ fsync, PostgreSQL gom chúng lại và chỉ thực hiện một lần `fsync` cho cả nhóm. Cơ chế này giải thích vì sao TPS tăng đáng kể khi số client tăng, dù chi phí một lần fsync vẫn cao. PostgreSQL tự động thực hiện group commit khi nhiều backend cùng chờ `WALWriteLock`; ngoài ra có thể tinh chỉnh thêm bằng `commit_delay` và `commit_siblings` (mặc định `commit_delay = 0`).
-
-File WAL nằm trong `pg_wal/`, mỗi file 16 MB, được tái sử dụng theo cơ chế checkpoint.
+*Group commit*: khi nhiều backend cùng chờ `WALWriteLock`, PostgreSQL gom lại thực hiện một lần `fsync` cho cả nhóm (giúp TPS tăng mạnh theo số client). File WAL (16 MB) nằm ở `pg_wal/` và được tái sử dụng theo checkpoint.
 
 === MySQL InnoDB – Redo log và innodb_flush_log_at_trx_commit
 
-InnoDB cũng dùng write-ahead logging. Mọi thay đổi được ghi vào *redo log* (vòng tròn, kích thước cố định). Tham số tương ứng:
-
-- `innodb_flush_log_at_trx_commit = 1`: mỗi COMMIT đều flush log xuống đĩa. Cấu hình bền vững nhất.
-- `= 2`: ghi log vào page cache của hệ điều hành mỗi COMMIT, nhưng chỉ flush xuống đĩa khoảng mỗi giây. An toàn với crash tiến trình, nhưng có thể mất khoảng 1 giây giao dịch cuối khi crash hệ điều hành.
-- `= 0`: log được ghi và flush khoảng mỗi giây. Có thể mất dữ liệu ngay cả với crash tiến trình.
-
-Khi bật binlog, InnoDB còn phải đồng bộ thêm một lần nữa (`sync_binlog`). Trong thí nghiệm này binlog bị tắt (`skip-log-bin`) để chỉ so sánh chi phí redo log với WAL.
+InnoDB ghi thay đổi vào *redo log* (vòng tròn, cố định): `1` (flush mỗi COMMIT — bền vững nhất), `2` (`write()` vào page cache mỗi COMMIT, `fsync()` mỗi ~1 giây — an toàn với crash tiến trình nhưng mất ~1 s khi sập HĐH), và `0` (ghi + flush mỗi ~1 giây — có thể mất ngay cả khi kill tiến trình). Binlog được tắt (`skip-log-bin`) để chỉ so sánh redo log với WAL.
 
 === Cấu hình bền vững dùng trong thí nghiệm
 
@@ -386,8 +347,8 @@ Khoảng cách lớn nhất ở tải thấp đến trung bình rồi thu hẹp 
     columns: 2,
     align: center,
     gutter: 8pt,
-    image("img/H5_fsync_per_txn.png", width: 88%),
-    image("img/H3_tps_vs_clients.png", width: 88%),
+    image("img/H5_fsync_per_txn.png", width: 100%),
+    image("img/H3_tps_vs_clients.png", width: 100%),
   ),
   caption: [H5 – Số lần fsync mỗi giao dịch (trái) và H3 – Thông lượng TPS theo cấu hình và số client (phải).],
   placement: top,
@@ -395,7 +356,7 @@ Khoảng cách lớn nhất ở tải thấp đến trung bình rồi thu hẹp 
 
 *4. Độ trễ: cấu hình bền vững chậm hơn nhiều lần ở tải thấp.* Độ trễ p50 của PostgreSQL `on` là 2,35 / 4,82 / 4,94 ms ở 1 / 8 / 32 client, chậm hơn `off` (0,18 / 0,35 / 1,19 ms) từ 4,2 đến 13,8 lần. Với `on`, p50 ở 8 và 32 client (~4,8–4,9 ms) xấp xỉ gấp đôi một lần fsync, gợi ý giao dịch phải chờ đợt fsync đang chạy xong rồi mới đến nhóm mình. Đuôi độ trễ của MySQL `=1` dài hơn (p95 10,5–49,7 ms; p99 lên tới 178,4 ms ở 32 client).
 
-#shot("img/H4_latency.png", [H4 – Độ trễ p50, p95, p99 theo cấu hình flush log.], w: 56%)
+#shot("img/H4_latency.png", [H4 – Độ trễ p50, p95, p99 theo cấu hình flush log.], w: 78%)
 
 *5. MySQL `=2` nằm giữa `=1` và `=0`, và khoảng cách với `=0` rộng ra khi tăng tải.* Ở 1 client, `=2` đạt 2.420 TPS, gần `=0` (2.511) và cao hơn `=1` ~11 lần vì không chờ `fsync`. Ở 8 và 32 client, `=2` thấp hơn `=0` (3.607 so với 4.539, và 3.728 so với 4.893), do mỗi COMMIT của `=2` vẫn phải gọi `write()` đẩy log sang page cache, còn `=0` chỉ ghi định kỳ.
 
@@ -513,8 +474,8 @@ Cả 12 lần chạy đều có bất biến $A = T = B = H$ đúng và 0 lỗi.
     columns: 2,
     align: center,
     gutter: 8pt,
-    image("img/H6_page_protection_cost.png", width: 88%),
-    image("img/H8_wal_composition.png", width: 88%),
+    image("img/H6_page_protection_cost.png", width: 100%),
+    image("img/H8_wal_composition.png", width: 100%),
   ),
   caption: [H6 – Lượng ghi mỗi giao dịch (trái) và H8 – Thành phần WAL theo `pg_waldump` (phải).],
   placement: top,
@@ -522,7 +483,7 @@ Cả 12 lần chạy đều có bất biến $A = T = B = H$ đúng và 0 lỗi.
 
 *3. Chi phí tập trung ngay sau checkpoint.* Hình H7 vẽ lần chạy r1: khi bật `full_page_writes`, WAL đạt đỉnh 8–14 MB/s trong 30 giây đầu đo, giảm về ~0,6 MB/s từ giây 50 (r2, r3 đỉnh ~5 MB/s) và tăng lại ~10 MB/s ở mốc `checkpoint_timeout = 5min`. Điều này chứng tỏ FPI chỉ ghi ở lần sửa đầu sau mỗi checkpoint: checkpoint càng dày thì WAL càng phình nhưng RTO càng ngắn.
 
-#shot("img/H7_wal_rate.png", [H7 – Tốc độ sinh WAL theo thời gian (lần chạy r1 của mỗi cấu hình): đỉnh sau mỗi checkpoint khi `full_page_writes = on`.], w: 54%)
+#shot("img/H7_wal_rate.png", [H7 – Tốc độ sinh WAL theo thời gian (lần chạy r1 của mỗi cấu hình): đỉnh sau mỗi checkpoint khi `full_page_writes = on`.], w: 78%)
 
 *4. TPS của PostgreSQL không phân biệt được hai cấu hình.* TPS đạt 1.294 (bật, CV 17,0%: 1.547,5 / 1.189,3 / 1.145,4) so với 1.170 (tắt: 1.197,9 / 1.116,2 / 1.196,8), p50 trùng 4,82 ms và fsync/giao dịch giữ 0,270–0,269: ở 8 client nút thắt vẫn là chờ fsync khi COMMIT chứ không phải ghi tuần tự WAL.
 

@@ -98,8 +98,8 @@ Gọi $A, T, B$ là tổng số dư tài khoản, giao dịch viên, chi nhánh 
   grid(
     columns: 2,
     gutter: 8pt,
-    image("img/M_04_kiem_chung_duong_pg.png", width: 70%),
-    image("img/M_06_kiem_chung_am_pg.png", width: 70%),
+    image("img/M_04_kiem_chung_duong_pg.png", width: 94%),
+    image("img/M_06_kiem_chung_am_pg.png", width: 94%),
   ),
   caption: [Kiểm chứng script bất biến trên PostgreSQL: dữ liệu đúng (`OK`, trái) và cố ý làm lệch một số dư (`FAIL`, phải).],
 )
