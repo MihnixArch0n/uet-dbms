@@ -86,8 +86,8 @@
 // MỤC LỤC + PHÂN CÔNG
 // ============================================================
 #[
-  #set text(size: 9.5pt)
-  #show outline.entry: set block(above: 0.2em, below: 0.2em)
+  #set text(size: 12pt)
+  #show outline.entry: set block(above: 0.45em, below: 0.45em)
   #outline(title: "Mục lục", indent: 1em, depth: 2)
 ]
 
@@ -152,7 +152,25 @@ Hai container `bench-pg` (`postgres:16`, cổng 5432) và `bench-mysql` (`mysql:
 
 == Demo chức năng cơ bản
 
-Các thao tác cơ bản được thực hiện trên PostgreSQL 16.16 (dữ liệu `pgbench` scale 50). Ngoài các thao tác SQL/vận hành chuẩn đã kiểm chứng trên repository (`COPY`, `EXPLAIN ANALYZE`, phân quyền role, `pg_dump`/`pg_restore`, `pgbench`, DBeaver), báo cáo trình bày các điểm liên quan trực tiếp đến cơ chế durability ở Phần 2.
+Các thao tác cơ bản được thực hiện trên PostgreSQL 16.16 (dữ liệu `pgbench` scale 50). Bảng dưới tóm tắt các thao tác SQL và vận hành đã demo; toàn bộ lệnh nằm trong `demo/part1_demo.sql` và ảnh chụp tương ứng nằm trong `report/img/` của repo. Hai mục con sau đó trình bày chi tiết các thao tác liên quan trực tiếp đến durability ở Phần 2.
+
+#figure(
+  table(
+    columns: (3.3cm, 1fr, 1.7cm),
+    align: (left, left, center),
+    stroke: 0.5pt,
+    inset: 4pt,
+    table.header([*Thao tác*], [*Lệnh và kết quả*], [*Ảnh*]),
+    [Tạo bảng, nạp và truy vấn], [Nạp 100.000 dòng vào `demo_customer` bằng `COPY ... FROM PROGRAM`; truy vấn gom nhóm trả về 1 nhóm (Ha Noi) gồm 100.000 khách hàng, số dư trung bình 4.995], [`P1_05`],
+    [Kế hoạch thực thi], [`EXPLAIN ANALYZE`: tìm theo khóa chính dùng Index Scan, 1,236 ms; lọc `abalance > 1000` dùng Parallel Seq Scan, 7.956,85 ms (chậm hơn khoảng 6.400 lần)], [`P1_06`],
+    [Phân quyền], [Tạo role `teller`, cấp `SELECT, UPDATE` trên `pgbench_accounts`; `\dp` hiển thị `teller=rw/postgres`], [`P1_09`],
+    [Sao lưu, khôi phục], [`pg_dump -Fc` hai bảng, `pg_restore` vào database `restore_demo`: đủ 2 bảng, `pgbench_tellers` có 500 dòng], [`P1_11`],
+    [Đo tải nhanh], [`pgbench` 4 client, 30 giây: 23.367 giao dịch, 0 lỗi, độ trễ trung bình 5,135 ms, 778,88 TPS], [`P1_12`],
+    [Công cụ đồ họa], [DBeaver kết nối cổng 5432, hiển thị cây đối tượng và sơ đồ 5 bảng], [`P1_13`, `P1_14`],
+  ),
+  caption: [Các thao tác cơ bản đã demo trên PostgreSQL (lệnh trong `demo/part1_demo.sql`).],
+)
+
 
 === Phiên bản, tham số độ bền và tiến trình nền
 
@@ -171,7 +189,7 @@ Máy chủ là PostgreSQL 16.16 với các tham số đúng thiết kế: `wal_l
 
 === LSN, file WAL và thống kê checkpoint
 
-Trước khi COMMIT, vị trí ghi WAL là `F/2D950208`. Sau một giao dịch `UPDATE` rồi `COMMIT`, vị trí này tăng lên `F/2D950310` (+264 byte cho bản ghi cập nhật và commit), nằm trong file `000000010000000F0000002D` (16 MB). Hai view `pg_stat_wal` và `pg_stat_bgwriter` ghi nhận 2.666.921 bản ghi WAL (178,9 MB), 172 FPI (`wal_fpi`), `wal_buffers_full = 0`, số lần `wal_write` (116.912) và `wal_sync` (116.909) gần bằng nhau; cùng 23 `checkpoints_timed` và 92 `checkpoints_req` (do đạt `max_wal_size`).
+Trước khi COMMIT, vị trí ghi WAL là `F/2D950208`. Sau một giao dịch `UPDATE` rồi `COMMIT`, vị trí này tăng lên `F/2D950310` (+264 byte cho bản ghi cập nhật và commit), nằm trong file `000000010000000F0000002D` (16 MB). Hai view `pg_stat_wal` và `pg_stat_bgwriter` ghi nhận 2.666.921 bản ghi WAL (178,9 MB), 172 FPI (`wal_fpi`), `wal_buffers_full = 0`, số lần `wal_write` (116.912) và `wal_sync` (116.909) gần bằng nhau; cùng 23 `checkpoints_timed` và 92 `checkpoints_req` (chủ yếu do script chạy `CHECKPOINT` thủ công trước mỗi lần đo của thí nghiệm A và B).
 
 #figure(
   grid(
@@ -300,7 +318,7 @@ Từ lý thuyết ở mục 2.2 có thể rút ra các dự đoán sau. Bảng d
   #set text(size: 11pt)
   #figure(
     table(
-      columns: (1.3fr, 1.7fr, auto),
+      columns: (3.8cm, 1fr, 3cm),
       align: (left, left, center),
       stroke: 0.5pt,
       inset: 4pt,
@@ -312,7 +330,7 @@ Từ lý thuyết ở mục 2.2 có thể rút ra các dự đoán sau. Bảng d
       [InnoDB `=2` gần `=0` ở tải thấp, đều cao hơn `=1`], [1 client: `=2` đạt 2.420, `=0` đạt 2.511, `=1` đạt 214 TPS. Thứ tự `=0` ≥ `=2` ≥ `=1` đúng ở cả ba mức client], [Khớp],
       [TPS tăng theo số client ở mọi cấu hình], [PostgreSQL `off` giảm từ 20.930 (8 client) xuống 12.773 (32 client); các cấu hình khác tăng], [Không khớp, cần giải thích (ý 6 phần phân tích)],
       [Cấu hình mềm gần như không có fsync mỗi giao dịch], [Từ 0,000 đến 0,002 fsync mỗi giao dịch], [Khớp],
-      [Mỗi giao dịch của MySQL có khoảng 1 fsync khi `=1`], [1,391 fsync mỗi giao dịch ở 1 client, lớn hơn 1], [Giải thích được từ kiến trúc `log_writer`/`log_flusher` (mục 1)],
+      [Mỗi giao dịch của MySQL có khoảng 1 fsync khi `=1`], [1,391 fsync mỗi giao dịch ở 1 client, lớn hơn 1], [Không khớp, giải thích ở ý 1 phần phân tích],
     ),
     caption: [Đối chiếu dự đoán lý thuyết với kết quả thí nghiệm A.],
   )
@@ -503,7 +521,7 @@ Ba trong bốn cấu hình có CV TPS 17%–20% (PG `fpw=on`: 1.547,5 / 1.189,3 
 
 Tổng hợp kết quả ba thí nghiệm:
 
-- *Thí nghiệm A (flush log):* Chờ `fsync` làm TPS cấu hình bền vững thấp hơn cấu hình mềm 3,7–18,2× (PostgreSQL) và 2,8–11,7× (MySQL); group commit giảm xuống < 0,1 fsync/GD ở 32 client nhưng không triệt tiêu chi phí.
+- *Thí nghiệm A (flush log):* Chờ `fsync` làm TPS cấu hình bền vững thấp hơn cấu hình mềm 3,7–18,2× (PostgreSQL `off`) và 2,8–11,7× (MySQL `=0`); group commit giảm xuống < 0,1 fsync/GD ở 32 client nhưng không triệt tiêu chi phí.
 - *Thí nghiệm B (bảo vệ trang):* PostgreSQL trả chi phí vào WAL (tăng 5,7×, 82% là FPI sau checkpoint), InnoDB trả vào ghi đĩa qua doublewrite (tăng 1,8×, redo không đổi). Không tắt trên hệ thật; PG có thể tăng `checkpoint_timeout`/`max_wal_size`, InnoDB đặt `innodb_doublewrite_dir` trên ổ nhanh.
 - *Thí nghiệm C (crash & phục hồi):* Cấu hình bền vững (`on`, `=1`) không mất giao dịch (0/12 lần); InnoDB `=2` an toàn khi kill tiến trình nhưng mất tới 2.674 GD (~552 ms) khi sập HĐH. Mọi cấu hình giữ bất biến 42/42 lần và không hỏng trang; RPO luôn dưới chu kỳ flush (≤ 197 ms PG `off`, ≤ 630 ms InnoDB `=2`/`=0`), RTO 7–19 s chủ yếu do khởi động sau redo.
 
@@ -534,6 +552,6 @@ Giới hạn của nghiên cứu: (1) đo trên một máy và một ổ SSD SAT
   #set par(leading: 0.55em)
   1. PostgreSQL Global Development Group. *PostgreSQL 16 Documentation – Reliability and the Write-Ahead Log; WAL Configuration; WAL Internals; Asynchronous Commit; amcheck*. https://www.postgresql.org/docs/16/wal.html
   2. Oracle Corporation. *MySQL 8.4 Reference Manual – InnoDB Startup Options; InnoDB Recovery; 17.6.4 Doublewrite Buffer*. https://dev.mysql.com/doc/refman/8.4/en/innodb-parameters.html
-  3. Silberschatz, A., Korth, H. F., Sudarshan, S. *Database System Concepts* (Recovery & Storage Systems).
+  3. Silberschatz, A., Korth, H. F., Sudarshan, S. *Database System Concepts*, 7th ed. McGraw-Hill, 2019 (chương Recovery System và Storage Systems).
   4. libvirt. *virsh – Virtual Machine Management (`virsh destroy`)*. https://libvirt.org/manpages/virsh.html
 ]
