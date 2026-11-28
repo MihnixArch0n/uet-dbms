@@ -69,12 +69,12 @@ Thí nghiệm C gồm 42 lần crash: 21 lần kill tiến trình DBMS trên má
 
 #figure(
   grid(
-    columns: 2,
+    columns: 1,
     gutter: 8pt,
-    image("img/R_C2_mysql_2_tien_trinh.png", width: 94%),
-    image("img/R_C3_mysql_2_he_dieu_hanh.png", width: 94%),
+    image("img/R_C2_mysql_2_tien_trinh.png", width: 100%),
+    image("img/R_C3_mysql_2_he_dieu_hanh.png", width: 100%),
   ),
-  caption: [InnoDB `=2`: kill tiến trình không mất giao dịch (trái) vs ngắt nguồn máy ảo mất 2.674 giao dịch, RPO ~552 ms (phải).],
+  caption: [InnoDB `=2`: kill tiến trình không mất giao dịch (trên) vs ngắt nguồn máy ảo mất 2.674 giao dịch, RPO ~552 ms (dưới).],
 )
 
 *3. Các cấu hình lỏng mất nhiều hơn hẳn khi hệ điều hành sập.* PostgreSQL `off` mất tối đa 69 giao dịch (20 ms) khi kill tiến trình (chỉ mất phần trong WAL buffers, vì WAL writer đẩy mỗi 200 ms) so với 897 giao dịch (197 ms) khi ngắt nguồn HĐH; InnoDB `=0` tương ứng 108 giao dịch (19 ms) và 3.517 giao dịch (630 ms).
@@ -89,12 +89,12 @@ Hình H9 cho thấy khi kill tiến trình trên máy thật, InnoDB mất 7–1
 
 #figure(
   grid(
-    columns: 2,
+    columns: 1,
     gutter: 8pt,
-    image("img/R_C5_log_phuc_hoi_pg.png", width: 94%),
-    image("img/R_C6_log_phuc_hoi_mysql.png", width: 94%),
+    image("img/R_C5_log_phuc_hoi_pg.png", width: 100%),
+    image("img/R_C6_log_phuc_hoi_mysql.png", width: 100%),
   ),
-  caption: [Log phục hồi sau khi kill tiến trình: PostgreSQL (`redo starts/done at`, trái) và InnoDB (phải).],
+  caption: [Log phục hồi sau khi kill tiến trình: PostgreSQL (`redo starts/done at`, trên) và InnoDB (dưới).],
 )
 
 *6. Quan hệ với thí nghiệm A.* Trong cùng thời gian bơm tải, cấu hình lỏng nhận được nhiều xác nhận hơn cấu hình bền vững ~3–4 lần (nhưng nhỏ hơn chênh lệch ở thí nghiệm A vì `crash_client.py` viết bằng Python bị giới hạn ở ~3.500–5.000 TPS, nên không dùng TPS ở đây để so với thí nghiệm A). Đặt cạnh nhau, hai thí nghiệm cho thấy rõ đánh đổi: cấu hình lỏng tăng thông lượng nhiều lần, đổi lại có thể mất vài trăm mili giây giao dịch đã xác nhận khi hệ điều hành sập.

@@ -96,12 +96,12 @@ Gọi $A, T, B$ là tổng số dư tài khoản, giao dịch viên, chi nhánh 
 
 #figure(
   grid(
-    columns: 2,
+    columns: 1,
     gutter: 8pt,
-    image("img/M_04_kiem_chung_duong_pg.png", width: 94%),
-    image("img/M_06_kiem_chung_am_pg.png", width: 94%),
+    image("img/M_04_kiem_chung_duong_pg.png", width: 100%),
+    image("img/M_06_kiem_chung_am_pg.png", width: 100%),
   ),
-  caption: [Kiểm chứng script bất biến trên PostgreSQL: dữ liệu đúng (`OK`, trái) và cố ý làm lệch một số dư (`FAIL`, phải).],
+  caption: [Kiểm chứng script bất biến trên PostgreSQL: dữ liệu đúng (`OK`, trên) và cố ý làm lệch một số dư (`FAIL`, dưới).],
 )
 
 Ở thí nghiệm B và C, trước mỗi lần chạy, script đưa dữ liệu về trạng thái ban đầu (xóa bảng lịch sử, đưa mọi số dư về 0) và dừng lại nếu bất biến chưa phải `0|0|0|0|0`. Ở thí nghiệm A việc này chỉ làm một lần trước mỗi loạt (mỗi DBMS), nên dữ liệu tích lũy qua các lần chạy trong loạt (mục 2.4).

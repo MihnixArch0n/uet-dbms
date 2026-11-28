@@ -141,13 +141,13 @@ Hai container `bench-pg` (`postgres:16`, cổng 5432) và `bench-mysql` (`mysql:
 
 #figure(
   grid(
-    columns: 2,
+    columns: 1,
     align: center,
     gutter: 8pt,
-    image("img/P1_01_docker_ps.png", width: 96%),
-    image("img/P1_02_cau_hinh_nap.png", width: 96%),
+    image("img/P1_01_docker_ps.png", width: 70%),
+    image("img/P1_02_cau_hinh_nap.png", width: 82%),
   ),
-  caption: [Hai container PostgreSQL 16 và MySQL 8.4 (trái) và đối chiếu cấu hình nạp trước thí nghiệm (phải).],
+  caption: [Hai container PostgreSQL 16 và MySQL 8.4 (trên) và đối chiếu cấu hình nạp trước thí nghiệm (dưới).],
 )
 
 == Demo chức năng cơ bản
@@ -178,13 +178,13 @@ Máy chủ là PostgreSQL 16.16 với các tham số đúng thiết kế: `wal_l
 
 #figure(
   grid(
-    columns: 2,
+    columns: 1,
     align: center,
     gutter: 8pt,
-    image("img/P1_03_phien_ban_tham_so.png", width: 96%),
-    image("img/P1_04_tien_trinh.png", width: 96%),
+    image("img/P1_03_phien_ban_tham_so.png", width: 82%),
+    image("img/P1_04_tien_trinh.png", width: 100%),
   ),
-  caption: [Phiên bản, tham số durability (trái) và các tiến trình nền qua `pg_stat_activity` (phải).],
+  caption: [Phiên bản, tham số durability (trên) và các tiến trình nền qua `pg_stat_activity` (dưới).],
 )
 
 === LSN, file WAL và thống kê checkpoint
@@ -193,13 +193,13 @@ Trước khi COMMIT, vị trí ghi WAL là `F/2D950208`. Sau một giao dịch `
 
 #figure(
   grid(
-    columns: 2,
+    columns: 1,
     align: center,
     gutter: 8pt,
-    image("img/P1_07_wal_lsn.png", width: 96%),
-    image("img/P1_08_thong_ke_wal.png", width: 96%),
+    image("img/P1_07_wal_lsn.png", width: 100%),
+    image("img/P1_08_thong_ke_wal.png", width: 100%),
   ),
-  caption: [LSN trước/sau COMMIT (trái) và thống kê `pg_stat_wal` / `pg_stat_bgwriter` (phải).],
+  caption: [LSN trước/sau COMMIT (trên) và thống kê `pg_stat_wal` / `pg_stat_bgwriter` (dưới).],
 )
 
 #pagebreak()
@@ -362,13 +362,13 @@ Khoảng cách lớn nhất ở tải thấp đến trung bình rồi thu hẹp 
 
 #figure(
   grid(
-    columns: 2,
+    columns: 1,
     align: center,
     gutter: 8pt,
-    image("img/H5_fsync_per_txn.png", width: 100%),
-    image("img/H3_tps_vs_clients.png", width: 100%),
+    image("img/H5_fsync_per_txn.png", width: 66%),
+    image("img/H3_tps_vs_clients.png", width: 90%),
   ),
-  caption: [H5 – Số lần fsync mỗi giao dịch (trái) và H3 – Thông lượng TPS theo cấu hình và số client (phải).],
+  caption: [H5 – Số lần fsync mỗi giao dịch (trên) và H3 – Thông lượng TPS theo cấu hình và số client (dưới).],
   placement: top,
 )
 
@@ -489,13 +489,13 @@ Cả 12 lần chạy đều có bất biến $A = T = B = H$ đúng và 0 lỗi.
 
 #figure(
   grid(
-    columns: 2,
+    columns: 1,
     align: center,
     gutter: 8pt,
-    image("img/H6_page_protection_cost.png", width: 100%),
-    image("img/H8_wal_composition.png", width: 100%),
+    image("img/H6_page_protection_cost.png", width: 90%),
+    image("img/H8_wal_composition.png", width: 66%),
   ),
-  caption: [H6 – Lượng ghi mỗi giao dịch (trái) và H8 – Thành phần WAL theo `pg_waldump` (phải).],
+  caption: [H6 – Lượng ghi mỗi giao dịch (trên) và H8 – Thành phần WAL theo `pg_waldump` (dưới).],
   placement: top,
 )
 
