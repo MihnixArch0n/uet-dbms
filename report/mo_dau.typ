@@ -1,8 +1,6 @@
 // ============================================================
-// MỞ ĐẦU – số trang bắt đầu từ 1 tại đây
+// MỞ ĐẦU – số trang bắt đầu từ 1 tại bao_cao_tong_hop.typ
 // ============================================================
-#set page(numbering: "1")
-#counter(page).update(1)
 
 #heading(level: 1, numbering: none)[Mở đầu]
 
@@ -24,9 +22,9 @@
   stroke: 0.5pt,
   inset: 4.5pt,
   [*Thành viên*], [*Nội dung chính*], [*Phần báo cáo*],
-  [TV1], [Kiểm chứng PostgreSQL, thí nghiệm A (chi phí flush log), chương 1, lý thuyết WAL/flush, ghép báo cáo], [Chương 1, 2.1, 2.2 (phần flush), 2.4, Kết luận],
-  [TV2], [Kiểm chứng MySQL, thí nghiệm B (bảo vệ trang), lý thuyết Full-Page Writes / doublewrite, slide], [2.2 (phần bảo vệ trang), 2.5],
-  [TV3], [Chuẩn bị máy đo, sinh dữ liệu, máy ảo, thí nghiệm C (crash recovery), video demo], [2.2 (checkpoint và phục hồi), 2.3, 2.6],
+  [TV1 – Vũ Việt Anh], [Kiểm chứng PostgreSQL, thí nghiệm A (chi phí flush log), chương 1, lý thuyết WAL/flush, ghép báo cáo], [Chương 1, 2.1, 2.2 (phần flush), 2.4, Kết luận],
+  [TV2 – Phạm Tuấn Minh], [Kiểm chứng MySQL, thí nghiệm B (bảo vệ trang), lý thuyết Full-Page Writes / doublewrite, slide], [2.2 (phần bảo vệ trang), 2.5],
+  [TV3 – Trần Minh Hiếu], [Chuẩn bị máy đo, sinh dữ liệu, máy ảo, thí nghiệm C (crash recovery), video demo], [2.2 (checkpoint và phục hồi), 2.3, 2.6],
 )
 
 Mã nguồn, dữ liệu, kết quả đo và video demo thí nghiệm C (3 phút 42 giây) lưu tại #link("https://github.com/MihnixArch0n/uet-dbms").

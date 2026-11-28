@@ -8,7 +8,7 @@
 #show table: set text(size: 11pt)
 #show table: set par(justify: false)
 
-=== Bảo vệ trang dữ liệu (Full-Page Writes và Doublewrite Buffer)
+=== Bảo vệ trang dữ liệu (Full-Page Writes và Doublewrite Buffer) <sec-bao-ve-trang>
 
 WAL đảm bảo thay đổi đã được đẩy ra log trước COMMIT, nhưng không chống được *rách trang* (torn page): trang dữ liệu (8 KB PostgreSQL, 16 KB InnoDB) lớn hơn đơn vị ghi nguyên tử của HĐH/ổ đĩa (512 B – 4 KB), nên nếu sập giữa lúc ghi, trang sẽ nửa cũ nửa mới và log thay đổi mức dòng không đủ sửa. Hai hệ giải quyết theo hai hướng khác nhau:
 

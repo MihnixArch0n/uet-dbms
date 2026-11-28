@@ -10,7 +10,7 @@
 #let shot(path, cap, w: 100%) = figure(image(path, width: w), caption: cap)
 // Bảng: chữ nhỏ hơn, không căn đều hai bên (tránh khoảng trắng giãn trong ô hẹp)
 #show table: set text(size: 11pt)
-#show table: set par(justify: false)
+#show table: set par(justify: false, leading: 0.55em)
 
 == Phương pháp thực nghiệm
 
@@ -36,10 +36,10 @@ Mọi số liệu được đo trên *một máy duy nhất*. Hai hệ chạy tr
     [Hệ quản trị], [PostgreSQL 16.16 (image `postgres:16`), MySQL 8.4.13 (image `mysql:8.4`)],
     [Công cụ đo], [sysbench 1.0.20 (thí nghiệm A, B); Python 3.14 với psycopg 3 và PyMySQL (thí nghiệm C)],
   ),
-  caption: [Cấu hình máy đo, bảng B1 (chép từ `results/env/hardware.txt`).],
-)
+  caption: [Cấu hình máy đo (chép từ `results/env/hardware.txt`).],
+) <tab-hw>
 
-Tốc độ fsync ở bảng trên là trần thông lượng khi 1 client và mỗi COMMIT chờ một lần fsync (mục 2.4).
+Tốc độ fsync ở bảng trên là trần thông lượng khi 1 client và mỗi COMMIT chờ một lần fsync (@sec-expA).
 
 *Máy ảo cho crash hệ điều hành.* Hai hệ được đặt trong máy ảo KVM/QEMU quản lý bằng libvirt (4 vCPU, 8 GB RAM, đĩa qcow2 40 GB trên cùng ổ SSD, Ubuntu Server 24.04, cùng image và cấu hình Docker). Sự cố được gây bằng `virsh destroy` (ngắt nguồn đột ngột) [1] rồi bật lại bằng `virsh start`; lệnh flush của máy ảo được chuyển thẳng xuống đĩa máy thật nên dữ liệu đã `fsync` thực sự nằm trên đĩa.
 
@@ -69,8 +69,8 @@ Mỗi giao dịch là một lần gửi/rút tiền của pgbench: cộng số t
     [Binlog], [(không có)], [Tắt (`skip-log-bin`) để chỉ so sánh redo log với WAL],
     [Ghi log phục hồi], [`log_checkpoints = on`], [`log_error_verbosity = 3`],
   ),
-  caption: fcap([Cấu hình nền của hai hệ, bảng B2.], [Cấu hình nền của hai hệ, bảng B2. Đây cũng là *cấu hình bền vững*; mỗi thí nghiệm chỉ thay đổi đúng tham số đang nghiên cứu.]),
-)
+  caption: fcap([Cấu hình nền của hai hệ.], [Cấu hình nền của hai hệ. Đây cũng là *cấu hình bền vững*; mỗi thí nghiệm chỉ thay đổi đúng tham số đang nghiên cứu.]),
+) <tab-cfg>
 
 === Bất biến và kiểm chứng tính đúng
 
@@ -102,7 +102,7 @@ Trước mỗi lần chạy (thí nghiệm B, C) hoặc mỗi loạt (thí nghi�
     [Số lần chạy], [45 (3 lần mỗi ô, đo 300 s sau 60 s warmup)], [12 (3 lần mỗi ô, đo 300 s sau 60 s warmup)], [42 lần crash],
     [Đo], [TPS, độ trễ, số fsync và byte log mỗi giao dịch], [Byte WAL, ảnh trang, byte ghi đĩa mỗi giao dịch, TPS], [Giao dịch mất, RPO, RTO, thời gian redo, bất biến, hỏng dữ liệu],
   ),
-  caption: fcap([Tóm tắt thiết kế ba thí nghiệm.], [Tóm tắt thiết kế ba thí nghiệm. Tên tham số cụ thể ở bảng B2; thiết kế chi tiết của A và B ở mục 2.4 và 2.5.]),
+  caption: fcap([Tóm tắt thiết kế ba thí nghiệm.], [Tóm tắt thiết kế ba thí nghiệm. Tên tham số cụ thể ở @tab-cfg; thiết kế chi tiết của A và B ở @sec-expA và @sec-expB]),
 )
 
 Đo 300 giây để mỗi lần chạy chứa ít nhất một chu kỳ checkpoint (`checkpoint_timeout = 5min`). Mỗi ô báo cáo trung bình 3 lần lặp kèm hệ số biến thiên (CV).

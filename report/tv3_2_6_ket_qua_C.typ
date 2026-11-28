@@ -11,7 +11,7 @@
 #let shot(path, cap, w: 100%) = figure(image(path, width: w), caption: cap)
 // Bảng: chữ nhỏ hơn, không căn đều hai bên (tránh khoảng trắng giãn trong ô hẹp)
 #show table: set text(size: 11pt)
-#show table: set par(justify: false)
+#show table: set par(justify: false, leading: 0.55em)
 
 == Kết quả thí nghiệm C
 
@@ -41,8 +41,8 @@ Thí nghiệm C gồm 42 lần crash (21 lần kill tiến trình DBMS trên má
     [HĐH], [MySQL `=2`], [5 / 5], [4.926], [2.674], [552 ms], [11,6 s], [2,36 s],
     [HĐH], [MySQL `=0`], [5 / 5], [8.071], [3.517], [630 ms], [7,4 s], [2,45 s],
   ),
-  caption: fcap([Kết quả 42 lần crash, bảng B3 (`results/C_summary.csv`).], [Kết quả 42 lần crash, bảng B3 (`results/C_summary.csv`). "Tiến trình": kill tiến trình DBMS; "HĐH": ngắt nguồn máy ảo chạy DBMS. "GD mất": giao dịch đã được xác nhận COMMIT nhưng không còn sau phục hồi. RTO theo log và thời gian redo là trung vị, chỉ tính thời gian của DBMS (không gồm thời gian máy ảo khởi động).]),
-)
+  caption: fcap([Kết quả 42 lần crash (`results/C_summary.csv`).], [Kết quả 42 lần crash (`results/C_summary.csv`). "Tiến trình": kill tiến trình DBMS; "HĐH": ngắt nguồn máy ảo chạy DBMS. "GD mất": giao dịch đã được xác nhận COMMIT nhưng không còn sau phục hồi. RTO theo log và thời gian redo là trung vị, chỉ tính thời gian của DBMS (không gồm thời gian máy ảo khởi động).]),
+) <tab-expC>
 
 === Đối chiếu với kết quả dự kiến
 
@@ -59,7 +59,7 @@ Thí nghiệm C gồm 42 lần crash (21 lần kill tiến trình DBMS trên má
     [MySQL `=2`], [Không mất], [Không mất (0/5) ✓], [Có thể mất khoảng 1 giây cuối], [Mất ở 5/5 lần, tối đa 552 ms ✓],
     [MySQL `=0`], [Có thể mất khoảng 1 giây cuối], [Mất ở 4/5 lần, tối đa 19 ms ✓], [Có thể mất khoảng 1 giây cuối], [Mất ở 5/5 lần, tối đa 630 ms ✓],
   ),
-  caption: fcap([So sánh kết quả đo với bảng kết quả dự kiến theo tài liệu (mục 2.2).], [So sánh kết quả đo với bảng kết quả dự kiến theo tài liệu (mục 2.2). Mọi ô đều khớp.]),
+  caption: fcap([So sánh kết quả đo với bảng kết quả dự kiến theo tài liệu (@sec-co-che).], [So sánh kết quả đo với bảng kết quả dự kiến theo tài liệu (@sec-co-che). Mọi ô đều khớp.]),
 )
 
 === Phân tích
@@ -96,7 +96,7 @@ Thí nghiệm C gồm 42 lần crash (21 lần kill tiến trình DBMS trên má
 
 === Ghi chú kỹ thuật
 
-Ở lượt ngắt nguồn đầu tiên, phân vùng máy ảo bị đầy nên nhóm mở rộng lên 38 GB và chạy lại toàn bộ 21 lần. Một lần InnoDB `=2` có RTO bất thường (29,4 s) nên bảng B3 dùng trung vị. Công cụ bơm tải viết bằng Python chỉ đạt \~3.500–5.000 TPS, nên không dùng TPS ở thí nghiệm C để so với thí nghiệm A.
+Ở lượt ngắt nguồn đầu tiên, phân vùng máy ảo bị đầy nên nhóm mở rộng lên 38 GB và chạy lại toàn bộ 21 lần. Một lần InnoDB `=2` có RTO bất thường (29,4 s) nên @tab-expC dùng trung vị. Công cụ bơm tải viết bằng Python chỉ đạt \~3.500–5.000 TPS, nên không dùng TPS ở thí nghiệm C để so với thí nghiệm A.
 
 // ============================================================
 // GỢI Ý CHO MỤC 2.7 (TV1 tổng hợp) – TV3 góp ý, không in ra

@@ -22,16 +22,5 @@
   Chúng em xin cam đoan báo cáo này là kết quả tìm hiểu và thực nghiệm của Nhóm 02. Các số liệu, hình ảnh và kết quả đo trong báo cáo do nhóm tự thực hiện trên máy đo của nhóm, được lưu đầy đủ trong repository của đề tài và không sao chép từ công trình của người khác. Mọi nội dung tham khảo từ tài liệu, công trình của người khác đều được trích dẫn và ghi rõ trong mục Tài liệu tham khảo. Nếu có sai phạm, chúng em xin hoàn toàn chịu trách nhiệm.
 
   #v(0.8cm)
-  #align(right)[_Hà Nội, ngày #h(1cm) tháng 11 năm 2026_]
-  #v(0.4cm)
-  #set par(first-line-indent: 0cm, justify: false)
-  #grid(
-    columns: (1fr, 1fr, 1fr),
-    align: center,
-    row-gutter: 0.3cm,
-    [*Sinh viên*], [*Sinh viên*], [*Sinh viên*],
-    text(11pt, style: "italic")[(ký và ghi rõ họ tên)], text(11pt, style: "italic")[(ký và ghi rõ họ tên)], text(11pt, style: "italic")[(ký và ghi rõ họ tên)],
-    v(2.2cm), v(2.2cm), v(2.2cm),
-    [Vũ Việt Anh], [Phạm Tuấn Minh], [Trần Minh Hiếu],
-  )
+  #align(right)[_Hà Nội, tháng 11 năm 2026_]
 ]

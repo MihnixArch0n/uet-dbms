@@ -14,7 +14,8 @@
   paper: "a4",
   // Lề theo file mẫu của trường: trên 2,5 cm, dưới 3 cm, trái 3 cm, phải 2 cm
   margin: (top: 2.5cm, bottom: 3cm, left: 3cm, right: 2cm),
-  // Trang bìa, tóm tắt, lời cam đoan, mục lục không đánh số; số trang bắt đầu từ 1 ở phần Mở đầu.
+  // Trang bìa và phần đầu (Tóm tắt, Lời cam đoan, Mục lục, Danh mục) không đánh số;
+  // đánh số liên tục 1, 2, 3... bắt đầu từ Mở đầu.
   numbering: none,
 )
 // Nội dung: Times New Roman 13 pt (Liberation Serif là phông thay thế cùng kích thước chữ).
@@ -24,10 +25,13 @@
 #set par(justify: true, leading: 0.83em, spacing: 0.83em + 6pt, first-line-indent: (amount: 1cm, all: true))
 #show raw: set text(size: 0.85em)
 // Đánh số theo quy định: "Chương 1.", rồi 1.1., 1.1.1.
-#set heading(numbering: (..n) => {
-  let a = n.pos()
-  if a.len() == 1 { "Chương " + str(a.first()) + "." } else { a.map(str).join(".") + "." }
-})
+#set heading(
+  supplement: [Mục],
+  numbering: (..n) => {
+    let a = n.pos()
+    if a.len() == 1 { "Chương " + str(a.first()) + "." } else { a.map(str).join(".") + "." }
+  },
+)
 // Chỉ các mục lớn bắt đầu trang mới: Phân công, 1., 2., Tài liệu tham khảo (và Mục lục).
 #show heading.where(level: 1): it => {
   pagebreak(weak: true)
@@ -142,6 +146,8 @@
   #outline(title: none, target: figure.where(kind: image))
 ]
 
+#set page(numbering: "1")
+#counter(page).update(1)
 #include "mo_dau.typ"
 
 // ============================================================
@@ -237,7 +243,7 @@ Một giao dịch `UPDATE` rồi `COMMIT` đẩy vị trí WAL từ `F/2D950208`
 // ============================================================
 = Tìm hiểu và thực nghiệm về Durability \& Crash Recovery
 
-== Đặt vấn đề
+== Đặt vấn đề <sec-dat-van-de>
 
 Thuộc tính *Durability* (ACID) đòi hỏi dữ liệu của giao dịch đã xác nhận COMMIT không được mất dù hệ thống sập ngay sau đó. Dữ liệu đi qua 4 tầng: (1) bộ đệm DBMS (`shared_buffers` / buffer pool) → (2) page cache HĐH (`write()`) → (3) cache bộ điều khiển đĩa → (4) bề mặt đĩa (`fsync()`). Theo đó, *crash tiến trình DBMS* (`kill -9`) chỉ mất tầng (1); *crash HĐH* (tắt nguồn ảo) mất thêm tầng (2); *mất điện thật* có thể mất cả tầng (3) nếu ổ không tôn trọng flush.
 
@@ -251,7 +257,7 @@ Ghi thẳng trang dữ liệu khi COMMIT rất chậm vì I/O ngẫu nhiên. *Wr
 
 Ba câu hỏi nghiên cứu: (1) Chi phí hiệu năng (TPS, độ trễ) của việc chờ `fsync` log khi COMMIT? *(Thí nghiệm A)*; (2) Chi phí của cơ chế bảo vệ trang? *(Thí nghiệm B)*; (3) Khi crash thật xảy ra, giao dịch đã COMMIT có mất không, dữ liệu có nhất quán không và RTO bao lâu? *(Thí nghiệm C)*.
 
-== Cơ chế của hai hệ
+== Cơ chế của hai hệ <sec-co-che>
 
 === PostgreSQL – WAL và synchronous_commit
 
@@ -267,17 +273,15 @@ InnoDB ghi thay đổi vào *redo log* (vòng tròn, cố định) [2]: `1` (flu
 
 === Cấu hình bền vững dùng trong thí nghiệm
 
-Cấu hình bền vững (`fsync = on`, `synchronous_commit = on`, `full_page_writes = on` cho PostgreSQL; `innodb_flush_log_at_trx_commit = 1`, `innodb_doublewrite = ON` cho InnoDB — chi tiết ở bảng B2) được giữ làm nền. Thí nghiệm A *chỉ* thay đổi tham số flush log và giữ nguyên bảo vệ trang để đo riêng chi phí chờ `fsync` khi COMMIT.
+Cấu hình bền vững (`fsync = on`, `synchronous_commit = on`, `full_page_writes = on` cho PostgreSQL; `innodb_flush_log_at_trx_commit = 1`, `innodb_doublewrite = ON` cho InnoDB — chi tiết ở @tab-cfg) được giữ làm nền. Thí nghiệm A *chỉ* thay đổi tham số flush log và giữ nguyên bảo vệ trang để đo riêng chi phí chờ `fsync` khi COMMIT; tương tự, Thí nghiệm B (@sec-expB) *chỉ* thay đổi cơ chế bảo vệ trang và giữ nguyên flush log chặt để tách riêng hai chi phí này.
 
 #include "tv2_2_2_bao_ve_trang.typ"
-
-Thí nghiệm B (mục 2.5) đo chi phí này, và chỉ thay đổi cơ chế bảo vệ trang, giữ nguyên flush log chặt, để tách khỏi thí nghiệm A.
 
 #include "tv3_2_2_checkpoint_phuc_hoi.typ"
 
 #include "tv3_2_3_phuong_phap.typ"
 
-== Kết quả thí nghiệm A
+== Kết quả thí nghiệm A <sec-expA>
 
 Thí nghiệm A chỉ thay đổi tham số flush log (PostgreSQL `on`/`off`; InnoDB `1`/`2`/`0`), giữ nguyên bảo vệ trang: 45 lần chạy (1, 8, 32 client; 3 lần mỗi ô; đo 300 giây sau 60 giây làm nóng), tổng 61.489.705 giao dịch.
 
@@ -406,7 +410,7 @@ PG `off` là lựa chọn rẻ nhất nếu chấp nhận mất vài trăm mili 
 
 Năm ô có CV trên 10%, phần lớn ở 1 client do một lần chạy lệch (PG `on`: 417, 416, 334; MySQL `=1`: 246, 195, 201); MySQL `=1` ở 32 client (CV 23,5%: 1.710, 1.373, 2.195) chịu ảnh hưởng của tranh chấp khóa.
 
-== Kết quả thí nghiệm B
+== Kết quả thí nghiệm B <sec-expB>
 
 Thí nghiệm B chỉ thay đổi bảo vệ trang (PostgreSQL `full_page_writes`, InnoDB `innodb_doublewrite`), giữ flush log ở mức bền vững: 12 lần chạy (2 cấu hình mỗi hệ, 3 lần lặp, 8 client, đo 300 giây sau 60 giây làm nóng). Cấu hình tắt chỉ dùng để đo chi phí; trên hệ thật, tắt bảo vệ trang có thể làm hỏng dữ liệu khi HĐH sập hoặc mất điện.
 
@@ -445,7 +449,7 @@ Mỗi lần chạy bắt đầu từ dữ liệu ban đầu trong container vừ
       align: (left, left, center),
       stroke: 0.5pt,
       inset: 3.5pt,
-      table.header([*Dự kiến (mục 2.2.4)*], [*Kết quả đo*], [*Đánh giá*]),
+      table.header([*Dự kiến (@sec-bao-ve-trang)*], [*Kết quả đo*], [*Đánh giá*]),
       [PG: bật FPW làm WAL tăng mạnh, chủ yếu là ảnh trang], [WAL mỗi giao dịch 402 → 2.281 B (5,7×), FPI chiếm 82%; mỗi lần chạy 874 MB so với 141 MB], [Khớp],
       [FPI tập trung ngay sau checkpoint], [8–14 MB/s trong 30 giây đầu rồi về \~0,6 MB/s, tăng lại sau checkpoint định kỳ (r2, r3 đỉnh thấp hơn)], [Khớp một phần],
       [InnoDB: mỗi trang flush ghi hai lần, redo không đổi], [Doublewrite 10.945 B ≈ ghi trang 10.948 B; redo 1.069 và 1.071 B], [Khớp],
@@ -491,7 +495,7 @@ TPS có CV 17–20% ở ba trong bốn cấu hình do ổ SSD gắn ngoài qua U
 // ============================================================
 #heading(level: 1, numbering: none)[Kết luận]
 
-Báo cáo đã trả lời ba câu hỏi nghiên cứu đặt ra ở mục 2.1 bằng số liệu đo trên cùng một máy cho cả hai hệ. Tổng hợp kết quả ba thí nghiệm:
+Báo cáo đã trả lời ba câu hỏi nghiên cứu đặt ra ở @sec-dat-van-de bằng số liệu đo trên cùng một máy cho cả hai hệ. Tổng hợp kết quả ba thí nghiệm:
 
 - *Thí nghiệm A (flush log):* Chờ `fsync` làm TPS cấu hình bền vững thấp hơn cấu hình mềm 3,7–18,2× (PostgreSQL `off`) và 2,8–11,7× (MySQL `=0`); group commit giảm xuống < 0,1 fsync/GD ở 32 client nhưng không triệt tiêu chi phí.
 - *Thí nghiệm B (bảo vệ trang):* PostgreSQL trả chi phí vào WAL (tăng 5,7×, 82% là FPI sau checkpoint), InnoDB trả vào ghi đĩa qua doublewrite (tăng 1,8×, redo không đổi). Không tắt trên hệ thật; PG có thể tăng `checkpoint_timeout`/`max_wal_size`, InnoDB đặt `innodb_doublewrite_dir` trên ổ nhanh.
@@ -512,7 +516,7 @@ Các kết quả đo khớp với phần lớn dự đoán rút ra từ lý thuy
     [Log, số liệu theo dõi, dữ liệu tái tạo được; chấp nhận mất \~1 giây cuối khi máy sập], [`off`], [`=0`], [RPO tối đa \~0,2 s (PostgreSQL) và \~0,63 s (InnoDB); dữ liệu vẫn nhất quán; TPS cao hơn nhiều lần],
     [Chỉ lo tiến trình DBMS sập, hệ điều hành ổn định], [không có tương đương], [`=2`], [Không mất khi kill tiến trình (0/5 lần), nhưng mất tới 552 ms khi hệ điều hành sập; không dùng nếu không chắc về hệ điều hành],
   ),
-  caption: [Bảng đề xuất cấu hình theo loại ứng dụng (bảng B4).],
+  caption: [Bảng đề xuất cấu hình theo loại ứng dụng.],
 )
 
 Giới hạn của nghiên cứu: (1) đo trên một máy và một ổ SSD SATA gắn ngoài qua USB 3 (`write back`); (2) không mô phỏng mất điện vật lý thật và tắt binlog MySQL để so sánh công bằng với WAL; (3) số lần lặp ít (3 lần mỗi ô ở A/B, 3–5 lần crash ở C) nên RPO/RTO mang tính định hướng.
