@@ -65,7 +65,7 @@ Thí nghiệm C gồm 42 lần crash: 21 lần kill tiến trình DBMS trên má
 
 *1. Cấu hình bền vững giữ đúng cam kết.* PostgreSQL `synchronous_commit = on` và InnoDB `innodb_flush_log_at_trx_commit = 1` không làm mất giao dịch đã xác nhận nào ở cả 12 lần crash (kể cả khi ngắt nguồn hệ điều hành). Tổng cộng có 54 giao dịch thuộc nhóm "đang dở lúc crash nhưng đã commit": server đã ghi bản ghi commit xuống đĩa nhưng sập trước khi kịp trả lời client; dữ liệu vẫn đầy đủ và không sai, client chỉ cần cơ chế kiểm tra lại hoặc mã giao dịch chống trùng khi mất kết nối lúc COMMIT.
 
-*2. Cùng một cấu hình, hai loại sự cố cho kết quả trái ngược.* Với InnoDB `=2`, kill tiến trình không mất giao dịch (0/5 lần), nhưng ngắt nguồn HĐH mất tới 2.674 giao dịch (~0,55 giây cuối) ở cả 5/5 lần, do `=2` chỉ `write()` vào page cache mỗi COMMIT còn `fsync()` chạy mỗi giây — chứng minh không thể chỉ thử bằng kill tiến trình (nhận xét 1).
+*2. Cùng một cấu hình, hai loại sự cố cho kết quả trái ngược.* Với InnoDB `=2`, kill tiến trình không mất giao dịch (0/5 lần), nhưng ngắt nguồn HĐH mất tới 2.674 giao dịch (~0,55 giây cuối) ở cả 5/5 lần, do `=2` chỉ `write()` vào page cache mỗi COMMIT còn `fsync()` chạy mỗi giây — chứng minh không thể chỉ thử bằng kill tiến trình.
 
 #figure(
   grid(

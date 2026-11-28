@@ -186,18 +186,3 @@ Công cụ được kiểm chứng khi không có sự cố: sau 30 giây chạy
 
 *Kiểm tra hỏng dữ liệu.* Với PostgreSQL: chạy `bt_index_check` (extension `amcheck`) trên các chỉ mục khóa chính, đọc toàn bộ bảng để mọi checksum trang được kiểm tra, và tìm lỗi checksum trong log. Với MySQL: `CHECK TABLE` trên cả bốn bảng.
 
-=== Cách nhóm xử lý ba nhận xét của giảng viên
-
-#figure(
-  table(
-    columns: (4.2cm, 1fr),
-    align: (left, left),
-    stroke: 0.5pt,
-    inset: 5pt,
-    table.header([*Nhận xét*], [*Cách xử lý trong thiết kế*]),
-    [1. Phân biệt crash tiến trình, HĐH và mất điện], [Thí nghiệm C tách 2 mức: `docker kill` (còn page cache) và `virsh destroy` máy ảo KVM (mất page cache). Mất điện thật (bộ đệm ổ đĩa) nêu trong giới hạn và giải thích lý thuyết.],
-    [2. Định nghĩa/kiểm chứng bất biến & đối soát giao dịch], [Định nghĩa $A = T = B = H$, kiểm chứng script hai chiều (`OK`/`FAIL`), và gán `txn_id` ghi nhật ký client để đối soát chính xác giao dịch mất sau crash.],
-    [3. Tách thí nghiệm flush khỏi bảo vệ trang; rõ cấu hình bền vững & RPO/RTO], [Thí nghiệm A chỉ đổi flush (giữ bảo vệ trang), B chỉ đổi bảo vệ trang (giữ flush chặt). Cấu hình bền vững (bảng B2) và công thức RPO/RTO đo cho từng lần crash.],
-  ),
-  caption: [Đối chiếu nhận xét của giảng viên với thiết kế thí nghiệm.],
-)

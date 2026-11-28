@@ -213,7 +213,7 @@ Trước khi COMMIT, vị trí ghi WAL là `F/2D950208`. Sau một giao dịch `
 
 Thuộc tính *Durability* (ACID) đòi hỏi dữ liệu của giao dịch đã xác nhận COMMIT không được mất dù hệ thống sập ngay sau đó. Dữ liệu đi qua 4 tầng: (1) bộ đệm DBMS (`shared_buffers` / buffer pool) → (2) page cache HĐH (`write()`) → (3) cache bộ điều khiển đĩa → (4) bề mặt đĩa (`fsync()`). Theo đó, *crash tiến trình DBMS* (`kill -9`) chỉ mất tầng (1); *crash HĐH* (tắt nguồn ảo) mất thêm tầng (2); *mất điện thật* có thể mất cả tầng (3) nếu ổ không tôn trọng flush.
 
-Ghi thẳng trang dữ liệu khi COMMIT rất chậm vì I/O ngẫu nhiên. *Write-Ahead Logging* (WAL) khắc phục bằng cách ghi tuần tự vào log trước khi báo COMMIT, còn trang dữ liệu ghi sau (lazy). Tuy nhiên, trang DBMS (8 KB PostgreSQL, 16 KB InnoDB) lớn hơn đơn vị ghi nguyên tử của HĐH/ổ đĩa (4 KB); nếu sập giữa lúc ghi, trang bị *rách* (torn page) và log thay đổi không đủ sửa. Hai vấn đề độc lập này — *flush log khi COMMIT* và *bảo vệ trang* — được tách thành hai thí nghiệm A và B (nhận xét 3 của giảng viên).
+Ghi thẳng trang dữ liệu khi COMMIT rất chậm vì I/O ngẫu nhiên. *Write-Ahead Logging* (WAL) khắc phục bằng cách ghi tuần tự vào log trước khi báo COMMIT, còn trang dữ liệu ghi sau (lazy). Tuy nhiên, trang DBMS (8 KB PostgreSQL, 16 KB InnoDB) lớn hơn đơn vị ghi nguyên tử của HĐH/ổ đĩa (4 KB); nếu sập giữa lúc ghi, trang bị *rách* (torn page) và log thay đổi không đủ sửa. Hai vấn đề độc lập này — *flush log khi COMMIT* và *bảo vệ trang* — được tách thành hai thí nghiệm A và B.
 
 #figure(
   diagram-data-path(),
@@ -243,7 +243,7 @@ Cấu hình bền vững (`fsync = on`, `synchronous_commit = on`, `full_page_wr
 
 #include "tv2_2_2_bao_ve_trang.typ"
 
-Thí nghiệm B (mục 2.5) đo chi phí này, và chỉ thay đổi cơ chế bảo vệ trang, giữ nguyên flush log chặt, để tách khỏi thí nghiệm A (nhận xét 3 của giảng viên).
+Thí nghiệm B (mục 2.5) đo chi phí này, và chỉ thay đổi cơ chế bảo vệ trang, giữ nguyên flush log chặt, để tách khỏi thí nghiệm A.
 
 #include "tv3_2_2_checkpoint_phuc_hoi.typ"
 
