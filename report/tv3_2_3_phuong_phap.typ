@@ -1,3 +1,4 @@
+#import "flexcap.typ": fcap
 // ============================================================
 // MỤC 2.3: PHƯƠNG PHÁP THỰC NGHIỆM (TV3 viết phần chung và thiết kế thí nghiệm C)
 // Thay toàn bộ mục "== Phương pháp thực nghiệm (tóm tắt phần liên quan đến A)"
@@ -13,11 +14,11 @@
 
 == Phương pháp thực nghiệm
 
-Mục này mô tả những gì dùng chung cho cả ba thí nghiệm: máy đo, dữ liệu, workload, cách kiểm chứng tính đúng, và thiết kế chi tiết của thí nghiệm C. Thiết kế thí nghiệm A và B được trình bày ngắn ở đây và chi tiết hơn trong mục kết quả tương ứng (2.4 và 2.5). Mọi lệnh và script nằm trong repo của nhóm; báo cáo chỉ giải thích cách làm và lý do.
+Mục này mô tả phần dùng chung cho ba thí nghiệm và thiết kế chi tiết của thí nghiệm C; mọi lệnh và script nằm trong repo của nhóm.
 
 === Máy đo và môi trường
 
-Tất cả số liệu chính thức được đo trên *một máy duy nhất*, cùng phiên bản phần mềm và cùng cấu hình, để số liệu của ba thí nghiệm so sánh được với nhau. Hai hệ quản trị chạy trong Docker với cùng giới hạn tài nguyên (4 CPU, 6 GB RAM mỗi container); trong mỗi lần đo chỉ một hệ được bật để hai hệ không tranh tài nguyên.
+Mọi số liệu được đo trên *một máy duy nhất*. Hai hệ chạy trong Docker với cùng giới hạn tài nguyên (4 CPU, 6 GB RAM mỗi container), mỗi lần đo chỉ bật một hệ.
 
 #figure(
   table(
@@ -38,36 +39,17 @@ Tất cả số liệu chính thức được đo trên *một máy duy nhất*,
   caption: [Cấu hình máy đo, bảng B1 (chép từ `results/env/hardware.txt`).],
 )
 
-Con số fsync ở bảng B1 là giới hạn trên của thông lượng khi chỉ có 1 client và mỗi COMMIT phải chờ một lần fsync, dùng để giải thích kết quả thí nghiệm A (mục 2.4).
+Tốc độ fsync ở bảng trên là trần thông lượng khi 1 client và mỗi COMMIT chờ một lần fsync (mục 2.4).
 
-*Máy ảo cho crash hệ điều hành.* Để tắt ngang cả hệ điều hành đang chạy DBMS, hai hệ được đặt trong máy ảo KVM/QEMU (quản lý bằng `libvirt`, do VirtualBox không biên dịch được mô-đun nhân trên kernel 7.0 khi bật Secure Boot). Lệnh flush của máy ảo KVM được chuyển thẳng xuống đĩa máy thật nên dữ liệu đã `fsync` thực sự nằm trên đĩa.
-
-#figure(
-  table(
-    columns: (auto, 1fr),
-    align: (left, left),
-    stroke: 0.5pt,
-    inset: 4.5pt,
-    table.header([*Thành phần*], [*Cấu hình*]),
-    [Ảo hóa], [KVM/QEMU, quản lý bằng libvirt],
-    [Tài nguyên], [4 vCPU, 8 GB RAM, đĩa ảo qcow2 40 GB đặt trên cùng ổ SSD của máy đo],
-    [Hệ điều hành khách], [Ubuntu Server 24.04 LTS],
-    [Hệ quản trị], [Cùng image Docker và cùng file cấu hình như trên máy đo; container tự khởi động lại khi máy ảo bật (`restart: always`)],
-    [Gây sự cố / bật lại], [`virsh destroy dbvm` (ngắt nguồn đột ngột) [1] / `virsh start dbvm`],
-  ),
-  caption: [Máy ảo dùng cho mức sự cố hệ điều hành, bảng B1b.],
-)
+*Máy ảo cho crash hệ điều hành.* Hai hệ được đặt trong máy ảo KVM/QEMU quản lý bằng libvirt (4 vCPU, 8 GB RAM, đĩa qcow2 40 GB trên cùng ổ SSD, Ubuntu Server 24.04, cùng image và cấu hình Docker). Sự cố được gây bằng `virsh destroy` (ngắt nguồn đột ngột) [1] rồi bật lại bằng `virsh start`; lệnh flush của máy ảo được chuyển thẳng xuống đĩa máy thật nên dữ liệu đã `fsync` thực sự nằm trên đĩa.
 
 === Dữ liệu
 
-Dữ liệu là lược đồ ngân hàng của pgbench (chuẩn TPC-B, scale 50): 50 chi nhánh, 500 giao dịch viên, 5.000.000 tài khoản, cùng bảng lịch sử ban đầu rỗng (thêm cột `txn_id` để đối soát ở thí nghiệm C). Dữ liệu sinh một lần trong PostgreSQL bằng `pgbench -i -s 50`, xuất CSV và nạp nguyên vẹn sang MySQL (~755 MB trong PostgreSQL, ~603 MB trong MySQL), đối chiếu số dòng và các tổng ban đầu bằng 0 trên cả hai hệ. Với bộ đệm 2 GB mỗi hệ, toàn bộ dữ liệu nằm gọn trong bộ nhớ nên chi phí đo được chủ yếu là ghi log và ghi trang.
+Lược đồ ngân hàng của pgbench (TPC-B, scale 50): 50 chi nhánh, 500 giao dịch viên, 5.000.000 tài khoản và bảng lịch sử (thêm cột `txn_id` để đối soát ở thí nghiệm C). Dữ liệu sinh bằng `pgbench -i -s 50`, xuất CSV và nạp nguyên vẹn sang MySQL; với bộ đệm 2 GB, toàn bộ dữ liệu nằm gọn trong bộ nhớ nên chi phí đo được chủ yếu là ghi log và ghi trang.
 
 === Workload
 
-Mỗi giao dịch mô phỏng một lần gửi hoặc rút tiền theo đúng giao dịch mặc định của pgbench: chọn ngẫu nhiên một tài khoản, một giao dịch viên, một chi nhánh và số tiền `delta` trong khoảng từ −5000 đến 5000; cộng `delta` vào ba số dư; đọc lại số dư tài khoản; ghi một dòng vào bảng lịch sử. Năm câu lệnh này nằm trong *một* giao dịch.
-
-- Thí nghiệm A và B đo hiệu năng, nên dùng sysbench với script `workload/tpcb.lua` để cùng một công cụ chạy được trên cả hai hệ.
-- Thí nghiệm C cần biết chính xác giao dịch nào đã được xác nhận, nên dùng công cụ riêng `workload/crash_client.py` (mô tả ở phần thiết kế thí nghiệm C).
+Mỗi giao dịch là một lần gửi/rút tiền của pgbench: cộng số tiền ngẫu nhiên `delta` vào số dư tài khoản, giao dịch viên, chi nhánh và ghi một dòng lịch sử, tất cả trong *một* giao dịch. Thí nghiệm A và B dùng sysbench với `workload/tpcb.lua` để chạy được trên cả hai hệ; thí nghiệm C dùng công cụ riêng `workload/crash_client.py`.
 
 === Cấu hình nền
 
@@ -87,24 +69,24 @@ Mỗi giao dịch mô phỏng một lần gửi hoặc rút tiền theo đúng g
     [Binlog], [(không có)], [Tắt (`skip-log-bin`) để chỉ so sánh redo log với WAL],
     [Ghi log phục hồi], [`log_checkpoints = on`], [`log_error_verbosity = 3`],
   ),
-  caption: [Cấu hình nền của hai hệ, bảng B2. Đây cũng là *cấu hình bền vững*; mỗi thí nghiệm chỉ thay đổi đúng tham số đang nghiên cứu.],
+  caption: fcap([Cấu hình nền của hai hệ, bảng B2.], [Cấu hình nền của hai hệ, bảng B2. Đây cũng là *cấu hình bền vững*; mỗi thí nghiệm chỉ thay đổi đúng tham số đang nghiên cứu.]),
 )
 
 === Bất biến và kiểm chứng tính đúng
 
-Gọi $A, T, B$ là tổng số dư tài khoản, giao dịch viên, chi nhánh và $H$ là tổng `delta` bảng lịch sử. Ban đầu $A = T = B = H = 0$ (kiểm tra bằng truy vấn). Vì mỗi giao dịch cộng cùng một `delta` vào cả bốn đại lượng trong một giao dịch nguyên tử, bất biến $A = T = B = H$ luôn đúng (riêng mất trọn vẹn giao dịch được phát hiện qua đối soát ở thí nghiệm C). Script kiểm tra đã được kiểm chứng hai chiều trên cả PostgreSQL (hình dưới) và MySQL: chạy tải 60 giây trả về `OK`, cố ý sửa một số dư báo ngay `FAIL`.
+Gọi $A, T, B$ là tổng số dư tài khoản, giao dịch viên, chi nhánh và $H$ là tổng `delta` bảng lịch sử. Ban đầu cả bốn bằng 0, và vì mỗi giao dịch cộng cùng `delta` vào cả bốn một cách nguyên tử nên $A = T = B = H$ luôn phải đúng. Script kiểm tra được kiểm chứng hai chiều: chạy tải trả về `OK`, cố ý sửa một số dư báo ngay `FAIL`.
 
 #figure(
   grid(
     columns: 1,
     gutter: 8pt,
-    image("img/M_04_kiem_chung_duong_pg.png", width: 100%),
-    image("img/M_06_kiem_chung_am_pg.png", width: 100%),
+    image("img/M_04_kiem_chung_duong_pg.png", width: 78%),
+    image("img/M_06_kiem_chung_am_pg.png", width: 78%),
   ),
   caption: [Kiểm chứng script bất biến trên PostgreSQL: dữ liệu đúng (`OK`, trên) và cố ý làm lệch một số dư (`FAIL`, dưới).],
 )
 
-Ở thí nghiệm B và C, trước mỗi lần chạy, script đưa dữ liệu về trạng thái ban đầu (xóa bảng lịch sử, đưa mọi số dư về 0) và dừng lại nếu bất biến chưa phải `0|0|0|0|0`. Ở thí nghiệm A việc này chỉ làm một lần trước mỗi loạt (mỗi DBMS), nên dữ liệu tích lũy qua các lần chạy trong loạt (mục 2.4).
+Trước mỗi lần chạy (thí nghiệm B, C) hoặc mỗi loạt (thí nghiệm A), script đưa dữ liệu về trạng thái ban đầu và dừng nếu bất biến chưa bằng 0.
 
 === Tóm tắt thiết kế ba thí nghiệm
 
@@ -120,48 +102,20 @@ Gọi $A, T, B$ là tổng số dư tài khoản, giao dịch viên, chi nhánh 
     [Số lần chạy], [45 (3 lần mỗi ô, đo 300 s sau 60 s warmup)], [12 (3 lần mỗi ô, đo 300 s sau 60 s warmup)], [42 lần crash],
     [Đo], [TPS, độ trễ, số fsync và byte log mỗi giao dịch], [Byte WAL, ảnh trang, byte ghi đĩa mỗi giao dịch, TPS], [Giao dịch mất, RPO, RTO, thời gian redo, bất biến, hỏng dữ liệu],
   ),
-  caption: [Tóm tắt thiết kế ba thí nghiệm. Tên tham số cụ thể ở bảng B2; thiết kế chi tiết của A và B ở mục 2.4 và 2.5.],
+  caption: fcap([Tóm tắt thiết kế ba thí nghiệm.], [Tóm tắt thiết kế ba thí nghiệm. Tên tham số cụ thể ở bảng B2; thiết kế chi tiết của A và B ở mục 2.4 và 2.5.]),
 )
 
-Thời gian đo 300 giây được chọn để mỗi lần chạy chứa ít nhất một chu kỳ checkpoint (`checkpoint_timeout = 5min`). Nếu đo ngắn hơn, có lần chạy có checkpoint, có lần không, và số liệu sẽ lệch. Với mỗi ô, nhóm báo cáo giá trị trung bình của 3 lần lặp kèm hệ số biến thiên (CV); ô nào có CV trên 10% được ghi chú trong phần kết quả.
+Đo 300 giây để mỗi lần chạy chứa ít nhất một chu kỳ checkpoint (`checkpoint_timeout = 5min`). Mỗi ô báo cáo trung bình 3 lần lặp kèm hệ số biến thiên (CV).
 
 === Thiết kế thí nghiệm C: crash và phục hồi
 
-Câu hỏi: với từng cấu hình flush và từng loại sự cố, có giao dịch *đã được xác nhận COMMIT* nào bị mất không (RPO), dữ liệu có còn nhất quán không, và phục hồi mất bao lâu (RTO)?
-
-*Hai mức sự cố.* Mỗi loại sự cố xóa một số tầng khác nhau trên đường đi của dữ liệu (mục 2.1), nên được thử riêng:
-
-#figure(
-  table(
-    columns: (2.6cm, 1fr, 1fr, 2.6cm),
-    align: (left, left, left, left),
-    stroke: 0.5pt,
-    inset: 4.5pt,
-    table.header([*Mức*], [*Cách gây sự cố*], [*Dữ liệu bị xóa*], [*Chạy trên*]),
-    [1. Crash tiến trình], [`docker kill -s KILL` container DBMS khi đang có tải], [Bộ nhớ của DBMS (bộ đệm, WAL buffers, log buffer). Page cache của hệ điều hành còn nguyên], [Máy đo],
-    [2. Crash hệ điều hành], [Ngắt nguồn máy ảo (`virsh destroy`) khi đang có tải], [Thêm page cache của hệ điều hành khách: dữ liệu đã `write()` nhưng chưa `fsync()`], [Máy ảo KVM],
-    [3. Mất điện thật], [Không thực hiện], [Thêm bộ đệm ghi của ổ đĩa nếu ổ không tôn trọng lệnh flush], [Chỉ phân tích lý thuyết],
-  ),
-  caption: [Ba mức sự cố và phạm vi thí nghiệm.],
-)
+Thí nghiệm C trả lời: với từng cấu hình flush và từng loại sự cố, có giao dịch *đã xác nhận COMMIT* nào bị mất không (RPO), dữ liệu có nhất quán không và phục hồi mất bao lâu (RTO). Hai mức sự cố được thử riêng vì xóa các tầng khác nhau trên đường đi của dữ liệu (@fig-path): *crash tiến trình* (`docker kill -s KILL` trên máy đo, mất bộ nhớ của DBMS, page cache còn nguyên) và *crash hệ điều hành* (`virsh destroy` máy ảo, mất thêm page cache của HĐH khách). Mất điện thật (mất cả bộ đệm ghi của ổ nếu ổ không tôn trọng lệnh flush) chỉ được phân tích lý thuyết.
 
 *Ma trận chạy.* Năm cấu hình (PostgreSQL `on`, `off`; InnoDB `=1`, `=2`, `=0`) nhân hai mức sự cố. Cấu hình bền vững chạy 3 lần; cấu hình có thể mất dữ liệu chạy 5 lần, vì việc mất phụ thuộc thời điểm crash. Tổng cộng 2 × (3 + 5 + 3 + 5 + 5) = 42 lần crash.
 
-*Công cụ bơm tải có nhật ký xác nhận.* sysbench không cho biết giao dịch nào đã được xác nhận, nên nhóm viết `workload/crash_client.py`, chạy trên máy thật (ngoài phạm vi sự cố) với 8 luồng. Mỗi giao dịch mang một mã `txn_id` duy nhất, được ghi vào bảng lịch sử cùng với giao dịch. Mỗi luồng ghi hai nhật ký, ghi từng dòng xuống file ngay lập tức:
+*Công cụ bơm tải có nhật ký xác nhận.* `crash_client.py` chạy trên máy thật (ngoài phạm vi sự cố) với 8 luồng; mỗi giao dịch mang một `txn_id` duy nhất ghi vào bảng lịch sử. Mỗi luồng ghi ngay xuống file `txn_id` *trước* khi gửi COMMIT (nhật ký đã gửi) và *sau* khi COMMIT trả về (nhật ký đã xác nhận). Khi không có sự cố, số giao dịch đã xác nhận khớp đúng số dòng trong bảng lịch sử (24.005).
 
-- nhật ký *đã gửi*: `txn_id` ngay *trước* khi gửi COMMIT;
-- nhật ký *đã xác nhận*: `txn_id` và thời điểm ngay *sau* khi COMMIT trả về thành công.
-
-Công cụ được kiểm chứng khi không có sự cố: sau 30 giây chạy, số giao dịch đã xác nhận đúng bằng số dòng có `txn_id` trong bảng lịch sử (24.005 giao dịch), và bất biến `OK`.
-
-*Quy trình mỗi lần crash* (`scripts/run_expC.sh`):
-
-1. Đặt tham số flush, khởi động lại DBMS, đưa dữ liệu về trạng thái ban đầu và xác nhận bất biến bằng 0; với PostgreSQL chạy thêm `CHECKPOINT` để mọi lần có cùng điểm xuất phát.
-2. Chạy công cụ bơm tải 8 luồng trong một khoảng ngẫu nhiên từ 60 đến 120 giây, rồi gây sự cố và ghi thời điểm $t_"crash"$.
-3. Khởi động lại DBMS (mức 1) hoặc bật lại máy ảo (mức 2), ghi thời điểm ra lệnh $t_"start"$.
-4. Thử kết nối mỗi 0,2 giây; lần đầu thành công ghi $t_"ready"$.
-5. Lưu log của DBMS ở lần khởi động này, đọc các mốc phục hồi.
-6. Đối soát, kiểm tra bất biến và kiểm tra hỏng dữ liệu.
+*Quy trình mỗi lần crash* (`scripts/run_expC.sh`): đặt tham số, khởi động lại DBMS, đưa dữ liệu về ban đầu (PostgreSQL chạy thêm `CHECKPOINT`); bơm tải 60–120 giây ngẫu nhiên rồi gây sự cố; khởi động lại DBMS hoặc máy ảo, thử kết nối mỗi 0,2 giây để đo thời gian sẵn sàng; lưu log phục hồi; đối soát và kiểm tra hỏng dữ liệu.
 
 *Đối soát.* Gọi ACK là tập `txn_id` đã được xác nhận, SENT là tập đã gửi COMMIT, PRESENT là tập `txn_id` còn trong bảng lịch sử sau phục hồi. Từ đó:
 
@@ -177,12 +131,11 @@ Công cụ được kiểm chứng khi không có sự cố: sau 30 giây chạy
     [Giao dịch lạ], [PRESENT ∖ (ACK ∪ SENT)], [Phải bằng 0; khác 0 nghĩa là công cụ hoặc bước đưa dữ liệu về ban đầu có lỗi],
     [Khớp số dòng], [`COUNT(*)` = \|PRESENT\|], [Bảng lịch sử chỉ chứa giao dịch của lần chạy này],
     [RPO theo thời gian], [lần xác nhận cuối cùng − lần xác nhận sớm nhất trong số giao dịch bị mất], [Độ dài khoảng thời gian có giao dịch đã xác nhận bị mất; 0 nếu không mất],
-    [RTO (máy thật)], [$t_"ready" - t_"start"$], [Ở mức 2 bao gồm cả thời gian máy ảo khởi động],
     [RTO theo log DBMS], [từ dòng khởi động đầu tiên đến dòng sẵn sàng nhận kết nối trong log], [Chỉ tính DBMS; dùng khi so sánh các cấu hình],
     [Thời gian redo], [PostgreSQL: thời gian ghi ở dòng `redo done at`. InnoDB: từ dòng `Starting crash recovery` đến `Apply batch completed`], [Phần phát lại log trong RTO],
   ),
   caption: [Định nghĩa các chỉ số của thí nghiệm C (`scripts/reconcile.py`, `scripts/parse_recovery_log.py`).],
 )
 
-*Kiểm tra hỏng dữ liệu.* Với PostgreSQL: chạy `bt_index_check` (extension `amcheck`) trên các chỉ mục khóa chính, đọc toàn bộ bảng để mọi checksum trang được kiểm tra, và tìm lỗi checksum trong log. Với MySQL: `CHECK TABLE` trên cả bốn bảng.
+*Kiểm tra hỏng dữ liệu:* PostgreSQL chạy `bt_index_check` (`amcheck`), đọc toàn bộ bảng để kiểm tra checksum trang; MySQL chạy `CHECK TABLE` trên bốn bảng.
 
