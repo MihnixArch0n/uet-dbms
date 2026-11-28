@@ -83,9 +83,9 @@ Thí nghiệm C gồm 42 lần crash: 21 lần kill tiến trình DBMS trên má
 
 *5. Thời gian phục hồi.* RTO theo log (trung vị) của PostgreSQL là 9–11 giây (phát lại 600–1.050 MB WAL trong 0,6–4,3 giây, phần lớn thời gian còn lại là checkpoint kết thúc phục hồi), còn InnoDB là 18–19 giây khi kill tiến trình và 7–12 giây trên máy ảo (redo chỉ 12–100 MB nhờ fuzzy checkpoint nhưng khởi tạo bộ đệm 2 GB và plugin tốn thời gian).
 
-#shot("img/H9_redo_time.png", [H9 – Thời gian redo theo lượng log cần phát lại, 42 lần crash.], w: 76%)
+#shot("img/H9_redo_time.png", [Thời gian redo theo lượng log cần phát lại, 42 lần crash.], w: 76%) <fig-h9>
 
-Hình H9 cho thấy khi kill tiến trình trên máy thật, InnoDB mất 7–12 giây để redo 23–65 MB do đọc trang trực tiếp từ đĩa (`O_DIRECT`), trong khi PostgreSQL redo ~900 MB trong ~1 giây nhờ page cache còn nguyên; trên máy ảo thì ngược lại (page cache khách mất, đĩa ảo được máy thật đệm).
+@fig-h9 cho thấy khi kill tiến trình trên máy thật, InnoDB mất 7–12 giây để redo 23–65 MB do đọc trang trực tiếp từ đĩa (`O_DIRECT`), trong khi PostgreSQL redo ~900 MB trong ~1 giây nhờ page cache còn nguyên; trên máy ảo thì ngược lại (page cache khách mất, đĩa ảo được máy thật đệm).
 
 #figure(
   grid(

@@ -14,14 +14,14 @@ WAL đảm bảo thay đổi đã được đẩy ra log trước COMMIT, nhưng
 
 ==== PostgreSQL – Full-Page Writes (`full_page_writes`)
 
-Khi `full_page_writes = on` (mặc định), ở *lần sửa đầu tiên* của mỗi trang sau mỗi checkpoint, PostgreSQL ghi toàn bộ nội dung trang (Full-Page Image – FPI, tối đa 8 KB) vào WAL. Khi phục hồi từ redo point của checkpoint gần nhất, FPI ghi đè trang có thể bị rách trước khi áp dụng các bản ghi redo tiếp theo.
+Khi `full_page_writes = on` (mặc định), ở *lần sửa đầu tiên* của mỗi trang sau mỗi checkpoint, PostgreSQL ghi toàn bộ nội dung trang (Full-Page Image – FPI, tối đa 8 KB) vào WAL [3]. Khi phục hồi từ redo point của checkpoint gần nhất, FPI ghi đè trang có thể bị rách trước khi áp dụng các bản ghi redo tiếp theo.
 - *Chu kỳ checkpoint:* Sau mỗi checkpoint, hàng loạt trang sửa lần đầu tạo đỉnh WAL (tăng mạnh khi `checkpoint_timeout` = `5min` / `max_wal_size` = `4GB` ngắn).
 - *Ảnh hưởng của `--data-checksums` / `wal_log_hints`:* Khi bật checksum (như cấu hình nhóm), cả việc đánh dấu *hint bits* lần đầu sau checkpoint cũng phải ghi FPI (`XLOG/FPI_FOR_HINT`).
 - *Khi tắt (`off`):* Giảm mạnh WAL nhưng có nguy cơ hỏng dữ liệu khi sập HĐH/mất điện; chỉ tắt nếu lớp lưu trữ ghi nguyên tử 8 KB (như ZFS).
 
 ==== MySQL InnoDB – Doublewrite Buffer (`innodb_doublewrite`)
 
-InnoDB ghi các trang bẩn vào vùng đệm trung gian *doublewrite buffer* (`#ib_*` trong `innodb_doublewrite_dir`) thành từng lô tuần tự lớn với một lần `fsync()` *trước khi* ghi vào tablespace đích, nhờ đó tránh nhân đôi I/O ngẫu nhiên và có bản sao nguyên vẹn để cứu trang rách khi phục hồi. Các chế độ MySQL 8.4: `ON`/`DETECT_AND_RECOVER` (mặc định, ghi và sửa trang), `DETECT_ONLY` (chỉ ghi metadata phát hiện), và `OFF` (tắt hoàn toàn, đổi sang/từ `OFF` cần restart).
+InnoDB ghi các trang bẩn vào vùng đệm trung gian *doublewrite buffer* (`#ib_*` trong `innodb_doublewrite_dir`) thành từng lô tuần tự lớn với một lần `fsync()` [2] *trước khi* ghi vào tablespace đích, nhờ đó tránh nhân đôi I/O ngẫu nhiên và có bản sao nguyên vẹn để cứu trang rách khi phục hồi. Các chế độ MySQL 8.4: `ON`/`DETECT_AND_RECOVER` (mặc định, ghi và sửa trang), `DETECT_ONLY` (chỉ ghi metadata phát hiện), và `OFF` (tắt hoàn toàn, đổi sang/từ `OFF` cần restart).
 
 ==== So sánh hai cơ chế bảo vệ trang
 

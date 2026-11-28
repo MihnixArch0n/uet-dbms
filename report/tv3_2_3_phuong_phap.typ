@@ -53,7 +53,7 @@ Con số fsync ở bảng B1 là giới hạn trên của thông lượng khi ch
     [Tài nguyên], [4 vCPU, 8 GB RAM, đĩa ảo qcow2 40 GB đặt trên cùng ổ SSD của máy đo],
     [Hệ điều hành khách], [Ubuntu Server 24.04 LTS],
     [Hệ quản trị], [Cùng image Docker và cùng file cấu hình như trên máy đo; container tự khởi động lại khi máy ảo bật (`restart: always`)],
-    [Gây sự cố / bật lại], [`virsh destroy dbvm` (ngắt nguồn đột ngột) / `virsh start dbvm`],
+    [Gây sự cố / bật lại], [`virsh destroy dbvm` (ngắt nguồn đột ngột) [1] / `virsh start dbvm`],
   ),
   caption: [Máy ảo dùng cho mức sự cố hệ điều hành, bảng B1b.],
 )

@@ -14,18 +14,28 @@
   paper: "a4",
   // Lề theo file mẫu của trường: trên 2,5 cm, dưới 3 cm, trái 3 cm, phải 2 cm
   margin: (top: 2.5cm, bottom: 3cm, left: 3cm, right: 2cm),
-  numbering: "1",
+  // Trang bìa, tóm tắt, lời cam đoan, mục lục không đánh số; số trang bắt đầu từ 1 ở phần Mở đầu.
+  numbering: none,
 )
 // Nội dung: Times New Roman 13 pt (Liberation Serif là phông thay thế cùng kích thước chữ).
 #set text(font: ("Times New Roman", "Liberation Serif"), size: 13pt, lang: "vi")
 // Giãn dòng 1,3 lines như Word: khoảng cách hai dòng = 1,3 × 1,15 em ≈ 1,49 em,
 // tức leading 0,83 em (Typst đo từ chân dòng trên tới đỉnh chữ hoa dòng dưới). Cách đoạn thêm 6 pt.
-#set par(justify: true, leading: 0.83em, spacing: 0.83em + 6pt)
+#set par(justify: true, leading: 0.83em, spacing: 0.83em + 6pt, first-line-indent: (amount: 1cm, all: true))
 #show raw: set text(size: 0.85em)
-#set heading(numbering: "1.1.")
+// Đánh số theo quy định: "Chương 1.", rồi 1.1., 1.1.1.
+#set heading(numbering: (..n) => {
+  let a = n.pos()
+  if a.len() == 1 { "Chương " + str(a.first()) + "." } else { a.map(str).join(".") + "." }
+})
 // Chỉ các mục lớn bắt đầu trang mới: Phân công, 1., 2., Tài liệu tham khảo (và Mục lục).
 #show heading.where(level: 1): it => {
   pagebreak(weak: true)
+  // Hình, bảng đánh số lại từ đầu ở mỗi chương
+  if it.numbering != none {
+    counter(figure.where(kind: image)).update(0)
+    counter(figure.where(kind: table)).update(0)
+  }
   v(0.6em)
   it
   v(0.6em)
@@ -36,6 +46,14 @@
   v(0.3em)
 }
 #show figure: set block(breakable: true)
+// Hình và bảng đánh số theo chương (Hình 1.1, Bảng 2.3); chú thích bảng đặt trên đầu bảng, chú thích hình đặt dưới hình.
+#set figure(numbering: n => numbering("1.1", counter(heading).get().first(), n))
+#set figure.caption(separator: [. ])
+#show figure.where(kind: table): set figure.caption(position: top)
+#show figure.where(kind: table): set block(breakable: false)
+#show figure.caption: set par(first-line-indent: 0cm)
+#show table.cell: set par(first-line-indent: 0cm)
+#show outline: set par(first-line-indent: 0cm)
 // Bảng: chữ 11 pt, giãn dòng hẹp hơn nội dung, không căn đều trong ô. Chú thích hình/bảng 12 pt.
 #show table: set text(size: 11pt)
 #show table: set par(justify: false, leading: 0.55em)
@@ -56,7 +74,7 @@
   margin: (left: 2.79cm, top: 2.5cm, right: 21cm - 2.79cm - 16.23cm, bottom: 29.7cm - 2.5cm - 25.45cm),
 )[
   #set text(font: ("Times New Roman", "Liberation Serif"), weight: "bold")
-  #set par(justify: false, leading: 0.6em)
+  #set par(justify: false, leading: 0.6em, first-line-indent: 0cm)
   // Khung viền đôi: đường mảnh bên ngoài, đường đậm bên trong
   #place(top + left, rect(width: 100%, height: 100%, stroke: 0.75pt + navy))
   #place(top + left, dx: 2.6pt, dy: 2.6pt, rect(width: 100% - 5.2pt, height: 100% - 5.2pt, stroke: 2.6pt + navy))
@@ -72,14 +90,16 @@
     #v(0.15cm)
     Sinh viên thực hiện \
     #v(0.2cm)
-    #text(14pt, weight: "regular")[
+    #text(14pt)[
       Vũ Việt Anh – 24020033 \
       Phạm Tuấn Minh – 24020240 \
       Trần Minh Hiếu – 24020132
     ]
   ]))
-  #place(bottom + center, dy: -1.6cm, text(12pt)[HÀ NỘI 2026])
+  #place(bottom + center, dy: -1.6cm, text(12pt)[HÀ NỘI - 2026])
 ]
+
+#include "mo_dau_tom_tat.typ"
 
 
 // ============================================================
@@ -87,30 +107,27 @@
 // ============================================================
 #[
   #set text(size: 12pt)
-  #show outline.entry: set block(above: 0.45em, below: 0.45em)
+  #show outline.entry: set block(above: 0.35em, below: 0.35em)
   #outline(title: "Mục lục", indent: 1em, depth: 2)
 ]
 
-#v(0.2cm)
-#heading(level: 2, numbering: none)[Phân công công việc]
+#heading(level: 2, numbering: none, outlined: false)[Danh mục chữ viết tắt]
 
 #table(
-  columns: (auto, 1fr, auto),
-  align: (left, left, center),
+  columns: (auto, 1fr, auto, 1fr),
   stroke: 0.5pt,
-  inset: 4.5pt,
-  [*Thành viên*], [*Nội dung chính*], [*Mục báo cáo*],
-  [TV1], [Kiểm chứng PostgreSQL, thí nghiệm A (chi phí flush log), mục 1 báo cáo, lý thuyết WAL/flush, ghép báo cáo], [1, 2.1, 2.2 (phần flush), 2.4, 2.7],
-  [TV2], [Kiểm chứng MySQL, thí nghiệm B (bảo vệ trang), lý thuyết Full-Page Writes / doublewrite, slide], [2.2 (phần bảo vệ trang), 2.5],
-  [TV3], [Chuẩn bị máy đo, sinh dữ liệu, máy ảo, thí nghiệm C (crash recovery), video demo], [2.2 (checkpoint và phục hồi), 2.3, 2.6],
+  inset: 3.5pt,
+  [*Viết tắt*], [*Ý nghĩa*], [*Viết tắt*], [*Ý nghĩa*],
+  [CV], [Hệ số biến thiên], [MVCC], [Multi-Version Concurrency Control],
+  [DBMS], [Hệ quản trị cơ sở dữ liệu], [PG], [PostgreSQL],
+  [FPI], [Full-Page Image – ảnh trang đầy đủ], [RPO], [Recovery Point Objective],
+  [GD], [Giao dịch], [RTO], [Recovery Time Objective],
+  [HĐH], [Hệ điều hành], [SSD], [Solid-State Drive],
+  [KVM], [Kernel-based Virtual Machine], [TPS], [Số giao dịch mỗi giây],
+  [LSN], [Log Sequence Number], [WAL], [Write-Ahead Logging],
 )
 
-#v(0.8cm)
-Repository GitHub (mã nguồn, dữ liệu, kịch bản demo, kết quả thực nghiệm): #link("https://github.com/MihnixArch0n/uet-dbms")
-
-Video demo thí nghiệm C (3 phút 42 giây, có phụ đề): #link("https://github.com/MihnixArch0n/uet-dbms/blob/main/demo/demo_thi_nghiem_C.mp4")
-
-#pagebreak()
+#include "mo_dau.typ"
 
 // ============================================================
 // PHẦN 1 – POSTGRESQL
@@ -121,11 +138,11 @@ Video demo thí nghiệm C (3 phút 42 giây, có phụ đề): #link("https://g
 
 PostgreSQL bắt nguồn từ dự án POSTGRES tại Đại học California, Berkeley (1986) do Michael Stonebraker dẫn dắt. Năm 1996 dự án được đổi tên thành PostgreSQL và trở thành phần mềm mã nguồn mở. Hiện nay PostgreSQL là một trong những hệ quản trị cơ sở dữ liệu quan hệ (RDBMS) mạnh mẽ nhất, tuân thủ phần lớn chuẩn SQL và nhiều tính năng hướng đối tượng.
 
-Điểm khác biệt nổi bật so với MySQL là mô hình *object-relational*: PostgreSQL cho phép người dùng định nghĩa kiểu dữ liệu mới, toán tử, hàm và chỉ mục tùy biến. MySQL (đặc biệt với engine InnoDB) tập trung vào hiệu năng web và dễ triển khai, trong khi PostgreSQL hướng tới tính đúng đắn, khả năng mở rộng và tuân thủ chuẩn. Oracle và SQL Server là các hệ thương mại có nhiều tính năng enterprise tương tự, nhưng PostgreSQL cung cấp hầu hết các khả năng đó dưới giấy phép mở (PostgreSQL License – tương tự BSD).
+Điểm khác biệt nổi bật so với MySQL là mô hình *object-relational*: PostgreSQL cho phép người dùng định nghĩa kiểu dữ liệu mới, toán tử, hàm và chỉ mục tùy biến. MySQL (đặc biệt với engine InnoDB) tập trung vào hiệu năng web và dễ triển khai, trong khi PostgreSQL hướng tới tính đúng đắn, khả năng mở rộng và tuân thủ chuẩn. Oracle và SQL Server là các hệ thương mại có nhiều tính năng enterprise tương tự, nhưng PostgreSQL cung cấp hầu hết các khả năng đó dưới giấy phép mở (PostgreSQL License – tương tự BSD) [3].
 
 == Kiến trúc
 
-PostgreSQL dùng mô hình *process-per-connection*: tiến trình chính (`postmaster`) lắng nghe kết nối và fork một `backend process` riêng cho mỗi client (cô lập lỗi tốt, tốn bộ nhớ hơn thread của MySQL). Các tiến trình nền chính gồm: *checkpointer* (ghi trang bẩn định kỳ và tạo checkpoint), *background writer* (ghi dần trang bẩn), *WAL writer* (đẩy WAL theo chu kỳ `wal_writer_delay`), và *autovacuum* (dọn phiên bản cũ MVCC).
+PostgreSQL dùng mô hình *process-per-connection*: tiến trình chính (`postmaster`) lắng nghe kết nối và fork một `backend process` riêng cho mỗi client (cô lập lỗi tốt, tốn bộ nhớ hơn thread của MySQL). Các tiến trình nền chính gồm: *checkpointer* (ghi trang bẩn định kỳ và tạo checkpoint), *background writer* (ghi dần trang bẩn), *WAL writer* (đẩy WAL theo chu kỳ `wal_writer_delay`), và *autovacuum* (dọn phiên bản cũ MVCC) [3].
 
 Bộ nhớ chia thành *Shared memory* (shared buffers, WAL buffers, lock table) và *Backend-private memory* (`work_mem`, `maintenance_work_mem`). Lưu trữ vật lý dưới `$PGDATA` gồm `base/` (dữ liệu bảng/chỉ mục dạng trang 8 KB, dữ liệu lớn tách sang TOAST), `pg_wal/` (các file WAL 16 MB) và `global/` (catalog toàn cục, `pg_control`).
 
@@ -213,7 +230,7 @@ Trước khi COMMIT, vị trí ghi WAL là `F/2D950208`. Sau một giao dịch `
 
 Thuộc tính *Durability* (ACID) đòi hỏi dữ liệu của giao dịch đã xác nhận COMMIT không được mất dù hệ thống sập ngay sau đó. Dữ liệu đi qua 4 tầng: (1) bộ đệm DBMS (`shared_buffers` / buffer pool) → (2) page cache HĐH (`write()`) → (3) cache bộ điều khiển đĩa → (4) bề mặt đĩa (`fsync()`). Theo đó, *crash tiến trình DBMS* (`kill -9`) chỉ mất tầng (1); *crash HĐH* (tắt nguồn ảo) mất thêm tầng (2); *mất điện thật* có thể mất cả tầng (3) nếu ổ không tôn trọng flush.
 
-Ghi thẳng trang dữ liệu khi COMMIT rất chậm vì I/O ngẫu nhiên. *Write-Ahead Logging* (WAL) khắc phục bằng cách ghi tuần tự vào log trước khi báo COMMIT, còn trang dữ liệu ghi sau (lazy). Tuy nhiên, trang DBMS (8 KB PostgreSQL, 16 KB InnoDB) lớn hơn đơn vị ghi nguyên tử của HĐH/ổ đĩa (4 KB); nếu sập giữa lúc ghi, trang bị *rách* (torn page) và log thay đổi không đủ sửa. Hai vấn đề độc lập này — *flush log khi COMMIT* và *bảo vệ trang* — được tách thành hai thí nghiệm A và B.
+Ghi thẳng trang dữ liệu khi COMMIT rất chậm vì I/O ngẫu nhiên. *Write-Ahead Logging* (WAL) [4] khắc phục bằng cách ghi tuần tự vào log trước khi báo COMMIT, còn trang dữ liệu ghi sau (lazy). Tuy nhiên, trang DBMS (8 KB PostgreSQL, 16 KB InnoDB) lớn hơn đơn vị ghi nguyên tử của HĐH/ổ đĩa (4 KB); nếu sập giữa lúc ghi, trang bị *rách* (torn page) và log thay đổi không đủ sửa. Hai vấn đề độc lập này — *flush log khi COMMIT* và *bảo vệ trang* — được tách thành hai thí nghiệm A và B.
 
 #figure(
   diagram-data-path(),
@@ -227,7 +244,7 @@ Ba câu hỏi nghiên cứu: (1) Chi phí hiệu năng (TPS, độ trễ) của 
 
 === PostgreSQL – WAL và synchronous_commit
 
-Mọi thay đổi sinh bản ghi trong *WAL buffers*. Khi COMMIT, backend ghi WAL ra đĩa và gọi `fsync`/`fdatasync` tùy cấu hình:
+Mọi thay đổi sinh bản ghi trong *WAL buffers*. Khi COMMIT, backend ghi WAL ra đĩa và gọi `fsync`/`fdatasync` tùy cấu hình [3]:
 - `synchronous_commit = on` (mặc định, bền vững): chờ WAL flush xuống đĩa rồi mới trả lời client.
 - `synchronous_commit = off`: trả lời ngay khi bản ghi vào WAL buffers; `walwriter` flush định kỳ theo `wal_writer_delay` (200 ms, cửa sổ mất tối đa ~3 lần chu kỳ nhưng không rách trang). Khác hoàn toàn `fsync = off` (có thể hỏng DB).
 
@@ -235,7 +252,7 @@ Mọi thay đổi sinh bản ghi trong *WAL buffers*. Khi COMMIT, backend ghi WA
 
 === MySQL InnoDB – Redo log và innodb_flush_log_at_trx_commit
 
-InnoDB ghi thay đổi vào *redo log* (vòng tròn, cố định): `1` (flush mỗi COMMIT — bền vững nhất), `2` (`write()` vào page cache mỗi COMMIT, `fsync()` mỗi ~1 giây — an toàn với crash tiến trình nhưng mất ~1 s khi sập HĐH), và `0` (ghi + flush mỗi ~1 giây — có thể mất ngay cả khi kill tiến trình). Binlog được tắt (`skip-log-bin`) để chỉ so sánh redo log với WAL.
+InnoDB ghi thay đổi vào *redo log* (vòng tròn, cố định) [2]: `1` (flush mỗi COMMIT — bền vững nhất), `2` (`write()` vào page cache mỗi COMMIT, `fsync()` mỗi ~1 giây — an toàn với crash tiến trình nhưng mất ~1 s khi sập HĐH), và `0` (ghi + flush mỗi ~1 giây — có thể mất ngay cả khi kill tiến trình). Binlog được tắt (`skip-log-bin`) để chỉ so sánh redo log với WAL.
 
 === Cấu hình bền vững dùng trong thí nghiệm
 
@@ -368,13 +385,13 @@ Khoảng cách lớn nhất ở tải thấp đến trung bình rồi thu hẹp 
     image("img/H5_fsync_per_txn.png", width: 66%),
     image("img/H3_tps_vs_clients.png", width: 90%),
   ),
-  caption: [H5 – Số lần fsync mỗi giao dịch (trên) và H3 – Thông lượng TPS theo cấu hình và số client (dưới).],
+  caption: [Số lần fsync mỗi giao dịch (trên) và thông lượng TPS theo cấu hình và số client (dưới).],
   placement: top,
 )
 
 *4. Độ trễ: cấu hình bền vững chậm hơn nhiều lần ở tải thấp.* Độ trễ p50 của PostgreSQL `on` là 2,35 / 4,82 / 4,94 ms ở 1 / 8 / 32 client, chậm hơn `off` (0,18 / 0,35 / 1,19 ms) từ 4,2 đến 13,8 lần. Với `on`, p50 ở 8 và 32 client (~4,8–4,9 ms) xấp xỉ gấp đôi một lần fsync, gợi ý giao dịch phải chờ đợt fsync đang chạy xong rồi mới đến nhóm mình. Đuôi độ trễ của MySQL `=1` dài hơn (p95 10,5–49,7 ms; p99 lên tới 178,4 ms ở 32 client).
 
-#shot("img/H4_latency.png", [H4 – Độ trễ p50, p95, p99 theo cấu hình flush log.], w: 78%)
+#shot("img/H4_latency.png", [Độ trễ p50, p95, p99 theo cấu hình flush log.], w: 78%)
 
 *5. MySQL `=2` nằm giữa `=1` và `=0`, và khoảng cách với `=0` rộng ra khi tăng tải.* Ở 1 client, `=2` đạt 2.420 TPS, gần `=0` (2.511) và cao hơn `=1` ~11 lần vì không chờ `fsync`. Ở 8 và 32 client, `=2` thấp hơn `=0` (3.607 so với 4.539, và 3.728 so với 4.893), do mỗi COMMIT của `=2` vẫn phải gọi `write()` đẩy log sang page cache, còn `=0` chỉ ghi định kỳ.
 
@@ -471,7 +488,7 @@ Cả 12 lần chạy đều có bất biến $A = T = B = H$ đúng và 0 lỗi.
       table.header([*Dự kiến trước khi đo (theo mục 2.2.4)*], [*Kết quả đo*], [*Đánh giá*]),
       [PostgreSQL: bật `full_page_writes` làm tăng mạnh lượng WAL, chủ yếu là ảnh trang], [WAL mỗi giao dịch tăng từ 402 lên 2.281 byte (5,7 lần); FPI chiếm 82%], [Khớp],
       [Với 5 triệu tài khoản cập nhật ngẫu nhiên, tỉ lệ FPI cao], [82% byte WAL là FPI; tổng WAL mỗi lần chạy khoảng 874 MB so với 141 MB], [Khớp],
-      [FPI tập trung ngay sau checkpoint rồi giảm], [Hình H7 (lần chạy r1): 8 đến 14 MB/giây trong khoảng 30 giây đầu của giai đoạn đo, về khoảng 0,6 MB/giây. Lần r2 và r3 đỉnh thấp hơn (khoảng 5 MB/giây) và giảm dần chậm hơn. Cả ba lần đều tăng lại khoảng 10 MB/giây sau checkpoint định kỳ], [Khớp một phần],
+      [FPI tập trung ngay sau checkpoint rồi giảm], [@fig-h7 (lần chạy r1): 8 đến 14 MB/giây trong khoảng 30 giây đầu của giai đoạn đo, về khoảng 0,6 MB/giây. Lần r2 và r3 đỉnh thấp hơn (khoảng 5 MB/giây) và giảm dần chậm hơn. Cả ba lần đều tăng lại khoảng 10 MB/giây sau checkpoint định kỳ], [Khớp một phần],
       [InnoDB: doublewrite làm mỗi trang flush bị ghi hai lần], [Lượng ghi qua doublewrite (10.945 byte) bằng lượng ghi trang dữ liệu (10.948 byte)], [Khớp],
       [InnoDB: redo log không đổi], [1.069 và 1.071 byte mỗi giao dịch], [Khớp],
       [Chi phí của InnoDB nhỏ nếu dữ liệu nằm gọn trong bộ đệm], [Mỗi giao dịch flush khoảng 0,67 trang nên chi phí đáng kể], [Không khớp],
@@ -495,13 +512,13 @@ Cả 12 lần chạy đều có bất biến $A = T = B = H$ đúng và 0 lỗi.
     image("img/H6_page_protection_cost.png", width: 90%),
     image("img/H8_wal_composition.png", width: 66%),
   ),
-  caption: [H6 – Lượng ghi mỗi giao dịch (trên) và H8 – Thành phần WAL theo `pg_waldump` (dưới).],
+  caption: [Lượng ghi mỗi giao dịch (trên) và thành phần WAL theo `pg_waldump` (dưới).],
   placement: top,
 )
 
-*3. Chi phí tập trung ngay sau checkpoint.* Hình H7 vẽ lần chạy r1: khi bật `full_page_writes`, WAL đạt đỉnh 8–14 MB/s trong 30 giây đầu đo, giảm về ~0,6 MB/s từ giây 50 (r2, r3 đỉnh ~5 MB/s) và tăng lại ~10 MB/s ở mốc `checkpoint_timeout = 5min`. Điều này chứng tỏ FPI chỉ ghi ở lần sửa đầu sau mỗi checkpoint: checkpoint càng dày thì WAL càng phình nhưng RTO càng ngắn.
+*3. Chi phí tập trung ngay sau checkpoint.* @fig-h7 vẽ lần chạy r1: khi bật `full_page_writes`, WAL đạt đỉnh 8–14 MB/s trong 30 giây đầu đo, giảm về ~0,6 MB/s từ giây 50 (r2, r3 đỉnh ~5 MB/s) và tăng lại ~10 MB/s ở mốc `checkpoint_timeout = 5min`. Điều này chứng tỏ FPI chỉ ghi ở lần sửa đầu sau mỗi checkpoint: checkpoint càng dày thì WAL càng phình nhưng RTO càng ngắn.
 
-#shot("img/H7_wal_rate.png", [H7 – Tốc độ sinh WAL theo thời gian (lần chạy r1 của mỗi cấu hình): đỉnh sau mỗi checkpoint khi `full_page_writes = on`.], w: 78%)
+#shot("img/H7_wal_rate.png", [Tốc độ sinh WAL theo thời gian (lần chạy r1 của mỗi cấu hình): đỉnh sau mỗi checkpoint khi `full_page_writes = on`.], w: 78%) <fig-h7>
 
 *4. TPS của PostgreSQL không phân biệt được hai cấu hình.* TPS đạt 1.294 (bật, CV 17,0%: 1.547,5 / 1.189,3 / 1.145,4) so với 1.170 (tắt: 1.197,9 / 1.116,2 / 1.196,8), p50 trùng 4,82 ms và fsync/giao dịch giữ 0,270–0,269: ở 8 client nút thắt vẫn là chờ fsync khi COMMIT chứ không phải ghi tuần tự WAL.
 
@@ -517,17 +534,21 @@ Ba trong bốn cấu hình có CV TPS 17%–20% (PG `fpw=on`: 1.547,5 / 1.189,3 
 
 #include "tv3_2_6_ket_qua_C.typ"
 
-== Kết luận và đề xuất
+// ============================================================
+// KẾT LUẬN
+// ============================================================
+#heading(level: 1, numbering: none)[Kết luận]
 
-Tổng hợp kết quả ba thí nghiệm:
+Báo cáo đã trả lời ba câu hỏi nghiên cứu đặt ra ở mục 2.1 bằng số liệu đo trên cùng một máy cho cả hai hệ. Tổng hợp kết quả ba thí nghiệm:
 
 - *Thí nghiệm A (flush log):* Chờ `fsync` làm TPS cấu hình bền vững thấp hơn cấu hình mềm 3,7–18,2× (PostgreSQL `off`) và 2,8–11,7× (MySQL `=0`); group commit giảm xuống < 0,1 fsync/GD ở 32 client nhưng không triệt tiêu chi phí.
 - *Thí nghiệm B (bảo vệ trang):* PostgreSQL trả chi phí vào WAL (tăng 5,7×, 82% là FPI sau checkpoint), InnoDB trả vào ghi đĩa qua doublewrite (tăng 1,8×, redo không đổi). Không tắt trên hệ thật; PG có thể tăng `checkpoint_timeout`/`max_wal_size`, InnoDB đặt `innodb_doublewrite_dir` trên ổ nhanh.
 - *Thí nghiệm C (crash & phục hồi):* Cấu hình bền vững (`on`, `=1`) không mất giao dịch (0/12 lần); InnoDB `=2` an toàn khi kill tiến trình nhưng mất tới 2.674 GD (~552 ms) khi sập HĐH. Mọi cấu hình giữ bất biến 42/42 lần và không hỏng trang; RPO luôn dưới chu kỳ flush (≤ 197 ms PG `off`, ≤ 630 ms InnoDB `=2`/`=0`), RTO 7–19 s chủ yếu do khởi động sau redo.
 
-Cấu hình khuyến nghị phụ thuộc vào yêu cầu ứng dụng:
+Các kết quả đo khớp với phần lớn dự đoán rút ra từ lý thuyết; những điểm chưa khớp hoặc chưa đủ để kết luận đã được chỉ ra trong từng thí nghiệm. Từ đó, nhóm đề xuất cấu hình cho từng loại ứng dụng như bảng dưới.
 
 #figure(
+  numbering: none,
   table(
     columns: (1.4fr, 1.15fr, 0.75fr, 2.2fr),
     align: (left, left, left, left),
@@ -538,7 +559,7 @@ Cấu hình khuyến nghị phụ thuộc vào yêu cầu ứng dụng:
     [Log, số liệu theo dõi, dữ liệu tái tạo được; chấp nhận mất ~1 giây cuối khi máy sập], [`off`], [`=0`], [RPO tối đa ~0,2 s (PostgreSQL) và ~0,63 s (InnoDB); dữ liệu vẫn nhất quán; TPS cao hơn nhiều lần],
     [Chỉ lo tiến trình DBMS sập, hệ điều hành ổn định], [không có tương đương], [`=2`], [Không mất khi kill tiến trình (0/5 lần), nhưng mất tới 552 ms khi hệ điều hành sập; không dùng nếu không chắc về hệ điều hành],
   ),
-  caption: [Bảng B4 – Đề xuất cấu hình theo loại ứng dụng.],
+  caption: [Bảng đề xuất cấu hình theo loại ứng dụng (bảng B4).],
 )
 
 Giới hạn của nghiên cứu: (1) đo trên một máy và một ổ SSD SATA gắn ngoài qua USB 3 (`write back`); (2) không mô phỏng mất điện vật lý thật và tắt binlog MySQL để so sánh công bằng với WAL; (3) số lần lặp ít (3 lần mỗi ô ở A/B, 3–5 lần crash ở C) nên RPO/RTO mang tính định hướng.
@@ -546,12 +567,17 @@ Giới hạn của nghiên cứu: (1) đo trên một máy và một ổ SSD SAT
 // ============================================================
 // TÀI LIỆU THAM KHẢO
 // ============================================================
-#heading(level: 2, numbering: none)[Tài liệu tham khảo]
+#heading(level: 1, numbering: none)[Tài liệu tham khảo]
+// Theo Phụ lục 04 của quy định trình bày: xếp theo ngôn ngữ, thứ tự ABC (họ tác giả hoặc tên cơ quan), số thứ tự trong ngoặc vuông.
 #[
-  #set text(size: 9.5pt)
-  #set par(leading: 0.55em)
-  1. PostgreSQL Global Development Group. *PostgreSQL 16 Documentation – Reliability and the Write-Ahead Log; WAL Configuration; WAL Internals; Asynchronous Commit; amcheck*. https://www.postgresql.org/docs/16/wal.html
-  2. Oracle Corporation. *MySQL 8.4 Reference Manual – InnoDB Startup Options; InnoDB Recovery; 17.6.4 Doublewrite Buffer*. https://dev.mysql.com/doc/refman/8.4/en/innodb-parameters.html
-  3. Silberschatz, A., Korth, H. F., Sudarshan, S. *Database System Concepts*, 7th ed. McGraw-Hill, 2019 (chương Recovery System và Storage Systems).
-  4. libvirt. *virsh – Virtual Machine Management (`virsh destroy`)*. https://libvirt.org/manpages/virsh.html
+  #set par(first-line-indent: 0cm, hanging-indent: 1cm, justify: false)
+  *Tiếng Anh*
+
+  [1] libvirt Project, _virsh – management user interface_ (`virsh destroy`), https://libvirt.org/manpages/virsh.html.
+
+  [2] Oracle Corporation, _MySQL 8.4 Reference Manual_, The InnoDB Storage Engine: Doublewrite Buffer; Redo Log; InnoDB Recovery, https://dev.mysql.com/doc/refman/8.4/en/.
+
+  [3] PostgreSQL Global Development Group, _PostgreSQL 16 Documentation_, Reliability and the Write-Ahead Log; pg_waldump; amcheck, https://www.postgresql.org/docs/16/.
+
+  [4] A. Silberschatz, H. F. Korth, S. Sudarshan, _Database System Concepts_, 7th ed., McGraw-Hill, 2019, chapters Physical Storage Systems and Recovery System.
 ]
